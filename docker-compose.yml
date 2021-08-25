@@ -67,6 +67,7 @@ services:
                 depends_on: [ tor, manager ]
                 volumes:
                         - ${PWD}/lnd:/data/.lnd
+                        - ${PWD}/walletpassword:/walletpassword
                 environment:
                   HOME: /data
                 restart: on-failure
@@ -80,6 +81,7 @@ services:
                         ipv4_address: $LND_IP
         dashboard:
                 container_name: dashboard
+                #image: communitybitcoinnode/dashboard:main@sha256:8369e13b26cd4d97dc827298fa866985bd4faf6f5fa5228c3f9152d393def1c7
                 image: getumbrel/dashboard:v0.3.25@sha256:03ac7a94d08f2e678e494baf748152a4d6905d2b4dd1726ae55e3c5b154bec62
                 restart: on-failure
                 stop_grace_period: 1m30s
@@ -88,7 +90,7 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: getumbrel/manager:v0.2.13@sha256:cb0c7a66de89c0a8b8c8e292086f9508f19a8c63c7e962d7f97723c4fd8ec367
+                image: communitybitcoinnode/manager:main@sha256:292a88ffbf9dd73774c2d07d7e0bddeeac7ae78810f80aa1377c0bac4f46fa87
                 depends_on: [ tor ]
                 restart: on-failure
                 stop_grace_period: 5m30s
@@ -129,7 +131,8 @@ services:
                     LND_ADMIN_MACAROON_FILE: "/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon"
                     SHUTDOWN_SIGNAL_FILE: "/signals/shutdown"
                     REBOOT_SIGNAL_FILE: "/signals/reboot"
-                    GITHUB_REPO: "getumbrel/umbrel"
+                    GITHUB_REPO: "runcitadel/compose-nonfree"
+                    GITHUB_BRANCH: "main"
                     UMBREL_VERSION_FILE: "/info.json"
                     UPDATE_STATUS_FILE: "/statuses/update-status.json"
                     UPDATE_SIGNAL_FILE: "/signals/update"
@@ -145,7 +148,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: getumbrel/middleware:v0.1.12@sha256:2d689fbf9248d638a772f77c85e3fbf92c6bf69134533cbe4b450d80b2319c92
+                image: communitybitcoinnode/middleware:main@sha256:575bd3067d109079e1bd188d7432bf2aa3407f48aac4ec2e58f7479d58198a6d
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
@@ -167,7 +170,7 @@ services:
                         ipv4_address: $MIDDLEWARE_IP
         neutrino-switcher:
                 container_name: neutrino-switcher
-                image: getumbrel/neutrino-switcher:v1.3.0@sha256:399ccea7f39129ff16c9c408f9e68a01dd4671f428273f3c3f401a8a0d2f7ddc
+                image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
                 depends_on: [ bitcoin, lnd ]
                 restart: on-failure
                 volumes:

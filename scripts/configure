@@ -260,7 +260,7 @@ def replace_vars(file_path):
 
 templates_to_build = {
   "./templates/torrc-apps-sample": "./tor/torrc-apps",
-  "./templates/torrc-apps-sample": "./tor/torrc-apps-2",
+  "./templates/torrc-apps-2-sample": "./tor/torrc-apps-2",
   "./templates/torrc-umbrel-sample": "./tor/torrc-umbrel",
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
