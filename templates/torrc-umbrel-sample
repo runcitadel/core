@@ -32,4 +32,5 @@ HiddenServicePort <lnd-rest-port> <lnd-ip>:<lnd-rest-port>
 HiddenServiceDir /var/lib/tor/lnd-grpc
 HiddenServicePort <lnd-grpc-port> <lnd-ip>:<lnd-grpc-port>
 
-HashedControlPassword <password>
+HashedControlPassword <tor-hashed-password>
+

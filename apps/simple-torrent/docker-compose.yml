@@ -6,9 +6,9 @@ services:
     user: "1000:1000"
     restart: on-failure
     ports:
-      - "${APP_SIMPLETORRENT_PORT}:${APP_SIMPLETORRENT_PORT}"
+      - "${APP_SIMPLE_TORRENT_PORT}:${APP_SIMPLE_TORRENT_PORT}"
     command: >
-      --port=${APP_SIMPLETORRENT_PORT}
+      --port=${APP_SIMPLE_TORRENT_PORT}
       --config-path /config/simple-torrent.json
     volumes:
       - ${APP_DATA_DIR}/data/torrents:/torrents
@@ -16,4 +16,4 @@ services:
       - ${APP_DATA_DIR}/data/config:/config
     networks:
       default:
-        ipv4_address: $APP_SIMPLETORRENT_IP
+        ipv4_address: $APP_SIMPLE_TORRENT_IP
