@@ -90,7 +90,7 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: communitybitcoinnode/manager:main@sha256:292a88ffbf9dd73774c2d07d7e0bddeeac7ae78810f80aa1377c0bac4f46fa87
+                image: communitybitcoinnode/manager:main@sha256:107aeb42c26b6d64613c598133332d7a3bb2f4f43ebb0eb05583d5b8825f88e8
                 depends_on: [ tor ]
                 restart: on-failure
                 stop_grace_period: 5m30s
@@ -148,7 +148,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: communitybitcoinnode/middleware:main@sha256:575bd3067d109079e1bd188d7432bf2aa3407f48aac4ec2e58f7479d58198a6d
+                image: communitybitcoinnode/middleware:main@sha256:6862a380b48eb88765783af1c7663fee31887103b431eed7c65fa3d0a4ae20bb
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
