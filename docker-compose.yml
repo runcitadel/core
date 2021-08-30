@@ -90,7 +90,7 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: communitybitcoinnode/manager:main@sha256:107aeb42c26b6d64613c598133332d7a3bb2f4f43ebb0eb05583d5b8825f88e8
+                image: communitybitcoinnode/manager:main@sha256:a151fd034346f4e9bae3dd78110e3877c193303f431643ac45b3ee30773a5148
                 depends_on: [ tor ]
                 restart: on-failure
                 stop_grace_period: 5m30s
