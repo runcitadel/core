@@ -19,8 +19,8 @@ metadata:
   developer: Dan Janosik
   website: https://explorer.btc21.org
   dependencies:
-  - bitcoind
   - electrum
+  - bitcoind
   repo: https://github.com/janoside/btc-rpc-explorer
   support: https://github.com/janoside/btc-rpc-explorer/discussions
   port: 3002
@@ -53,5 +53,6 @@ containers:
     BTCEXP_BASIC_AUTH_PASSWORD: ''
   name: web
   permissions:
+  - electrum
   - bitcoind
   ip: $APP_BTC_RPC_EXPLORER_IP

@@ -51,5 +51,4 @@ containers:
   - data:/data
   permissions:
   - lnd
-  - bitcoind
   ip: $APP_LNBITS_IP

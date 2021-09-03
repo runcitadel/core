@@ -22,8 +22,8 @@ metadata:
   developer: BTCPay Server Foundation
   website: https://btcpayserver.org
   dependencies:
-  - bitcoind
   - lnd
+  - bitcoind
   repo: https://github.com/btcpayserver/btcpayserver
   support: https://chat.btcpayserver.org
   port: 3003
@@ -85,7 +85,6 @@ containers:
   - data/btcpay:/data
   permissions:
   - lnd
-  - bitcoind
   ip: $APP_BTCPAY_SERVER_IP
 - image: postgres:9.6.20@sha256:82c335ccb6b60941cb860cbb8252c12f63fd3e27a0d15bce5bc6de110c02a2b4
   user: 1000:1000
