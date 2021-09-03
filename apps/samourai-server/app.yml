@@ -49,6 +49,7 @@ containers:
     MYSQL_ROOT_PASSWORD: rootpassword
     MYSQL_USER: samourai
     MYSQL_PASSWORD: password
+  ip: $APP_SAMOURAI_SERVER_DB_IP
 - image: louneskmt/dojo-nodejs:1.10.1@sha256:d1460df18df091837718fcd0a6d3850e2f1a4a49da5914a697648c40d5477184
   init: true
   restart: on-failure
@@ -96,6 +97,7 @@ containers:
     INDEXER_IP: $ELECTRUM_IP
     INDEXER_RPC_PORT: $ELECTRUM_PORT
     INDEXER_BATCH_SUPPORT: inactive
+  ip: $APP_SAMOURAI_SERVER_NODE_IP
 - image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
   init: true
   restart: on-failure
@@ -120,6 +122,7 @@ containers:
     WHIRLPOOL_BITCOIN_NETWORK: $BITCOIN_NETWORK
     WHIRLPOOL_DOJO: 'on'
     WHIRLPOOL_DOJO_IP: $APP_SAMOURAI_SERVER_IP
+  ip: $APP_SAMOURAI_SERVER_WHIRLPOOL_IP
 - image: nginx:1.19-alpine@sha256:c2ce58e024275728b00a554ac25628af25c54782865b3487b11c21cafb7fabda
   init: true
   restart: on-failure
@@ -145,3 +148,4 @@ containers:
     NODE_PREFIX_SUPPORT: support
     NODE_ADMIN_KEY: $SAMOURAI_SERVER_NODE_ADMIN_KEY
     WHIRLPOOL_API_KEY: $SAMOURAI_SERVER_WHIRLPOOL_API_KEY
+  ip: $APP_SAMOURAI_SERVER_IP

@@ -60,6 +60,7 @@ containers:
   env:
     FRONTEND_HTTP_PORT: $APP_MEMPOOL_PORT
     BACKEND_MAINNET_HTTP_HOST: $APP_MEMPOOL_API_IP
+  ip: $APP_MEMPOOL_IP
 - image: mempool/backend:v2.2.1@sha256:175f33ab2e96319c2730c020f28207cef9d1f4cb330eab4f40fa4721d01fa272
   user: 1000:1000
   init: true
@@ -85,6 +86,7 @@ containers:
     BACKEND_MAINNET_HTTP_PORT: '8999'
     CACHE_DIR: /backend/cache
     MEMPOOL_CLEAR_PROTECTION_MINUTES: '20'
+  ip: $APP_MEMPOOL_API_IP
 - image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
   user: 1000:1000
   restart: on-failure
@@ -98,3 +100,4 @@ containers:
     MYSQL_USER: mempool
     MYSQL_PASSWORD: mempool
     MYSQL_ROOT_PASSWORD: moneyprintergobrrr
+  ip: $APP_MEMPOOL_DB_IP

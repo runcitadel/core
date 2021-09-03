@@ -51,3 +51,4 @@ containers:
     TLS_LOCATION: /lnd/tls.cert
     MACAROON_LOCATION: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
     LND_LOG_LOCATION: /lnd/logs/bitcoin/${BITCOIN_NETWORK}/lnd.log
+  ip: $APP_SPHINX_RELAY_IP

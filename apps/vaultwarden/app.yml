@@ -40,3 +40,4 @@ containers:
   - data:/data
   env:
     ROCKET_PORT: ${APP_VAULTWARDEN_PORT}
+  ip: $APP_VAULTWARDEN_IP

@@ -54,3 +54,4 @@ containers:
   - data/config:/config
   - data/downloads:/downloads
   - data/torrents:/torrents
+  ip: $APP_SIMPLE_TORRENT_IP

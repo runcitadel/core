@@ -42,3 +42,4 @@ containers:
   env:
   - VIRTUAL_HOST=${APP_DOMAIN}
   - WEBPASSWORD=moneyprintergobrrr
+  ip: $APP_PI_HOLE_IP

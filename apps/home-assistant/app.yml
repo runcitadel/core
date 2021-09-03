@@ -34,3 +34,4 @@ containers:
   name: server
   data:
   - data:/config
+  ip: $APP_HOME_ASSISTANT_IP

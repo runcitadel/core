@@ -52,6 +52,7 @@ containers:
     NBXPLORER_BTCNODEENDPOINT: $BITCOIN_IP:$BITCOIN_P2P_PORT
     NBXPLORER_BTCRPCUSER: $BITCOIN_RPC_USER
     NBXPLORER_BTCRPCPASSWORD: $BITCOIN_RPC_PASS
+  ip: $APP_BTCPAY_SERVER_NBXPLORER_IP
 - image: btcpayserver/btcpayserver:1.2.1@sha256:8c1b890d720e81164d0215b04a1ff6533093397ec4d067e00e12fed7c045e413
   user: 1000:1000
   restart: on-failure
@@ -82,6 +83,7 @@ containers:
     BTCPAY_BTCEXPLORERURL: http://$APP_BTCPAY_SERVER_NBXPLORER_IP:32838
     BTCPAY_BTCLIGHTNING: type=lnd-rest;server=https://$LND_IP:$LND_REST_PORT/;macaroonfilepath=/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon;allowinsecure=true
     BTCPAY_SOCKSENDPOINT: $TOR_PROXY_IP:$TOR_PROXY_PORT
+  ip: $APP_BTCPAY_SERVER_IP
 - image: postgres:9.6.20@sha256:82c335ccb6b60941cb860cbb8252c12f63fd3e27a0d15bce5bc6de110c02a2b4
   user: 1000:1000
   restart: on-failure
@@ -91,3 +93,4 @@ containers:
   - data/postgres:/var/lib/postgresql/data
   env:
     POSTGRES_HOST_AUTH_METHOD: trust
+  ip: $APP_BTCPAY_SERVER_DB_IP

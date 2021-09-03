@@ -61,3 +61,4 @@ containers:
     SYNAPSE_REPORT_STATS: 'yes'
     SYNAPSE_ENABLE_REGISTRATION: 'yes'
     SYNAPSE_NO_TLS: 'yes'
+  ip: $APP_SYNAPSE_IP

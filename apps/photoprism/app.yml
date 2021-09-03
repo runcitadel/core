@@ -60,6 +60,7 @@ containers:
     PHOTOPRISM_SITE_CAPTION: Digital Asset Management
     PHOTOPRISM_SITE_DESCRIPTION: ''
     PHOTOPRISM_SITE_AUTHOR: ''
+  ip: ${APP_PHOTOPRISM_IP}
 - image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
   user: 1000:1000
   restart: on-failure
@@ -75,3 +76,4 @@ containers:
     MYSQL_DATABASE: photoprism
     MYSQL_USER: photoprism
     MYSQL_PASSWORD: photoprism
+  ip: ${APP_PHOTOPRISM_DB_IP}

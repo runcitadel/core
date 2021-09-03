@@ -52,3 +52,4 @@ containers:
     BTCEXP_NO_RATES: 'true'
     BTCEXP_RPC_ALLOWALL: 'false'
     BTCEXP_BASIC_AUTH_PASSWORD: ''
+  ip: $APP_BTC_RPC_EXPLORER_IP

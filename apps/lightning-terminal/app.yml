@@ -53,3 +53,4 @@ containers:
   - lnd
   env:
     HOME: /data
+  ip: $APP_LIGHTNING_TERMINAL_IP

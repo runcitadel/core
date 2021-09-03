@@ -51,3 +51,4 @@ containers:
     LNBITS_SITE_TITLE: LNbits - Umbrel
     LNBITS_DEFAULT_WALLET_NAME: LNbits wallet
     LNBITS_DISABLED_EXTENSIONS: amilk
+  ip: $APP_LNBITS_IP

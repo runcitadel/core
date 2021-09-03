@@ -33,6 +33,7 @@ containers:
   name: redis
   data:
   - data/redis:/data
+  ip: ${APP_BLUEWALLET_REDIS_IP}
 - image: bluewalletorganization/lndhub:v1.3.3@sha256:b99408dfb53f503def405668f5fc4d8185de39a87843d4ea8774544a5df1fe36
   user: 1000:1000
   depends_on:
@@ -54,3 +55,4 @@ containers:
     CONFIG: '{ "rateLimit": 10000, "postRateLimit": 10000, "redis": { "port": 6379,
       "host": "$APP_BLUEWALLET_REDIS_IP", "family": 4, "password": "moneyprintergobrrr",
       "db": 0 }, "lnd": { "url": "$LND_IP:$LND_GRPC_PORT", "password": ""}}'
+  ip: ${APP_BLUEWALLET_LNDHUB_IP}

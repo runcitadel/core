@@ -36,3 +36,4 @@ containers:
   - data:/home/coder
   env:
     PASSWORD: moneyprintergobrrr
+  ip: $APP_CODE_SERVER_IP

@@ -40,3 +40,4 @@ containers:
   ports:
   - $APP_ELEMENT_PORT:80
   name: web
+  ip: $APP_ELEMENT_IP

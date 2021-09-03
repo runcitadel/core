@@ -45,3 +45,4 @@ containers:
     ACCOUNT_CONFIG_PATH: /data/thubConfig.yaml
     YML_ENV_1: $LND_IP:$LND_GRPC_PORT
     TOR_PROXY_SERVER: socks://$TOR_PROXY_IP:$TOR_PROXY_PORT
+  ip: $APP_THUNDERHUB_IP
