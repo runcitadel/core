@@ -346,7 +346,8 @@
         "developer": "Shahana and Suheb",
         "website": "https://github.com/Ride-The-Lightning/RTL",
         "dependencies": [
-            "lnd"
+            "lnd",
+            "bitcoind"
         ],
         "repo": "https://github.com/Ride-The-Lightning/RTL",
         "support": "https://github.com/Ride-The-Lightning/RTL/issues/new",
