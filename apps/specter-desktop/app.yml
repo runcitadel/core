@@ -54,13 +54,13 @@ containers:
   command:
   - --host=0.0.0.0
   - --specter-data-folder=/data
-  name: web
-  data:
-  - data:/data
-  env:
+  environment:
     BTC_RPC_USER: $BITCOIN_RPC_USER
     BTC_RPC_PASSWORD: $BITCOIN_RPC_PASS
     BTC_RPC_HOST: $BITCOIN_IP
     BTC_RPC_PORT: $BITCOIN_RPC_PORT
     BTC_RPC_PROTOCOL: http
+  name: web
+  data:
+  - data:/data
   ip: $APP_SPECTER_DESKTOP_IP

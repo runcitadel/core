@@ -35,9 +35,9 @@ containers:
   stop_grace_period: 1m
   ports:
   - $APP_VAULTWARDEN_PORT:$APP_VAULTWARDEN_PORT
+  environment:
+    ROCKET_PORT: ${APP_VAULTWARDEN_PORT}
   name: server
   data:
   - data:/data
-  env:
-    ROCKET_PORT: ${APP_VAULTWARDEN_PORT}
   ip: $APP_VAULTWARDEN_IP

@@ -35,11 +35,11 @@ containers:
   - 3233
   - 53:53/udp
   - ${APP_PI_HOLE_PORT}:80
+  environment:
+  - VIRTUAL_HOST=${APP_DOMAIN}
+  - WEBPASSWORD=moneyprintergobrrr
   name: server
   data:
   - data/dnsmasq:/etc/dnsmasq.d/
   - data/pihole:/etc/pihole/
-  env:
-  - VIRTUAL_HOST=${APP_DOMAIN}
-  - WEBPASSWORD=moneyprintergobrrr
   ip: $APP_PI_HOLE_IP

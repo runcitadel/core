@@ -34,15 +34,15 @@ containers:
   stop_grace_period: 1m
   ports:
   - $APP_THUNDERHUB_PORT:$APP_THUNDERHUB_PORT
-  name: web
-  data:
-  - data:/data
-  permissions:
-  - lnd
-  env:
+  environment:
     NO_VERSION_CHECK: 'true'
     LOG_LEVEL: debug
     ACCOUNT_CONFIG_PATH: /data/thubConfig.yaml
     YML_ENV_1: $LND_IP:$LND_GRPC_PORT
     TOR_PROXY_SERVER: socks://$TOR_PROXY_IP:$TOR_PROXY_PORT
+  name: web
+  data:
+  - data:/data
+  permissions:
+  - lnd
   ip: $APP_THUNDERHUB_IP

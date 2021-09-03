@@ -36,8 +36,7 @@ containers:
   stop_grace_period: 1m
   ports:
   - $APP_BTC_RPC_EXPLORER_PORT:$APP_BTC_RPC_EXPLORER_PORT
-  name: web
-  env:
+  environment:
     BTCEXP_HOST: 0.0.0.0
     BTCEXP_BITCOIND_HOST: $BITCOIN_IP
     BTCEXP_BITCOIND_PORT: $BITCOIN_RPC_PORT
@@ -52,4 +51,5 @@ containers:
     BTCEXP_NO_RATES: 'true'
     BTCEXP_RPC_ALLOWALL: 'false'
     BTCEXP_BASIC_AUTH_PASSWORD: ''
+  name: web
   ip: $APP_BTC_RPC_EXPLORER_IP

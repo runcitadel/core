@@ -38,27 +38,24 @@ containers:
   restart: on-failure
   stop_grace_period: 5m
   user: 1000:1000
+  environment:
+    MYSQL_DATABASE: samourai-main
+    MYSQL_ROOT_PASSWORD: rootpassword
+    MYSQL_USER: samourai
+    MYSQL_PASSWORD: password
   name: db
   data:
   - mysql/update-db.sh:/update-db.sh
   - mysql/mysql-dojo.cnf:/etc/mysql/conf.d/mysql-dojo.cnf
   - mysql/db-scripts:/docker-entrypoint-initdb.d
   - mysql/data:/var/lib/mysql
-  env:
-    MYSQL_DATABASE: samourai-main
-    MYSQL_ROOT_PASSWORD: rootpassword
-    MYSQL_USER: samourai
-    MYSQL_PASSWORD: password
   ip: $APP_SAMOURAI_SERVER_DB_IP
 - image: louneskmt/dojo-nodejs:1.10.1@sha256:d1460df18df091837718fcd0a6d3850e2f1a4a49da5914a697648c40d5477184
   init: true
   restart: on-failure
   command: /home/node/app/wait-for-it.sh db:3306 --timeout=720 --strict -- /home/node/app/restart.sh
   user: 1000:1000
-  depends_on:
-  - db
-  name: node
-  env:
+  environment:
     COMMON_BTC_NETWORK: $BITCOIN_NETWORK
     DOJO_NODEJS_VERSION_TAG: 1.10.1
     NET_DOJO_TOR_IPV4: $TOR_PROXY_IP
@@ -97,6 +94,9 @@ containers:
     INDEXER_IP: $ELECTRUM_IP
     INDEXER_RPC_PORT: $ELECTRUM_PORT
     INDEXER_BATCH_SUPPORT: inactive
+  depends_on:
+  - db
+  name: node
   ip: $APP_SAMOURAI_SERVER_NODE_IP
 - image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
   init: true
@@ -115,19 +115,27 @@ containers:
   - --cli.mix.liquidityClient=true
   - --cli.mix.clientsPerPool=1
   - --resync
-  name: whirlpool
-  data:
-  - whirlpool:/home/whirlpool/.whirlpool-cli
-  env:
+  environment:
     WHIRLPOOL_BITCOIN_NETWORK: $BITCOIN_NETWORK
     WHIRLPOOL_DOJO: 'on'
     WHIRLPOOL_DOJO_IP: $APP_SAMOURAI_SERVER_IP
+  name: whirlpool
+  data:
+  - whirlpool:/home/whirlpool/.whirlpool-cli
   ip: $APP_SAMOURAI_SERVER_WHIRLPOOL_IP
 - image: nginx:1.19-alpine@sha256:c2ce58e024275728b00a554ac25628af25c54782865b3487b11c21cafb7fabda
   init: true
   restart: on-failure
   command: /bin/sh -c "envsubst < /var/www/connect/js/conf.template.js > /var/www/connect/js/conf.js
     && /wait-for node:8080 --timeout=720 -- nginx"
+  environment:
+    COMMON_BTC_NETWORK: $BITCOIN_NETWORK
+    DOJO_LOCAL_PORT: $APP_SAMOURAI_SERVER_DOJO_PORT
+    DOJO_HIDDEN_SERVICE: $SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE
+    WHIRLPOOL_HIDDEN_SERVICE: $SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE
+    NODE_PREFIX_SUPPORT: support
+    NODE_ADMIN_KEY: $SAMOURAI_SERVER_NODE_ADMIN_KEY
+    WHIRLPOOL_API_KEY: $SAMOURAI_SERVER_WHIRLPOOL_API_KEY
   ports:
   - $APP_SAMOURAI_SERVER_DOJO_PORT:80
   - $APP_SAMOURAI_SERVER_CONNECT_PORT:8081
@@ -140,12 +148,4 @@ containers:
   - nginx/${BITCOIN_NETWORK}.conf:/etc/nginx/sites-enabled/dojo.conf
   - nginx/nginx.conf:/etc/nginx/nginx.conf
   - nginx/wait-for:/wait-for
-  env:
-    COMMON_BTC_NETWORK: $BITCOIN_NETWORK
-    DOJO_LOCAL_PORT: $APP_SAMOURAI_SERVER_DOJO_PORT
-    DOJO_HIDDEN_SERVICE: $SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE
-    WHIRLPOOL_HIDDEN_SERVICE: $SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE
-    NODE_PREFIX_SUPPORT: support
-    NODE_ADMIN_KEY: $SAMOURAI_SERVER_NODE_ADMIN_KEY
-    WHIRLPOOL_API_KEY: $SAMOURAI_SERVER_WHIRLPOOL_API_KEY
   ip: $APP_SAMOURAI_SERVER_IP

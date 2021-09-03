@@ -47,11 +47,7 @@ containers:
   ports:
   - ${APP_GITEA_PORT}:${APP_GITEA_PORT}
   - ${APP_GITEA_SSH_PORT}:${APP_GITEA_SSH_PORT}
-  name: server
-  data:
-  - data/gitea/config:/etc/gitea
-  - data/gitea/data:/var/lib/gitea
-  env:
+  environment:
     GITEA__security__INSTALL_LOCK: 'true'
     GITEA__server__DOMAIN: ${APP_DOMAIN}
     GITEA__server__HTTP_PORT: ${APP_GITEA_PORT}
@@ -64,16 +60,20 @@ containers:
     GITEA__database__NAME: gitea
     GITEA__database__USER: gitea
     GITEA__database__PASSWD: moneyprintergobrrr
+  name: server
+  data:
+  - data/gitea/config:/etc/gitea
+  - data/gitea/data:/var/lib/gitea
   ip: $APP_GITEA_IP
 - image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
   user: 1000:1000
   restart: on-failure
-  name: db
-  data:
-  - data/db:/var/lib/mysql
-  env:
+  environment:
     MYSQL_ROOT_PASSWORD: gitea
     MYSQL_USER: gitea
     MYSQL_PASSWORD: moneyprintergobrrr
     MYSQL_DATABASE: gitea
+  name: db
+  data:
+  - data/db:/var/lib/mysql
   ip: $APP_GITEA_DB_IP

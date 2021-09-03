@@ -43,11 +43,7 @@ containers:
   init: true
   ports:
   - ${APP_BLUEWALLET_LNDHUB_PORT}:${APP_BLUEWALLET_LNDHUB_PORT}
-  name: lndhub
-  data: []
-  permissions:
-  - lnd
-  env:
+  environment:
     PORT: ${APP_BLUEWALLET_LNDHUB_PORT}
     TOR_URL: ${APP_HIDDEN_SERVICE}
     LND_CERT_FILE: /lnd/tls.cert
@@ -55,4 +51,8 @@ containers:
     CONFIG: '{ "rateLimit": 10000, "postRateLimit": 10000, "redis": { "port": 6379,
       "host": "$APP_BLUEWALLET_REDIS_IP", "family": 4, "password": "moneyprintergobrrr",
       "db": 0 }, "lnd": { "url": "$LND_IP:$LND_GRPC_PORT", "password": ""}}'
+  name: lndhub
+  data: []
+  permissions:
+  - lnd
   ip: ${APP_BLUEWALLET_LNDHUB_IP}

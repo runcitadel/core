@@ -39,6 +39,8 @@ containers:
   stop_grace_period: 1m
   ports:
   - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
+  environment:
+    HOME: /data
   command:
   - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
   - --network="$BITCOIN_NETWORK"
@@ -51,6 +53,4 @@ containers:
   - data:/data
   permissions:
   - lnd
-  env:
-    HOME: /data
   ip: $APP_LIGHTNING_TERMINAL_IP

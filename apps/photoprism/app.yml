@@ -41,11 +41,7 @@ containers:
   stop_grace_period: 1m
   ports:
   - ${APP_PHOTOPRISM_PORT}:${APP_PHOTOPRISM_PORT}
-  name: web
-  data:
-  - storage:/photoprism/storage
-  - originals:/photoprism/originals
-  env:
+  environment:
     PHOTOPRISM_ADMIN_PASSWORD: moneyprintergobrrr
     PHOTOPRISM_ORIGINALS_LIMIT: 10000
     PHOTOPRISM_HTTP_COMPRESSION: gzip
@@ -60,6 +56,10 @@ containers:
     PHOTOPRISM_SITE_CAPTION: Digital Asset Management
     PHOTOPRISM_SITE_DESCRIPTION: ''
     PHOTOPRISM_SITE_AUTHOR: ''
+  name: web
+  data:
+  - storage:/photoprism/storage
+  - originals:/photoprism/originals
   ip: ${APP_PHOTOPRISM_IP}
 - image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
   user: 1000:1000
@@ -68,12 +68,12 @@ containers:
   command: mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4
     --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF
     --innodb-lock-wait-timeout=50
-  name: db
-  data:
-  - database:/var/lib/mysql
-  env:
+  environment:
     MYSQL_ROOT_PASSWORD: photoprism
     MYSQL_DATABASE: photoprism
     MYSQL_USER: photoprism
     MYSQL_PASSWORD: photoprism
+  name: db
+  data:
+  - database:/var/lib/mysql
   ip: ${APP_PHOTOPRISM_DB_IP}

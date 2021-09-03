@@ -35,12 +35,7 @@ containers:
   stop_grace_period: 1m
   ports:
   - $APP_LNBITS_PORT:$APP_LNBITS_PORT
-  name: web
-  data:
-  - data:/data
-  permissions:
-  - lnd
-  env:
+  environment:
     LNBITS_BIND: 0.0.0.0:$APP_LNBITS_PORT
     LNBITS_DATA_FOLDER: /data
     LNBITS_BACKEND_WALLET_CLASS: LndWallet
@@ -51,4 +46,9 @@ containers:
     LNBITS_SITE_TITLE: LNbits - Umbrel
     LNBITS_DEFAULT_WALLET_NAME: LNbits wallet
     LNBITS_DISABLED_EXTENSIONS: amilk
+  name: web
+  data:
+  - data:/data
+  permissions:
+  - lnd
   ip: $APP_LNBITS_IP

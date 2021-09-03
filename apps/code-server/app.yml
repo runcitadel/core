@@ -31,9 +31,9 @@ containers:
   user: 1000:1000
   ports:
   - ${APP_CODE_SERVER_PORT}:8080
+  environment:
+    PASSWORD: moneyprintergobrrr
   name: server
   data:
   - data:/home/coder
-  env:
-    PASSWORD: moneyprintergobrrr
   ip: $APP_CODE_SERVER_IP

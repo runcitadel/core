@@ -50,10 +50,7 @@ containers:
   - $APP_SYNAPSE_PORT:$APP_SYNAPSE_PORT
   entrypoint: bash
   command: -c './start.py generate && ./start.py migrate_config && exec ./start.py'
-  name: server
-  data:
-  - data/synapse:/data
-  env:
+  environment:
     UID: '1000'
     GID: '1000'
     SYNAPSE_HTTP_PORT: ${APP_SYNAPSE_PORT}
@@ -61,4 +58,7 @@ containers:
     SYNAPSE_REPORT_STATS: 'yes'
     SYNAPSE_ENABLE_REGISTRATION: 'yes'
     SYNAPSE_NO_TLS: 'yes'
+  name: server
+  data:
+  - data/synapse:/data
   ip: $APP_SYNAPSE_IP
