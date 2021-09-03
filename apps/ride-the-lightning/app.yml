@@ -1,0 +1,85 @@
+metadata:
+  id: ride-the-lightning
+  category: Lightning Node Management
+  name: Ride The Lightning
+  version: 0.11.0
+  tagline: A powerful dashboard for the Lightning Network
+  description: 'RTL is a full function, device agnostic, web user interface to help
+    manage lightning node operation. It enables full control over your lightning node
+    with rich functionality for Bitcoin base layer and Lightning Network. Some cool
+    features available on RTL are:
+
+
+    - Rich dashboard with two layout options
+
+    - Send/Receive funds on-chain
+
+    - Rich channel management with advanced features like balance score, circular
+    re-balancing etc.
+
+    - Payments and Invoice management with QR codes
+
+    - Routing analysis for the payments forwarded
+
+    - Channel backups
+
+    - Detailed reports on routing and transaction history
+
+    - Optional Loop interface for submarine swaps
+
+    - Customizable UI with multiple color schemes and dark/light modes'
+  developer: Shahana and Suheb
+  website: https://github.com/Ride-The-Lightning/RTL
+  dependencies:
+  - lnd
+  - bitcoind
+  repo: https://github.com/Ride-The-Lightning/RTL
+  support: https://github.com/Ride-The-Lightning/RTL/issues/new
+  port: 3001
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: ''
+  defaultPassword: moneyprintergobrrr
+containers:
+- image: shahanafarooqui/rtl:0.11.0@sha256:d0cd3d868acab40352bc3c8f4b62e49a7ae833878ac09d64debffdddfc063322
+  user: 1000:1000
+  restart: on-failure
+  stop_grace_period: 1m
+  ports:
+  - $APP_RIDE_THE_LIGHTNING_PORT:$APP_RIDE_THE_LIGHTNING_PORT
+  name: web
+  data:
+  - loop:/loop
+  - rtl:/data
+  permissions:
+  - bitcoind
+  - lnd
+  env:
+    PORT: $APP_RIDE_THE_LIGHTNING_PORT
+    RTL_CONFIG_PATH: /data
+    CHANNEL_BACKUP_PATH: /data/backup
+    LN_IMPLEMENTATION: LND
+    LN_SERVER_URL: https://$LND_IP:$LND_REST_PORT
+    MACAROON_PATH: /lnd/data/chain/bitcoin/$BITCOIN_NETWORK
+    CONFIG_PATH: /lnd/lnd.conf
+    SWAP_SERVER_URL: https://$APP_RIDE_THE_LIGHTNING_LOOP_IP:8081
+    SWAP_MACAROON_PATH: /loop/.loop/$BITCOIN_NETWORK
+- image: louneskmt/loop:v0.12.1-beta@sha256:f57abd0cbccfaa741d6f0eb301421be1649e7dd42c1fc804a7759d7521866436
+  user: 1000:1000
+  restart: on-failure
+  stop_grace_period: 1m
+  command:
+  - --network=$BITCOIN_NETWORK
+  - --lnd.host="$LND_IP:$LND_GRPC_PORT"
+  - --lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
+  - --lnd.tlspath="/lnd/tls.cert"
+  - --restlisten=0.0.0.0:8081
+  name: loop
+  data:
+  - loop:/data
+  permissions:
+  - lnd
+  env:
+    HOME: /data

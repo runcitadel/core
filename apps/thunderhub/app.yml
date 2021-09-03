@@ -1,0 +1,47 @@
+metadata:
+  id: thunderhub
+  category: Lightning Node Management
+  name: ThunderHub
+  version: 0.12.24
+  tagline: Take full control of your Lightning node
+  description: 'ThunderHub allows you to take full control of your Lightning node
+    with a slick and awesome UI. Explore all the options that ThunderHub has to offer,
+    from sending and receiving Lightning payments, to checking your node''s health
+    statistics, and even more advanced options like channel rebalancing and multi-path
+    lightning payments.
+
+
+    Managing and monitoring your node has never been easier with transaction reports,
+    graphs and a huge assortment of different features all bundled inside of this
+    great tool.'
+  developer: Anthony Potdevin
+  website: https://apotdevin.com
+  dependencies:
+  - lnd
+  repo: https://github.com/apotdevin/thunderhub
+  support: https://t.me/thunderhub
+  port: 3000
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: ''
+  defaultPassword: moneyprintergobrrr
+containers:
+- image: apotdevin/thunderhub:v0.12.24@sha256:ea466edac18a8889d6e59f3697f16612fd25d7c3fffb712098ef337fe1d76f2b
+  user: 1000:1000
+  restart: on-failure
+  stop_grace_period: 1m
+  ports:
+  - $APP_THUNDERHUB_PORT:$APP_THUNDERHUB_PORT
+  name: web
+  data:
+  - data:/data
+  permissions:
+  - lnd
+  env:
+    NO_VERSION_CHECK: 'true'
+    LOG_LEVEL: debug
+    ACCOUNT_CONFIG_PATH: /data/thubConfig.yaml
+    YML_ENV_1: $LND_IP:$LND_GRPC_PORT
+    TOR_PROXY_SERVER: socks://$TOR_PROXY_IP:$TOR_PROXY_PORT
