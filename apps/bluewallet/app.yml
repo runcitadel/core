@@ -55,4 +55,5 @@ containers:
   data: []
   permissions:
   - lnd
+  - bitcoind
   ip: ${APP_BLUEWALLET_LNDHUB_IP}

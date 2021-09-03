@@ -97,6 +97,8 @@ containers:
   depends_on:
   - db
   name: node
+  permissions:
+  - bitcoind
   ip: $APP_SAMOURAI_SERVER_NODE_IP
 - image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
   init: true
@@ -122,6 +124,8 @@ containers:
   name: whirlpool
   data:
   - whirlpool:/home/whirlpool/.whirlpool-cli
+  permissions:
+  - bitcoind
   ip: $APP_SAMOURAI_SERVER_WHIRLPOOL_IP
 - image: nginx:1.19-alpine@sha256:c2ce58e024275728b00a554ac25628af25c54782865b3487b11c21cafb7fabda
   init: true
@@ -148,4 +152,6 @@ containers:
   - nginx/${BITCOIN_NETWORK}.conf:/etc/nginx/sites-enabled/dojo.conf
   - nginx/nginx.conf:/etc/nginx/nginx.conf
   - nginx/wait-for:/wait-for
+  permissions:
+  - bitcoind
   ip: $APP_SAMOURAI_SERVER_IP

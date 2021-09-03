@@ -51,4 +51,5 @@ containers:
   - data:/relay/.lnd/
   permissions:
   - lnd
+  - bitcoind
   ip: $APP_SPHINX_RELAY_IP

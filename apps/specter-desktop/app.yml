@@ -63,4 +63,6 @@ containers:
   name: web
   data:
   - data:/data
+  permissions:
+  - bitcoind
   ip: $APP_SPECTER_DESKTOP_IP

@@ -64,8 +64,8 @@ containers:
   - loop:/loop
   - rtl:/data
   permissions:
-  - bitcoind
   - lnd
+  - bitcoind
   ip: $APP_RIDE_THE_LIGHTNING_IP
 - image: louneskmt/loop:v0.12.1-beta@sha256:f57abd0cbccfaa741d6f0eb301421be1649e7dd42c1fc804a7759d7521866436
   user: 1000:1000

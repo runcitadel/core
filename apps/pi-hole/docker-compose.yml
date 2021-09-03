@@ -8,7 +8,7 @@ services:
     # user: "1000:1000"
     restart: on-failure
     ports:
-      - 53:53
+      - "53:53"
       - 53:53/udp
       - ${APP_PI_HOLE_PORT}:80
     volumes:

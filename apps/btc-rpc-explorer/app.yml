@@ -52,4 +52,6 @@ containers:
     BTCEXP_RPC_ALLOWALL: 'false'
     BTCEXP_BASIC_AUTH_PASSWORD: ''
   name: web
+  permissions:
+  - bitcoind
   ip: $APP_BTC_RPC_EXPLORER_IP
