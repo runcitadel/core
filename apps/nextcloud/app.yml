@@ -2,17 +2,29 @@ metadata:
   id: nextcloud
   category: Files
   name: Nextcloud
-  version: 21.0.2
+  version: 22.1.1
   tagline: Productivity platform that keeps you in control
-  description: "Nextcloud puts your data at your fingertips, under your control. Store\
-    \ your documents, calendar, contacts and photos on your Umbrel instead of some\
-    \ company's data center. Features:\n\n- Mobile and desktop sync \n- Versioning\
-    \ and undelete \n- Galleries and activity feed \n- File editing and preview support\
-    \ for PDF, images, text files, Open Document, Word files and more. \n- Smooth\
-    \ performance and easy user interface. \n- Fine-grained control over access to\
-    \ data and sharing capabilities by user and by group.\n\nNote: After logging in\
-    \ to Nextcloud please change the password to something secure before sharing the\
-    \ address with anyone."
+  description: >-
+    Nextcloud puts your data at your fingertips, under your control. Store
+    your documents, calendar, contacts and photos on your Umbrel instead of some
+    company's data center.
+    Features:
+
+
+    - Mobile and desktop sync 
+
+    - Versioning and undelete 
+
+    - Galleries and activity feed 
+
+    - File editing and preview support for PDF, images, text files, Open Document, Word files and more. 
+
+    - Smooth performance and easy user interface. 
+
+    - Fine-grained control over access to data and sharing capabilities by user and by group.
+
+
+    Note: After logging in to Nextcloud please change the password to something secure before sharing the address with anyone.
   developer: Nextcloud GmbH
   website: https://nextcloud.com
   dependencies: []
@@ -26,8 +38,9 @@ metadata:
   path: /login?user=umbrel
   defaultPassword: moneyprintergobrrr
   torOnly: false
+
 containers:
-- image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
+- image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
   user: 1000:1000
   command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
   restart: on-failure
@@ -47,7 +60,7 @@ containers:
   data:
   - data/redis:/data
   ip: $APP_NEXTCLOUD_REDIS_IP
-- image: nextcloud:22.0.0-apache@sha256:55de721417c16ff110720217406778e16f1b63154d2e8d42fc7913c37dbe6d50
+- image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
   restart: on-failure
   ports:
   - ${APP_NEXTCLOUD_PORT}:80
@@ -67,7 +80,7 @@ containers:
   data:
   - data/nextcloud:/var/www/html
   ip: $APP_NEXTCLOUD_IP
-- image: nextcloud:22.0.0-apache@sha256:55de721417c16ff110720217406778e16f1b63154d2e8d42fc7913c37dbe6d50
+- image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
   restart: on-failure
   entrypoint: /cron.sh
   depends_on:

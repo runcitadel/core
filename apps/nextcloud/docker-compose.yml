@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   db:
-    image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
+    image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
     user: 1000:1000
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: on-failure
@@ -25,7 +25,7 @@ services:
       default:
         ipv4_address: $APP_NEXTCLOUD_REDIS_IP
   web:
-    image: nextcloud:22.0.0-apache@sha256:55de721417c16ff110720217406778e16f1b63154d2e8d42fc7913c37dbe6d50
+    image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
     restart: on-failure
     ports:
     - ${APP_NEXTCLOUD_PORT}:80
@@ -47,7 +47,7 @@ services:
       default:
         ipv4_address: $APP_NEXTCLOUD_IP
   cron:
-    image: nextcloud:22.0.0-apache@sha256:55de721417c16ff110720217406778e16f1b63154d2e8d42fc7913c37dbe6d50
+    image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
     restart: on-failure
     entrypoint: /cron.sh
     depends_on:

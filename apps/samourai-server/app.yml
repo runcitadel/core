@@ -34,7 +34,7 @@ metadata:
   path: ''
   defaultPassword: ''
 containers:
-- image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
+- image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
   init: true
   restart: on-failure
   stop_grace_period: 5m
