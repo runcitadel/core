@@ -2,7 +2,7 @@ metadata:
   id: home-assistant
   category: Automation
   name: Home Assistant
-  version: 2021.06.3
+  version: 2021.9.2
   tagline: Home automation that puts local control & privacy first
   description: "Open source home automation that puts local control and privacy first,\
     \ powered by a worldwide community of tinkerers and DIY enthusiasts. Home Assistant\
@@ -28,7 +28,7 @@ metadata:
   defaultPassword: ''
   torOnly: false
 containers:
-- image: homeassistant/home-assistant:2021.7.4@sha256:ba02887fcde92e57a08e3376479e24cddb62a4198a8f3ff0a6f77f426ecc33da
+- image: homeassistant/home-assistant:2021.9.2@sha256:43b39af7c9c63b933ba4ed17c226c97111c39a4cb379e444099292bdeedfbaff
   ports:
   - ${APP_HOME_ASSISTANT_PORT}:8123
   name: server

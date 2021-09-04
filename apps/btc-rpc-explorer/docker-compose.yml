@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   web:
-    image: getumbrel/btc-rpc-explorer:v3.1.1@sha256:df6810c00cb026a1d8cadaba2f4926f1310b996eebe006d29929fece5bff63bf
+    image: runcitadel/btc-rpc-explorer:v3.2.0@sha256:fabece1bbcf0ceebf4147a905407a8e952dc7a04f148a511375ed4d32915bf5e
     ports:
     - $APP_BTC_RPC_EXPLORER_PORT:$APP_BTC_RPC_EXPLORER_PORT
     environment:

@@ -43,7 +43,7 @@
         "repo": "https://github.com/Ride-The-Lightning/RTL",
         "support": "https://github.com/Ride-The-Lightning/RTL/issues/new",
         "tagline": "A powerful dashboard for the Lightning Network",
-        "version": "0.11.0",
+        "version": "0.11.2",
         "website": "https://github.com/Ride-The-Lightning/RTL"
     },
     {
@@ -88,7 +88,7 @@
         "repo": "https://github.com/cryptoadvance/specter-desktop",
         "support": "https://t.me/spectersupport",
         "tagline": "Multisig with hardware wallets made easy",
-        "version": "1.5.1",
+        "version": "1.6.0",
         "website": "https://specter.solutions"
     },
     {
@@ -132,7 +132,7 @@
         "support": "https://community.home-assistant.io",
         "tagline": "Home automation that puts local control & privacy first",
         "torOnly": false,
-        "version": "2021.06.3",
+        "version": "2021.9.2",
         "website": "https://home-assistant.io"
     },
     {
@@ -226,7 +226,7 @@
         "repo": "https://github.com/janoside/btc-rpc-explorer",
         "support": "https://github.com/janoside/btc-rpc-explorer/discussions",
         "tagline": "Simple, database-free blockchain explorer",
-        "version": "3.1.1",
+        "version": "3.2.0",
         "website": "https://explorer.btc21.org"
     },
     {

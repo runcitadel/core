@@ -2,9 +2,10 @@ metadata:
   id: specter-desktop
   category: Wallets
   name: Specter Desktop
-  version: 1.5.1
+  version: 1.6.0
   tagline: Multisig with hardware wallets made easy
-  description: 'Specter Desktop connects to the Bitcoin Core running on your Umbrel
+  description: >-
+    Specter Desktop connects to the Bitcoin Core running on your Umbrel
     and functions as a watch-only coordinator for multi-signature and single-key Bitcoin
     wallets. At the moment Specter Desktop is working with all major hardware wallets
     including:
@@ -30,7 +31,7 @@ metadata:
     Specter Desktop also supports using the Bitcoin Core on your Umbrel as a hot wallet,
     by importing or generating a random BIP39 mnemonic, but this feature is experimental
     and we do not recommend using it at this stage. We plan to add support for other
-    hardware wallets as they come up.'
+    hardware wallets as they come up.
   developer: Crypto Advance
   website: https://specter.solutions
   dependencies:
@@ -45,7 +46,7 @@ metadata:
   path: ''
   defaultPassword: ''
 containers:
-- image: lncm/specter-desktop:v1.5.1@sha256:fcfd2d5b5808c48717af7830b6da92606fbd7f5edcdd62b5766a0cb2f08f2ffe
+- image: lncm/specter-desktop:v1.6.0@sha256:d641f3f81f2450e4f36803b39dc061a999f48eed8a8c4a1de4110391115938b0
   stop_signal: SIGINT
   restart: on-failure
   stop_grace_period: 1m
