@@ -18,7 +18,7 @@ yellow() {
     echo -e "\033[33m$@\033[0m"
 }
 
-echo -n "Running "; yellow "₿itcoin";
+echo -n "Thanks for running #"; yellow "₿itcoin";
 sleep 5
 
 red "Please read the following notes carefully, as it explains details about bugs and other issues in the beta."
@@ -26,21 +26,17 @@ sleep 7
 echo
 echo "Thanks for joining us on the Citadel beta, we're installing the update."
 sleep 3
-echo "There is an ongoing issue with the blocks not being displayed on the dashboard, please be patient, a fix is in development."
+echo "Please do not install an update from the dashboard if it asks you to, or you might go back to Umbrel."
 sleep 3
-echo "Meanwhile, you can use the mempool app to check if the blocks are still being synced."
-sleep 3
-echo "Also, please do NOT install an update from the dashboard if it asks you to, or you might go back to Umbrel."
-sleep 3
-echo "We're sorry for all these issues, and beta 2 next week will fix most of them and include updated apps."
+echo "We're sorry about this issue and ony other potential issues, we're working alpha 3 with more improvements."
 sleep 3
 echo "If you have any questions, please DM us on Twitter."
 sleep 3
-echo "Waiting 60 seconds, if you want to cancel the update, turn your node off using the dashboard now"
+echo "Waiting 10 seconds, if you want to cancel the update, press CTRL+C now."
 
-sleep 60
+sleep 10
 echo
-green "Thanks for testing Citadel! The update will start now."
+green "Thanks for testing Citadel! The upgrade will start now."
 
 echo
 echo "======================================="
