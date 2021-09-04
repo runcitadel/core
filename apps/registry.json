@@ -292,7 +292,6 @@
         "repo": "https://github.com/cdr/code-server",
         "support": "https://github.com/cdr/code-server/discussions",
         "tagline": "Run VS Code on your Umbrel",
-        "torOnly": false,
         "version": "3.10.2",
         "website": "https://coder.com"
     },

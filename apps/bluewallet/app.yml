@@ -4,12 +4,13 @@ metadata:
   name: BlueWallet Lightning
   version: 1.3.3
   tagline: Connect BlueWallet to your Lightning node
-  description: 'Run BlueWallet in the most private and secure way possible by removing
-    3rd parties and connecting it directly to your Umbrel''s Lightning node.
+  description: >-
+    Run BlueWallet in the most private and secure way possible by removing
+    3rd parties and connecting it directly to your Umbrel's Lightning node.
 
 
     You can pair multiple BlueWallet accounts, so your friends and family can pair
-    their BlueWallet with your Umbrel for a trust-minimized setup.'
+    their BlueWallet with your Umbrel for a trust-minimized setup.
   developer: BlueWallet
   website: https://lndhub.io
   dependencies:
@@ -21,26 +22,27 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  path: ''
-  defaultPassword: ''
+
+
 containers:
-- image: redis:6.2.2-buster@sha256:e10f55f92478715698a2cef97c2bbdc48df2a05081edd884938903aa60df6396
-  user: 1000:1000
+- name: redis
+  image: redis:6.2.2-buster@sha256:e10f55f92478715698a2cef97c2bbdc48df2a05081edd884938903aa60df6396
   command: redis-server --requirepass moneyprintergobrrr
-  restart: on-failure
-  stop_grace_period: 1m
-  init: true
-  name: redis
   data:
   - data/redis:/data
   ip: ${APP_BLUEWALLET_REDIS_IP}
-- image: bluewalletorganization/lndhub:v1.3.3@sha256:b99408dfb53f503def405668f5fc4d8185de39a87843d4ea8774544a5df1fe36
   user: 1000:1000
-  depends_on:
-  - redis
   restart: on-failure
   stop_grace_period: 1m
   init: true
+
+
+- name: lndhub
+  image: bluewalletorganization/lndhub:v1.3.3@sha256:b99408dfb53f503def405668f5fc4d8185de39a87843d4ea8774544a5df1fe36
+  permissions:
+  - lnd
+  depends_on:
+  - redis
   ports:
   - ${APP_BLUEWALLET_LNDHUB_PORT}:${APP_BLUEWALLET_LNDHUB_PORT}
   environment:
@@ -48,11 +50,25 @@ containers:
     TOR_URL: ${APP_HIDDEN_SERVICE}
     LND_CERT_FILE: /lnd/tls.cert
     LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
-    CONFIG: '{ "rateLimit": 10000, "postRateLimit": 10000, "redis": { "port": 6379,
-      "host": "$APP_BLUEWALLET_REDIS_IP", "family": 4, "password": "moneyprintergobrrr",
-      "db": 0 }, "lnd": { "url": "$LND_IP:$LND_GRPC_PORT", "password": ""}}'
-  name: lndhub
-  data: []
-  permissions:
-  - lnd
+    CONFIG: >
+      { 
+        "rateLimit": 10000,
+        "postRateLimit": 10000,
+        "redis": {
+          "port": 6379,
+          "host": "$APP_BLUEWALLET_REDIS_IP",
+          "family": 4,
+          "password": "moneyprintergobrrr",
+          "db": 0
+        },
+        "lnd": {
+          "url": "$LND_IP:$LND_GRPC_PORT",
+          "password": ""
+        }
+      }
   ip: ${APP_BLUEWALLET_LNDHUB_IP}
+  # Some stuff for the container to run securely & stop properly
+  user: 1000:1000
+  restart: on-failure
+  stop_grace_period: 1m
+  init: true

@@ -4,7 +4,8 @@ metadata:
   name: BTCPay Server
   version: 1.2.1
   tagline: Accept Bitcoin payments with 0 fees & no 3rd party
-  description: 'BTCPay Server is a payment processor that allows you to receive payments
+  description: >-
+    BTCPay Server is a payment processor that allows you to receive payments
     in Bitcoin (and altcoins) directly, with no fees, transaction cost or a middleman.
     It is a non-custodial invoicing system which eliminates the involvement of a third-party.
 
@@ -18,7 +19,7 @@ metadata:
     You can not only to attach an unlimited number of stores and use the Lightning
     Network but also become a payment processor for others. Thanks to the apps built
     on top of it, you can use BTCPay to receive donations, start a crowdfunding campaign
-    or have an in-store Point of Sale.'
+    or have an in-store Point of Sale.
   developer: BTCPay Server Foundation
   website: https://btcpayserver.org
   dependencies:
@@ -31,10 +32,10 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  path: ''
-  defaultPassword: ''
+
 containers:
-- image: nicolasdorier/nbxplorer:2.1.58@sha256:4b66b2285490aa742925912ea30e0f3b06416271b63a17e0eee0d30df543dfa4
+- name: nbxplorer
+  image: nicolasdorier/nbxplorer:2.1.58@sha256:4b66b2285490aa742925912ea30e0f3b06416271b63a17e0eee0d30df543dfa4
   user: 1000:1000
   restart: on-failure
   stop_grace_period: 1m
@@ -49,16 +50,14 @@ containers:
     NBXPLORER_BTCNODEENDPOINT: $BITCOIN_IP:$BITCOIN_P2P_PORT
     NBXPLORER_BTCRPCUSER: $BITCOIN_RPC_USER
     NBXPLORER_BTCRPCPASSWORD: $BITCOIN_RPC_PASS
-  name: nbxplorer
   data:
   - data/nbxplorer:/data
   permissions:
   - bitcoind
   ip: $APP_BTCPAY_SERVER_NBXPLORER_IP
-- image: btcpayserver/btcpayserver:1.2.1@sha256:8c1b890d720e81164d0215b04a1ff6533093397ec4d067e00e12fed7c045e413
-  user: 1000:1000
-  restart: on-failure
-  stop_grace_period: 1m
+
+- name: web
+  image: btcpayserver/btcpayserver:1.2.1@sha256:8c1b890d720e81164d0215b04a1ff6533093397ec4d067e00e12fed7c045e413
   depends_on:
   - nbxplorer
   - postgres
@@ -72,27 +71,30 @@ containers:
     BTCPAY_DATADIR: /data
     BTCPAY_PLUGINDIR: /data/plugins
     BTCPAY_DOCKERDEPLOYMENT: 'false'
-    BTCPAY_POSTGRES: User ID=postgres;Host=$APP_BTCPAY_SERVER_DB_IP;Port=5432;Database=btcpayserver$BITCOIN_NETWORK
+    BTCPAY_POSTGRES: User ID=postgres;Host=$APP_BTCPAY_SERVER_POSTGRES_IP;Port=5432;Database=btcpayserver$BITCOIN_NETWORK
     BTCPAY_NETWORK: $BITCOIN_NETWORK
     BTCPAY_BIND: 0.0.0.0:$APP_BTCPAY_SERVER_PORT
     BTCPAY_CHAINS: btc
     BTCPAY_BTCEXPLORERURL: http://$APP_BTCPAY_SERVER_NBXPLORER_IP:32838
     BTCPAY_BTCLIGHTNING: type=lnd-rest;server=https://$LND_IP:$LND_REST_PORT/;macaroonfilepath=/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon;allowinsecure=true
     BTCPAY_SOCKSENDPOINT: $TOR_PROXY_IP:$TOR_PROXY_PORT
-  name: web
   data:
   - data/nbxplorer:/data/.nbxplorer
   - data/btcpay:/data
   permissions:
   - lnd
   ip: $APP_BTCPAY_SERVER_IP
-- image: postgres:9.6.20@sha256:82c335ccb6b60941cb860cbb8252c12f63fd3e27a0d15bce5bc6de110c02a2b4
+  user: 1000:1000
+  restart: on-failure
+  stop_grace_period: 1m
+
+- name: postgres
+  image: postgres:9.6.20@sha256:82c335ccb6b60941cb860cbb8252c12f63fd3e27a0d15bce5bc6de110c02a2b4
   user: 1000:1000
   restart: on-failure
   stop_grace_period: 1m
   environment:
     POSTGRES_HOST_AUTH_METHOD: trust
-  name: postgres
   data:
   - data/postgres:/var/lib/postgresql/data
-  ip: $APP_BTCPAY_SERVER_DB_IP
+  ip: $APP_BTCPAY_SERVER_POSTGRES_IP
