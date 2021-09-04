@@ -292,7 +292,7 @@
         "repo": "https://github.com/cdr/code-server",
         "support": "https://github.com/cdr/code-server/discussions",
         "tagline": "Run VS Code on your Umbrel",
-        "version": "3.10.2",
+        "version": "3.11.1",
         "website": "https://coder.com"
     },
     {
@@ -314,7 +314,7 @@
         "support": "https://vaultwarden.discourse.group/",
         "tagline": "Unofficial Bitwarden\u00ae compatible server",
         "torOnly": true,
-        "version": "1.22.1",
+        "version": "1.22.2",
         "website": "https://github.com/dani-garcia"
     },
     {
@@ -359,7 +359,7 @@
         "support": "https://discourse.gitea.io",
         "tagline": "A painless self-hosted Git service",
         "torOnly": false,
-        "version": "1.14.3",
+        "version": "1.15.2",
         "website": "https://gitea.io/en-us/"
     },
     {
@@ -407,7 +407,7 @@
         "repo": "https://github.com/btcpayserver/btcpayserver",
         "support": "https://chat.btcpayserver.org",
         "tagline": "Accept Bitcoin payments with 0 fees & no 3rd party",
-        "version": "1.2.1",
+        "version": "1.2.2",
         "website": "https://btcpayserver.org"
     },
     {
@@ -430,7 +430,7 @@
         "repo": "https://github.com/lnbits/lnbits",
         "support": "https://t.me/lnbits",
         "tagline": "Multi-user wallet management system",
-        "version": "ab446a8",
+        "version": "3b9401e",
         "website": "https://github.com/lnbits/lnbits"
     },
     {
@@ -451,8 +451,7 @@
         "repo": "https://github.com/boypt/simple-torrent",
         "support": "https://github.com/boypt/simple-torrent/issues",
         "tagline": "Download torrents with your Umbrel",
-        "torOnly": false,
-        "version": "1.2.23",
+        "version": "1.3.6",
         "website": "https://github.com/boypt"
     },
     {
@@ -474,7 +473,7 @@
         "support": "https://matrix.to/#/#synapse:matrix.org",
         "tagline": "Matrix reference homeserver",
         "torOnly": false,
-        "version": "1.38.0",
+        "version": "1.41.1",
         "website": "https://matrix.org"
     }
 ]

@@ -2,7 +2,7 @@ metadata:
   id: vaultwarden
   category: Password Managers
   name: Vaultwarden
-  version: 1.22.1
+  version: 1.22.2
   tagline: "Unofficial Bitwarden\xAE compatible server"
   description: "Vaultwarden (formerly known as Bitwarden_RS) is an alternative implementation\
     \ of the Bitwarden\xAE server API written in Rust, compatible with upstream Bitwarden\xAE\

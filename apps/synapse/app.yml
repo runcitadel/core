@@ -2,7 +2,7 @@ metadata:
   id: synapse
   category: Messaging
   name: Synapse
-  version: 1.38.0
+  version: 1.41.1
   tagline: Matrix reference homeserver
   description: 'Synapse is a reference "homeserver" implementation of Matrix from
     the core development team at matrix.org, written in Python/Twisted. It is intended
@@ -42,7 +42,7 @@ metadata:
   defaultPassword: ''
   torOnly: false
 containers:
-- image: matrixdotorg/synapse:v1.39.0@sha256:f2cfc838172a3c8c3f3595a637ba465f0d933049ba48b7c7822cec2f0ccc9d80
+- image: matrixdotorg/synapse:v1.41.1@sha256:4a815afa1fc094d55a9e9a6436790de5dce97993d4165004dd5878f7247a81c3
   user: 1000:1000
   restart: on-failure
   stop_grace_period: 1m
