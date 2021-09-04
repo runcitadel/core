@@ -337,7 +337,7 @@
         "repo": "https://github.com/BlueWallet/LndHub",
         "support": "https://t.me/bluewallet",
         "tagline": "Connect BlueWallet to your Lightning node",
-        "version": "1.3.3",
+        "version": "1.3.5",
         "website": "https://lndhub.io"
     },
     {
