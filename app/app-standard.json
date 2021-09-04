@@ -131,6 +131,10 @@
             "type": "string",
             "description": "The IP address the container should bind to (Should be unique)"
           },
+          "assignip": {
+            "type": "boolean",
+            "description": "Whether the container should be assigned an IP by Citadel"
+          },
           "user": {
             "type": "string",
             "description": "The user the container should run as"

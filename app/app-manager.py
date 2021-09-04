@@ -98,7 +98,7 @@ def download():
 def getApp(app):
     with open(app, 'r') as f:
         app = yaml.safe_load(f)
-    return convertToDockerComposeYML(app)
+    return convertToDockerComposeYML(app, os.path.join(appsDir, "ips.json"), os.path.join(nodeRoot, ".env"))
 
 def compose(app, arguments):
     # Runs a compose command in the app dir

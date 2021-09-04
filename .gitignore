@@ -33,6 +33,7 @@ logs/*
 statuses/*
 tor/*
 app-data/*
+apps/ips.json
 
 # Commit these files
 
