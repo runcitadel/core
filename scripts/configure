@@ -27,10 +27,31 @@ if not is_arm64() and not is_amd64():
   print('Umbrel only works on arm64 and amd64!')
   exit(1)
 
+# Download docker-compose from https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-arm64
+# or https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-amd64
+# and put it in $HOME/.docker/cli-plugins/docker-compose
+def download_docker_compose():
+  # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
+  subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
+  if os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')):
+    return
+  if is_arm64():
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-arm64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  elif is_amd64():
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-amd64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
+
+
 try:
-    subprocess.check_call(['docker-compose', '--version'])
+    subprocess.check_call(['wget', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except:
-    print('Docker-compose is not installed!')
+    print('Wget is not installed!')
+    exit(1)
+
+try:
+    subprocess.check_call(['docker', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+except:
+    print('Docker is not installed!')
     exit(1)
 
 # Switch to UMBREL root directory.
@@ -315,10 +336,13 @@ for template_path, output_path in templates_to_build.items():
   with open(output_path, 'w') as file:
     file.write(replace_vars(template_path))
 
+print("Installing docker-compose")
+print()
+download_docker_compose()
 print("Pulling Docker images")
 print()
 print("This may take a while, please be patient...")
-os.system('docker-compose pull')
+os.system('docker compose pull')
 print("Configuring permissions")
 print()
 os.system('chown -R 1000:1000 {}'.format(UMBREL_ROOT))

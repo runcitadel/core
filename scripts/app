@@ -17,7 +17,7 @@ Commands:
     uninstall                  Removes images and destroys all data for an app
     stop                       Stops an installed app
     start                      Starts an installed app
-    compose                    Passes all arguments to docker-compose
+    compose                    Passes all arguments to docker compose
     ls-installed               Lists installed apps
 EOF
 }
@@ -57,7 +57,7 @@ derive_entropy () {
 }
 
 # Check dependencies
-check_dependencies docker-compose jq openssl
+check_dependencies docker jq openssl
 
 if [ -z ${1+x} ]; then
   command=""
@@ -131,7 +131,7 @@ compose() {
   export SAMOURAI_SERVER_WHIRLPOOL_API_KEY=$(derive_entropy "env-${app_entropy_identifier}-WHIRLPOOL_API_KEY")
   export SQUEAKNODE_P2P_HIDDEN_SERVICE="$(cat "${squeaknode_p2p_hidden_service_file}" 2>/dev/null || echo "notyetset.onion")"
 
-  docker-compose \
+  docker compose \
     --env-file "${env_file}" \
     --project-name "${app}" \
     --file "${app_base_compose_file}" \
@@ -219,7 +219,7 @@ if [[ "$command" = "start" ]]; then
   exit
 fi
 
-# Passes all arguments to docker-compose
+# Passes all arguments to docker compose
 if [[ "$command" = "compose" ]]; then
   compose "${app}" ${args}
 

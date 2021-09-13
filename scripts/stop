@@ -31,4 +31,4 @@ echo
 
 echo "Stopping Docker services..."
 echo
-docker-compose down
+docker compose down

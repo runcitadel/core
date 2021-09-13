@@ -101,7 +101,7 @@ echo "Pulling new containers"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 50, "description": "Pulling new containers", "updateTo": "$RELEASE"}
 EOF
-docker-compose pull
+docker compose pull
 
 echo "Updating installed apps"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json

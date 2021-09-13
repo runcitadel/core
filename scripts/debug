@@ -140,19 +140,19 @@ echo
 echo "Bitcoin Core logs"
 echo "-----------------"
 echo
-docker-compose logs --tail=30 bitcoin
+docker compose logs --tail=30 bitcoin
 
 echo
 echo "LND logs"
 echo "--------"
 echo
-docker-compose logs --tail=30 lnd
+docker compose logs --tail=30 lnd
 
 echo
 echo "Tor logs"
 echo "--------"
 echo
-docker-compose logs --tail=30 tor
+docker compose logs --tail=30 tor
 
 installed_apps=$(./scripts/app ls-installed)
 if [[ ! -z "${installed_apps:-}" ]]; then

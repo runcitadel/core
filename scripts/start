@@ -20,7 +20,7 @@ check_dependencies () {
 }
 
 # Check system's dependencies
-check_dependencies readlink dirname ip docker docker-compose
+check_dependencies readlink dirname ip docker
 
 # Check karen's dependencies
 check_dependencies fswatch
@@ -108,7 +108,7 @@ echo
 echo
 echo "Starting Docker services..."
 echo
-docker-compose up --detach --build --remove-orphans || {
+docker compose up --detach --build --remove-orphans || {
   echo "Failed to start containers"
   $set_status umbrel errored docker-failed
   exit 1

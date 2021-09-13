@@ -4,7 +4,7 @@ set -euo pipefail
 
 UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
-result=$(docker-compose \
+result=$(docker compose \
   --file "${UMBREL_ROOT}/docker-compose.yml" \
   --env-file "${UMBREL_ROOT}/.env" \
   exec bitcoin bitcoin-cli "$@")
