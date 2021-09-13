@@ -102,9 +102,10 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: getumbrel/manager:v0.2.13@sha256:cb0c7a66de89c0a8b8c8e292086f9508f19a8c63c7e962d7f97723c4fd8ec367
+                image: runcitadel/manager:main@sha256:cd9ab356e5acd424713aee84dc3ef940663622f03e81766b822baf97cf612c41
                 depends_on: [ tor ]
                 restart: on-failure
+                init: true
                 stop_grace_period: 5m30s
                 volumes:
                         - ${PWD}:${PWD}
@@ -159,7 +160,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: getumbrel/middleware:v0.1.12@sha256:2d689fbf9248d638a772f77c85e3fbf92c6bf69134533cbe4b450d80b2319c92
+                image: runcitadel/middleware:main@sha256:23cf5bbf1465b6f0308a919edbdb31cbd4d15bff88b266c6888df1989c862be8
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
@@ -181,7 +182,7 @@ services:
                         ipv4_address: $MIDDLEWARE_IP
         neutrino-switcher:
                 container_name: neutrino-switcher
-                image: getumbrel/neutrino-switcher:v1.3.0@sha256:399ccea7f39129ff16c9c408f9e68a01dd4671f428273f3c3f401a8a0d2f7ddc
+                image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
                 depends_on: [ bitcoin, lnd ]
                 restart: on-failure
                 volumes:
@@ -199,7 +200,7 @@ services:
                         ipv4_address: $NEUTRINO_SWITCHER_IP
         electrs:
               container_name: electrs
-              image: getumbrel/electrs:v0.8.11@sha256:71f3cb021f113fbeaf2312d37998c1dc99ff2c7a399d29c9e540b16e62c3696c
+              image: runcitadel/electrs:main@sha256:7c5f0653ac0a7139e5345a1ea6ded553b2d463a78338d89bb6848534444d5ff9
               volumes:
                 - ${PWD}/bitcoin:/data/.bitcoin:ro
                 - ${PWD}/electrs:/data

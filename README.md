@@ -76,14 +76,14 @@ sudo ./scripts/stop
 ## 🎹 Services orchestrated
 
 - [`Umbrel Dashboard`](https://github.com/getumbrel/umbrel-dashboard)
-- [`Umbrel Manager`](https://github.com/getumbrel/umbrel-manager)
-- [`Umbrel Middleware`](https://github.com/getumbrel/umbrel-middleware)
+- [`Umbrel Manager`](https://github.com/runcitadel/manager)
+- [`Umbrel Middleware`](https://github.com/runcitadel/middleware)
 - [`Bitcoin Core`](https://github.com/getumbrel/docker-bitcoind)
-- [`LND`](https://github.com/getumbrel/docker-lnd)
-- [`Tor`](https://github.com/getumbrel/docker-tor)
+- [`LND`](https://github.com/lightingnetwork-lnd)
+- [`Tor`](https://github.com/lncm/docker-tor)
 - [`Nginx`](https://github.com/nginx/nginx)
 - [`Neutrino Switcher`](https://github.com/lncm/docker-lnd-neutrino-switch)
-- [`Electrs`](https://github.com/romanz/electrs)
+- [`Electrs`](https://github.com/getumbrel/docker-electrs)
 
 
 **Architecture**
