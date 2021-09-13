@@ -1,120 +1,171 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env python3
 
-##########################################################
-################## Check dependencies ####################
-##########################################################
+import sys
+import os
+from lib.rpcauth import get_data
+import re
+import subprocess
+import json
 
-check_dependencies () {
-  for cmd in "$@"; do
-    if ! command -v $cmd >/dev/null 2>&1; then
-      echo "This script requires \"${cmd}\" to be installed"
-      exit 1
-    fi
-  done
-}
+# Print an error if the user isn't running on Linux.
+if sys.platform != 'linux':
+    print('This script only works on Linux!')
+    exit(1)
 
-if [ ! "$(uname -s)" == "Linux" ]; then
-  echo "Sorry, Umbrel only supports Linux-based systems at this point."
-  echo
-  echo "You may work around this by modifying the configuration script yourself, but it's highly experimental."
-  echo "If you get it working, we hope you consider making a PR. :)"
-  exit 1
-fi
+# Print an error if user is not root
+if os.getuid() != 0:
+  print('This script must be run as root!')
+  exit(1)
 
-check_dependencies docker docker-compose dirname readlink
+# Check if the system is arm64 or amd64
+def is_arm64():
+  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'aarch64'
+def is_amd64():
+  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'x86_64'
 
-# Switch to Umbrel's root directory
-UMBREL_ROOT="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")"/..)"
-if [[ ! -d "$UMBREL_ROOT" ]]; then
-  echo "Root dir does not exist '$UMBREL_ROOT'"
-  exit 1
-fi
-cd "$UMBREL_ROOT"
+if not is_arm64() and not is_amd64():
+  print('Umbrel only works on arm64 and amd64!')
+  exit(1)
 
-# Make sure we use the status dir from the real Umbrel installation if this is
-# an OTA update.
-STATUS_DIR="${UMBREL_ROOT}/statuses"
-if [[ -f "${UMBREL_ROOT}/../.umbrel" ]]; then
-  STATUS_DIR="${UMBREL_ROOT}/../statuses"
-fi
+try:
+    subprocess.check_call(['docker-compose', '--version'])
+except:
+    print('Docker-compose is not installed!')
+    exit(1)
+
+# Switch to UMBREL root directory.
+UMBREL_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(UMBREL_ROOT)
+
+status_dir = os.path.join(UMBREL_ROOT, 'statuses')
+# Make sure to use the main status dir for updates
+if os.path.isfile('../.umbrel'):
+    status_dir = os.path.join(UMBREL_ROOT, '..', 'statuses')
 
 # Configure for mainnet or testnet or regtest depending
 # upon the user-supplied value of $NETWORK
-BITCOIN_NETWORK="${NETWORK:-mainnet}"
+# If the network is not specified, then use the mainnet
+BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
 
-if [ "$BITCOIN_NETWORK" != "mainnet" ] && [ "$BITCOIN_NETWORK" != "testnet" ] && [ "$BITCOIN_NETWORK" != "regtest" ]; then
-  echo "Error: Umbrel can only be configured for mainnet (default), testnet or regtest"
-  exit 1
-fi
+# Check if network neither mainnet nor testnet nor regtest
+if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
+    print('Error: Network must be either mainnet, testnet, or regtest!')
+    exit(1)
 
-# Get current Umbrel version
-UMBREL_VERSION="$(cat ${UMBREL_ROOT}/info.json | jq -r .version)"
+with open(os.path.join(UMBREL_ROOT, "info.json"), 'r') as file:
+  UMBREL_VERSION=json.load(file)['version']
 
-echo
-echo "======================================"
-if [[ -f "${STATUS_DIR}/configured" ]]; then
-  echo "=========== RECONFIGURING ============"
-else
-  echo "============ CONFIGURING ============="
-fi
-echo "========= UMBREL (${BITCOIN_NETWORK}) ==========="
-echo "======================================"
-echo
+print()
+print("======================================")
+if os.path.isfile(status_dir+'/configured'):
+  print("=========== RECONFIGURING ============")
+  reconfiguring=True
+else:
+  print("============ CONFIGURING =============")
+  reconfiguring=False
 
+print("============== UMBREL  ===============")
+print("======================================")
+print()
 
-##########################################################
-############### Setup configuration files ###############
-##########################################################
+# Parse a dotenv file
+def parse_dotenv(file_path):
+    with open(file_path, 'r') as file:
+      file_contents = file.read()
+    values = {}
+    lines = file_contents.split('\n')
+    for line in lines:
+      line = line.strip()
+      if line.startswith('#') or not line:
+        continue
+      # Append to values
+      key, value = line.split('=', 1)
+      values[key] = value
+    return values
 
-# Store paths to intermediary config files
-NGINX_CONF_FILE="./templates/nginx.conf"
-BITCOIN_CONF_FILE="./templates/bitcoin.conf"
-LND_CONF_FILE="./templates/lnd.conf"
-APPS_TOR_CONF_FILE="./templates/torrc-apps"
-APPS_2_TOR_CONF_FILE="./templates/torrc-apps-2"
-APPS_3_TOR_CONF_FILE="./templates/torrc-apps-3"
-UMBREL_TOR_CONF_FILE="./templates/torrc-umbrel"
-ELECTRS_CONF_FILE="./templates/electrs.toml"
-ENV_FILE="./templates/.env"
-
-# Remove intermediary files if they exist from any
-# previous unclean configuration run
-[[ -f "$NGINX_CONF_FILE" ]] && rm -f "$NGINX_CONF_FILE"
-[[ -f "$BITCOIN_CONF_FILE" ]] && rm -f "$BITCOIN_CONF_FILE"
-[[ -f "$LND_CONF_FILE" ]] && rm -f "$LND_CONF_FILE"
-[[ -f "$APPS_TOR_CONF_FILE" ]] && rm -f "$APPS_TOR_CONF_FILE"
-[[ -f "$APPS_2_TOR_CONF_FILE" ]] && rm -f "$APPS_2_TOR_CONF_FILE"
-[[ -f "$APPS_3_TOR_CONF_FILE" ]] && rm -f "$APPS_3_TOR_CONF_FILE"
-[[ -f "$UMBREL_TOR_CONF_FILE" ]] && rm -f "$UMBREL_TOR_CONF_FILE"
-[[ -f "$ELECTRS_CONF_FILE" ]] && rm -f "$ELECTRS_CONF_FILE"
-[[ -f "$ENV_FILE" ]] && rm -f "$ENV_FILE"
-
-# Copy template configs to intermediary configs
-[[ -f "./templates/nginx-sample.conf" ]] && cp "./templates/nginx-sample.conf" "$NGINX_CONF_FILE"
-[[ -f "./templates/bitcoin-sample.conf" ]] && cp "./templates/bitcoin-sample.conf" "$BITCOIN_CONF_FILE"
-[[ -f "./templates/lnd-sample.conf" ]] && cp "./templates/lnd-sample.conf" "$LND_CONF_FILE"
-[[ -f "./templates/torrc-apps-sample" ]] && cp "./templates/torrc-apps-sample" "$APPS_TOR_CONF_FILE"
-[[ -f "./templates/torrc-apps-2-sample" ]] && cp "./templates/torrc-apps-2-sample" "$APPS_2_TOR_CONF_FILE"
-[[ -f "./templates/torrc-apps-3-sample" ]] && cp "./templates/torrc-apps-3-sample" "$APPS_3_TOR_CONF_FILE"
-[[ -f "./templates/torrc-umbrel-sample" ]] && cp "./templates/torrc-umbrel-sample" "$UMBREL_TOR_CONF_FILE"
-[[ -f "./templates/electrs-sample.toml" ]] && cp "./templates/electrs-sample.toml" "$ELECTRS_CONF_FILE"
-[[ -f "./templates/.env-sample" ]] && cp "./templates/.env-sample" "$ENV_FILE"
-
-
+  
 ##########################################################
 ############ Generate configuration variables ############
 ##########################################################
 
-# Load existing credentials if we have some
-[[ -f "./.env" ]] && source "./.env"
-[[ ! -z ${PREV_ENV_FILE+x} ]] && [[ -f "${PREV_ENV_FILE}" ]] && source "${PREV_ENV_FILE}"
+if reconfiguring:
+  if os.path.isfile('../.umbrel'):
+    dotenv=parse_dotenv('../.env')
+  else:
+    dotenv=parse_dotenv('./.env')
 
-# Umbrel
+  BITCOIN_NETWORK=os.environ.get('OVERWRITE_NETWORK') or dotenv['BITCOIN_NETWORK']
+  # Check if network neither mainnet nor testnet nor regtest
+  if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
+      print('Error: Network must be either mainnet, testnet, or regtest!')
+      exit(1)
+  print("Using {} network".format(BITCOIN_NETWORK))
+  print()
+  BITCOIN_RPC_PORT=dotenv['BITCOIN_RPC_PORT']
+  BITCOIN_P2P_PORT=dotenv['BITCOIN_P2P_PORT']
+  BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
+  BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
+  BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
+  TOR_PASSWORD=dotenv['TOR_PASSWORD']
+  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
+else:
+  # Generate RPC credentials
+  print("Generating auth credentials")
+  print()
+  BITCOIN_RPC_USER="umbrel"
+  BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
+  BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
+  BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
+
+  # Pull Tor image and generate Tor password
+  print("Generating Tor password")
+  print()
+  os.system('docker pull --quiet lncm/tor:0.4.5.7')
+  TOR_PASSWORD=get_data('itdoesntmatter')['password']
+
+  # run 'docker run --rm lncm/tor:0.4.5.7 --quiet --hash-password "$TOR_PASS"' and get its output
+  # this is the password that is used to connect to the Tor network
+  # the password is stored in the .env file
+  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.5.7 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
+
+BITCOIN_NODE="neutrino"
+ALIAS_AND_COLOR=""
+
+if os.path.isfile("./lnd/lnd.conf"):
+  with open("./lnd/lnd.conf", 'r') as file:
+    for line in file:
+      if line.startswith("bitcoin.node="):
+        BITCOIN_NODE = line.split("=")[1].strip()
+      if line.startswith("alias="):
+        ALIAS_AND_COLOR += "\n" + line.strip()
+      if line.startswith("color="):
+        ALIAS_AND_COLOR += "\n" + line.strip()
+
+NEUTRINO_PEERS=""
+if BITCOIN_NETWORK == "mainnet":
+  BITCOIN_RPC_PORT=8332
+  BITCOIN_P2P_PORT=8333
+elif BITCOIN_NETWORK == "testnet":
+  BITCOIN_RPC_PORT=18332
+  BITCOIN_P2P_PORT=18333
+  NEUTRINO_PEERS='''
+[neutrino]
+neutrino.addpeer=testnet1-btcd.zaphq.io
+neutrino.addpeer=testnet2-btcd.zaphq.io
+  '''
+elif BITCOIN_NETWORK == "regtest":
+  BITCOIN_RPC_PORT=18334
+  BITCOIN_P2P_PORT=18335
+  BITCOIN_NODE="bitcoind"
+else:
+  exit(1)
+
+# IP addresses for services
+
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
 NGINX_IP="10.21.21.2"
-NGINX_PORT="${NGINX_PORT:-80}"
+NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
 MIDDLEWARE_IP="10.21.21.5"
@@ -135,6 +186,9 @@ APPS_TOR_IP="10.21.21.47"
 APPS_2_TOR_IP="10.21.21.48"
 APPS_3_TOR_IP="10.21.21.49"
 TOR_PROXY_PORT="9050"
+TOR_CONTROL_PORT="29051"
+NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
+
 
 # Apps
 APP_BTC_RPC_EXPLORER_IP="10.21.21.12"
@@ -205,263 +259,72 @@ APP_SQUEAKNODE_P2P_TESTNET_PORT="18555"
 APP_SQUEAKNODE_ENVOY_IP="10.21.21.55"
 APP_SQUEAKNODE_ENVOY_PORT="15081"
 
-# Generate RPC credentials
-if [[ -z ${BITCOIN_RPC_USER+x} ]] || [[ -z ${BITCOIN_RPC_PASS+x} ]] || [[ -z ${BITCOIN_RPC_AUTH+x} ]]; then
-  echo "Generating auth credentials"
-  echo
-  BITCOIN_RPC_USER="umbrel"
-  BITCOIN_RPC_DETAILS=$("./scripts/rpcauth.py" "$BITCOIN_RPC_USER")
-  BITCOIN_RPC_PASS=$(echo "$BITCOIN_RPC_DETAILS" | tail -1)
-  BITCOIN_RPC_AUTH=$(echo "$BITCOIN_RPC_DETAILS" | head -2 | tail -1 | sed -e "s/^rpcauth=//")
-fi
+DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
+# run "which docker" using subprocess and read STDERR
+DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
+# Get the real path by following symlinks
+DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
 
-# Pull Tor image and generate Tor password
-if [[ -z ${TOR_PASSWORD+x} ]] || [[ -z ${TOR_HASHED_PASSWORD+x} ]]; then
-  echo "Generating Tor password"
-  echo
-  TOR_PASSWORD=$("./scripts/rpcauth.py" "itdoesntmatter" | tail -1)
-  TOR_HASHED_PASSWORD=$(docker run --rm getumbrel/tor:v0.4.1.9 --quiet --hash-password "$TOR_PASSWORD")
-fi
-
-
-##########################################################
-### Update config files with configuration variables #####
-##########################################################
-
-if [ "$BITCOIN_NETWORK" == "testnet" ]; then
-  # Set testnet ports
-  BITCOIN_RPC_PORT=18332
-  BITCOIN_P2P_PORT=18333
-  # Switch Bitcoin Core to testnet
-  sed -i '1s/^/testnet=1\n[test]\n\n/' "$BITCOIN_CONF_FILE"
-  # Switch LND to testnet
-  sed -i "s/bitcoin.mainnet=1/bitcoin.testnet=1/g;" "$LND_CONF_FILE"
-  # Uncomment testnet neutrino block and peers
-  sed -i "s/\# \[neutrino\]/\[neutrino\]/g;" "$LND_CONF_FILE"
-  sed -i "s/\# neutrino.addpeer=testnet1-btcd.zaphq.io/neutrino.addpeer=testnet1-btcd.zaphq.io/g;" "$LND_CONF_FILE"
-  sed -i "s/\# neutrino.addpeer=testnet2-btcd.zaphq.io/neutrino.addpeer=testnet2-btcd.zaphq.io/g;" "$LND_CONF_FILE"
-  # Set electrs to testnet
-  sed -i "s/network = \"bitcoin\"/network = \"testnet\"/g;" "$ELECTRS_CONF_FILE"
-
-fi
-
-if [ "$BITCOIN_NETWORK" == "regtest" ]; then
-  # Set regtest ports
-  BITCOIN_RPC_PORT=18443
-  BITCOIN_P2P_PORT=18444
-  # Switch Bitcoin Core to regtest
-  sed -i '1s/^/regtest=1\n[regtest]\n\n/' "$BITCOIN_CONF_FILE"
-  # Switch LND to regtest
-  sed -i "s/bitcoin.mainnet=1/bitcoin.regtest=1/g;" "$LND_CONF_FILE"
-  # Use bitcoind as the node
-  sed -i "s/bitcoin.node=neutrino/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
-  # Set electrs to regtest
-  sed -i "s/network = \"bitcoin\"/network = \"regtest\"/g;" "$ELECTRS_CONF_FILE"
-fi
-
-# Update RPC, P2P and ZMQ Ports
-sed -i "s/rpcport=<port>/rpcport=$BITCOIN_RPC_PORT/g;" "$BITCOIN_CONF_FILE"
-sed -i "s/port=<port>/port=$BITCOIN_P2P_PORT/g;" "$BITCOIN_CONF_FILE"
-sed -i "s/<bitcoin-rpc-port>/$BITCOIN_RPC_PORT/g;" "$UMBREL_TOR_CONF_FILE"
-sed -i "s/<bitcoin-p2p-port>/$BITCOIN_P2P_PORT/g;" "$UMBREL_TOR_CONF_FILE"
-sed -i "/daemon_rpc_addr/s/<port>/$BITCOIN_RPC_PORT/g;" "$ELECTRS_CONF_FILE"
-sed -i "s/BITCOIN_RPC_PORT=<port>/BITCOIN_RPC_PORT=$BITCOIN_RPC_PORT/g;" "$ENV_FILE"
-sed -i "s/BITCOIN_P2P_PORT=<port>/BITCOIN_P2P_PORT=$BITCOIN_P2P_PORT/g;" "$ENV_FILE"
-
-# Add rpcauth
-sed -i "s/rpcauth=<rpcauth>/rpcauth=$BITCOIN_RPC_AUTH/g;" "$BITCOIN_CONF_FILE"
-sed -i "s/BITCOIN_RPC_AUTH=<rpcauth>/BITCOIN_RPC_AUTH='$BITCOIN_RPC_AUTH'/g;" "$ENV_FILE"
-# Add RPC credentials to lnd.conf
-sed -i "s/bitcoind.rpcuser=<username>/bitcoind.rpcuser=$BITCOIN_RPC_USER/g;" "$LND_CONF_FILE"
-sed -i "s/bitcoind.rpcpass=<password>/bitcoind.rpcpass=$BITCOIN_RPC_PASS/g;" "$LND_CONF_FILE"
-# Add RPC credentials to env file
-sed -i "s/BITCOIN_RPC_USER=<username>/BITCOIN_RPC_USER=$BITCOIN_RPC_USER/g;" "$ENV_FILE"
-sed -i "s/BITCOIN_RPC_PASS=<password>/BITCOIN_RPC_PASS=$BITCOIN_RPC_PASS/g;" "$ENV_FILE"
-
-# Add chain to env file
-sed -i "s/BITCOIN_NETWORK=<network>/BITCOIN_NETWORK=$BITCOIN_NETWORK/g;" "$ENV_FILE"
-
-# Add Tor password
-sed -i "s/HashedControlPassword <password>/HashedControlPassword $TOR_HASHED_PASSWORD/g;" "$UMBREL_TOR_CONF_FILE"
-sed -i "s/torpassword=<password>/torpassword=$TOR_PASSWORD/g;" "$BITCOIN_CONF_FILE"
-sed -i "s/tor.password=<password>/tor.password=$TOR_PASSWORD/g;" "$LND_CONF_FILE"
-sed -i "s/TOR_PASSWORD=<password>/TOR_PASSWORD=$TOR_PASSWORD/g;" "$ENV_FILE"
-sed -i "s/TOR_HASHED_PASSWORD=<password>/TOR_HASHED_PASSWORD=$TOR_HASHED_PASSWORD/g;" "$ENV_FILE"
-
-# Store docker binary path
-DOCKER_BINARY=$(readlink -f "$(which docker)")
-sed -i "s#DOCKER_BINARY=<path>#DOCKER_BINARY=$DOCKER_BINARY#g;" "$ENV_FILE"
-
-# Set Umbrel version in electrs banner
-sed -i "/server_banner/s/<version>/$UMBREL_VERSION/g;" "$ELECTRS_CONF_FILE"
-
-# Add hostname to lnd.conf for TLS certificate
-DEVICE_HOSTNAME="$(hostname)"
-sed -i "s/tlsextradomain=<hostname>/tlsextradomain=$DEVICE_HOSTNAME.local/g;" "$LND_CONF_FILE"
-
-# If node is already synced, do not reset to neutrino
-if [[ -f "${STATUS_DIR}/node-status-bitcoind-ready" ]]; then
-  sed -i "s/bitcoin.node=.*/bitcoin.node=bitcoind/g;" "$LND_CONF_FILE"
-fi
-
-# Set LND fee URL (but only for mainnet Neutrino)
+# Set LND fee URL for neutrino on mainnet
 LND_FEE_URL=""
-if [[ "$BITCOIN_NETWORK" == "mainnet" ]] && [[ ! -f "${STATUS_DIR}/node-status-bitcoind-ready" ]]; then
-  LND_FEE_URL="https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
-fi
+# If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
+if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
+   LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
 
-# TODO: Update all the above code to use this simpler logic
-for template in "${NGINX_CONF_FILE}" "${BITCOIN_CONF_FILE}" "${LND_CONF_FILE}" "${APPS_TOR_CONF_FILE}" "${APPS_2_TOR_CONF_FILE}" "${APPS_3_TOR_CONF_FILE}" "${UMBREL_TOR_CONF_FILE}" "${ELECTRS_CONF_FILE}" "${ENV_FILE}"; do
-  # Umbrel
-  sed -i "s/<network-ip>/${NETWORK_IP}/g" "${template}"
-  sed -i "s/<gateway-ip>/${GATEWAY_IP}/g" "${template}"
-  sed -i "s/<nginx-ip>/${NGINX_IP}/g" "${template}"
-  sed -i "s/<nginx-port>/${NGINX_PORT}/g" "${template}"
-  sed -i "s/<dashboard-ip>/${DASHBOARD_IP}/g" "${template}"
-  sed -i "s/<manager-ip>/${MANAGER_IP}/g" "${template}"
-  sed -i "s/<middleware-ip>/${MIDDLEWARE_IP}/g" "${template}"
-  sed -i "s/<neutrino-switcher-ip>/${NEUTRINO_SWITCHER_IP}/g" "${template}"
-  sed -i "s/<bitcoin-ip>/${BITCOIN_IP}/g" "${template}"
-  sed -i "s/<lnd-ip>/${LND_IP}/g" "${template}"
-  sed -i "s/<lnd-grpc-port>/${LND_GRPC_PORT}/g" "${template}"
-  sed -i "s/<lnd-rest-port>/${LND_REST_PORT}/g" "${template}"
-  sed -i "s/<electrum-ip>/${ELECTRUM_IP}/g" "${template}"
-  sed -i "s/<electrum-port>/${ELECTRUM_PORT}/g" "${template}"
-  sed -i "s/<tor-proxy-ip>/${TOR_PROXY_IP}/g" "${template}"
-  sed -i "s/<tor-proxy-port>/${TOR_PROXY_PORT}/g" "${template}"
-  sed -i "s/<apps-tor-ip>/${APPS_TOR_IP}/g" "${template}"
-  sed -i "s/<apps-2-tor-ip>/${APPS_2_TOR_IP}/g" "${template}"
-  sed -i "s/<apps-3-tor-ip>/${APPS_3_TOR_IP}/g" "${template}"
-  sed -i "s/<zmq-rawblock-port>/${BITCOIN_ZMQ_RAWBLOCK_PORT}/g;" "${template}"
-  sed -i "s/<zmq-rawtx-port>/${BITCOIN_ZMQ_RAWTX_PORT}/g;" "${template}"
-  sed -i "s/<zmq-hashblock-port>/${BITCOIN_ZMQ_HASHBLOCK_PORT}/g;" "${template}"
-  sed -i "s#<lndfeeurl>#${LND_FEE_URL}#g;" "${template}"
+# Checks if a variable with the name exists, if not, check if an env var with the name existts
+# if neither exists, then exit with an error
+def get_var(var_name, other_locals, file_name):
+  if var_name in locals():
+    return str(locals()[var_name])
+  elif var_name in other_locals:
+    return str(other_locals[var_name])
+  elif var_name in globals():
+    return str(globals()[var_name])
+  else:
+    print("Error: {} is not defined! (In file {})".format(var_name, file_name))
+    exit(1)
 
-  # Apps
-  sed -i "s/<app-btc-rpc-explorer-ip>/${APP_BTC_RPC_EXPLORER_IP}/g" "${template}"
-  sed -i "s/<app-btc-rpc-explorer-port>/${APP_BTC_RPC_EXPLORER_PORT}/g" "${template}"
-  sed -i "s/<app-thunderhub-ip>/${APP_THUNDERHUB_IP}/g" "${template}"
-  sed -i "s/<app-thunderhub-port>/${APP_THUNDERHUB_PORT}/g" "${template}"
-  sed -i "s/<app-sphinx-relay-ip>/${APP_SPHINX_RELAY_IP}/g" "${template}"
-  sed -i "s/<app-sphinx-relay-port>/${APP_SPHINX_RELAY_PORT}/g" "${template}"
-  sed -i "s/<app-ride-the-lightning-ip>/${APP_RIDE_THE_LIGHTNING_IP}/g" "${template}"
-  sed -i "s/<app-ride-the-lightning-port>/${APP_RIDE_THE_LIGHTNING_PORT}/g" "${template}"
-  sed -i "s/<app-ride-the-lightning-loop-ip>/${APP_RIDE_THE_LIGHTNING_LOOP_IP}/g" "${template}"
-  sed -i "s/<app-lightning-terminal-ip>/${APP_LIGHTNING_TERMINAL_IP}/g" "${template}"
-  sed -i "s/<app-lightning-terminal-port>/${APP_LIGHTNING_TERMINAL_PORT}/g" "${template}"
-  sed -i "s/<app-specter-desktop-ip>/${APP_SPECTER_DESKTOP_IP}/g" "${template}"
-  sed -i "s/<app-specter-desktop-port>/${APP_SPECTER_DESKTOP_PORT}/g" "${template}"
-  sed -i "s/<app-btcpay-server-ip>/${APP_BTCPAY_SERVER_IP}/g" "${template}"
-  sed -i "s/<app-btcpay-server-port>/${APP_BTCPAY_SERVER_PORT}/g" "${template}"
-  sed -i "s/<app-btcpay-server-nbxplorer-ip>/${APP_BTCPAY_SERVER_NBXPLORER_IP}/g" "${template}"
-  sed -i "s/<app-btcpay-server-db-ip>/${APP_BTCPAY_SERVER_DB_IP}/g" "${template}"
-  sed -i "s/<app-lnbits-ip>/${APP_LNBITS_IP}/g" "${template}"
-  sed -i "s/<app-lnbits-port>/${APP_LNBITS_PORT}/g" "${template}"
-  sed -i "s/<app-mempool-ip>/${APP_MEMPOOL_IP}/g" "${template}"
-  sed -i "s/<app-mempool-port>/${APP_MEMPOOL_PORT}/g" "${template}"
-  sed -i "s/<app-mempool-db-ip>/${APP_MEMPOOL_DB_IP}/g" "${template}"
-  sed -i "s/<app-mempool-api-ip>/${APP_MEMPOOL_API_IP}/g" "${template}"
-  sed -i "s/<app-samourai-server-ip>/${APP_SAMOURAI_SERVER_IP}/g" "${template}"
-  sed -i "s/<app-samourai-server-dojo-port>/${APP_SAMOURAI_SERVER_DOJO_PORT}/g" "${template}"
-  sed -i "s/<app-samourai-server-connect-port>/${APP_SAMOURAI_SERVER_CONNECT_PORT}/g" "${template}"
-  sed -i "s/<app-samourai-server-whirlpool-ip>/${APP_SAMOURAI_SERVER_WHIRLPOOL_IP}/g" "${template}"
-  sed -i "s/<app-samourai-server-whirlpool-port>/${APP_SAMOURAI_SERVER_WHIRLPOOL_PORT}/g" "${template}"
-  sed -i "s/<app-samourai-server-db-ip>/${APP_SAMOURAI_SERVER_DB_IP}/g" "${template}"
-  sed -i "s/<app-samourai-server-node-ip>/${APP_SAMOURAI_SERVER_NODE_IP}/g" "${template}"
-  sed -i "s/<app-bluewallet-lndhub-ip>/${APP_BLUEWALLET_LNDHUB_IP}/g" "${template}"
-  sed -i "s/<app-bluewallet-lndhub-port>/${APP_BLUEWALLET_LNDHUB_PORT}/g" "${template}"
-  sed -i "s/<app-bluewallet-redis-ip>/${APP_BLUEWALLET_REDIS_IP}/g" "${template}"
-  sed -i "s/<app-nextcloud-port>/${APP_NEXTCLOUD_PORT}/g" "${template}"
-  sed -i "s/<app-nextcloud-ip>/${APP_NEXTCLOUD_IP}/g" "${template}"
-  sed -i "s/<app-nextcloud-db-ip>/${APP_NEXTCLOUD_DB_IP}/g" "${template}"
-  sed -i "s/<app-nextcloud-redis-ip>/${APP_NEXTCLOUD_REDIS_IP}/g" "${template}"
-  sed -i "s/<app-nextcloud-cron-ip>/${APP_NEXTCLOUD_CRON_IP}/g" "${template}"
-  sed -i "s/<app-pi-hole-port>/${APP_PI_HOLE_PORT}/g" "${template}"
-  sed -i "s/<app-pi-hole-ip>/${APP_PI_HOLE_IP}/g" "${template}"
-  sed -i "s/<app-home-assistant-port>/${APP_HOME_ASSISTANT_PORT}/g" "${template}"
-  sed -i "s/<app-home-assistant-ip>/${APP_HOME_ASSISTANT_IP}/g" "${template}"
-  sed -i "s/<app-gitea-port>/${APP_GITEA_PORT}/g" "${template}"
-  sed -i "s/<app-gitea-ssh-port>/${APP_GITEA_SSH_PORT}/g" "${template}"
-  sed -i "s/<app-gitea-ip>/${APP_GITEA_IP}/g" "${template}"
-  sed -i "s/<app-gitea-db-ip>/${APP_GITEA_DB_IP}/g" "${template}"
-  sed -i "s/<app-simple-torrent-port>/${APP_SIMPLETORRENT_PORT}/g" "${template}"
-  sed -i "s/<app-simple-torrent-ip>/${APP_SIMPLETORRENT_IP}/g" "${template}"
-  sed -i "s/<app-photoprism-ip>/${APP_PHOTOPRISM_IP}/g" "${template}"
-  sed -i "s/<app-photoprism-port>/${APP_PHOTOPRISM_PORT}/g" "${template}"
-  sed -i "s/<app-photoprism-db-ip>/${APP_PHOTOPRISM_DB_IP}/g" "${template}"
-  sed -i "s/<app-synapse-ip>/${APP_SYNAPSE_IP}/g" "${template}"
-  sed -i "s/<app-synapse-port>/${APP_SYNAPSE_PORT}/g" "${template}"
-  sed -i "s/<app-element-ip>/${APP_ELEMENT_IP}/g" "${template}"
-  sed -i "s/<app-element-port>/${APP_ELEMENT_PORT}/g" "${template}"
-  sed -i "s/<app-vaultwarden-ip>/${APP_VAULTWARDEN_IP}/g" "${template}"
-  sed -i "s/<app-vaultwarden-port>/${APP_VAULTWARDEN_PORT}/g" "${template}"
-  sed -i "s/<app-code-server-ip>/${APP_CODE_SERVER_IP}/g" "${template}"
-  sed -i "s/<app-code-server-port>/${APP_CODE_SERVER_PORT}/g" "${template}"
-  sed -i "s/<app-squeaknode-ip>/${APP_SQUEAKNODE_IP}/g" "${template}"
-  sed -i "s/<app-squeaknode-port>/${APP_SQUEAKNODE_PORT}/g" "${template}"
-  sed -i "s/<app-squeaknode-grpc-port>/${APP_SQUEAKNODE_GRPC_PORT}/g" "${template}"
-  sed -i "s/<app-squeaknode-p2p-port>/${APP_SQUEAKNODE_P2P_PORT}/g" "${template}"
-  sed -i "s/<app-squeaknode-p2p-testnet-port>/${APP_SQUEAKNODE_P2P_TESTNET_PORT}/g" "${template}"
-  sed -i "s/<app-squeaknode-envoy-ip>/${APP_SQUEAKNODE_ENVOY_IP}/g" "${template}"
-  sed -i "s/<app-squeaknode-envoy-port>/${APP_SQUEAKNODE_ENVOY_PORT}/g" "${template}"
-done
+# Converts a string to uppercase, also replaces all - with _
+def convert_to_upper(string):
+  return string.upper().replace('-', '_')
 
-##########################################################
-############## Override main config files ################
-##########################################################
+# Put variables in the config file. A config file accesses an env var $EXAMPLE_VARIABLE by containing <example-variable>
+# in the config file. Check for such occurences and replace them with the actual variable
+def replace_vars(file_path):
+  with open(file_path, 'r') as file:
+    file_contents = file.read()
+  return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
-mv -f "$NGINX_CONF_FILE" "./nginx/nginx.conf"
-mv -f "$BITCOIN_CONF_FILE" "./bitcoin/bitcoin.conf"
-mv -f "$APPS_TOR_CONF_FILE" "./tor/torrc-apps"
-mv -f "$APPS_2_TOR_CONF_FILE" "./tor/torrc-apps-2"
-mv -f "$APPS_3_TOR_CONF_FILE" "./tor/torrc-apps-3"
-mv -f "$UMBREL_TOR_CONF_FILE" "./tor/torrc-umbrel"
-mv -f "$ELECTRS_CONF_FILE" "./electrs/electrs.toml"
-mv -f "$ENV_FILE" "./.env"
+templates_to_build = {
+  "./templates/torrc-apps-sample": "./tor/torrc-apps",
+  "./templates/torrc-apps-2-sample": "./tor/torrc-apps-2",
+  "./templates/torrc-apps-3-sample": "./tor/torrc-apps-3",
+  "./templates/torrc-umbrel-sample": "./tor/torrc-umbrel",
+  "./templates/lnd-sample.conf": "./lnd/lnd.conf",
+  "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
+  "./templates/.env-sample": "./.env",
+  "./templates/electrs-sample.toml": "./electrs/electrs.toml",
+  "./templates/nginx-sample.conf": "./nginx/nginx.conf"
+}
 
-# Only write LND config if one doesn't already exist to preserve any user changes.
-if [[ -f "./lnd/lnd.conf" ]]; then
-  echo "Skipping lnd.conf update to preserve user changes..."
-  rm "$LND_CONF_FILE"
-else
-  mv -f "$LND_CONF_FILE" "./lnd/lnd.conf"
-fi
+print("Generating configuration files")
+print()
 
-##########################################################
-######### Generate hidden services on first run ##########
-##########################################################
+# Loop through templates_to_build and build them
+for template_path, output_path in templates_to_build.items():
+  with open(output_path, 'w') as file:
+    file.write(replace_vars(template_path))
 
-# Prevents CORS issue if dashboard's hidden service
-# doesn't exist on the first run
-if [[ ! -f "${STATUS_DIR}/configured" ]]; then
-  echo "Generating hidden services..."
-  echo
-  docker-compose up --detach tor
-  wait_for_tor=10
-  while [[ ! -f "${UMBREL_ROOT}/tor/data/web/hostname" ]]; do
-    if [[ "${wait_for_tor}" == 0 ]]; then
-      echo "Dashboard's hidden service file wasn't created..."
-      echo
-      break
-    fi
-    sleep 1
-    ((wait_for_tor--))
-  done
-  docker-compose down
-fi
-
-##########################################################
-################ Configuration complete ##################
-##########################################################
-
-echo "Configuring permissions..."
-echo
-find "$UMBREL_ROOT" -path "$UMBREL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
-
-# Create configured status
-touch "${STATUS_DIR}/configured"
-
-echo "Configuration successful"
-echo "You can now start Umbrel by running:"
-echo "  sudo ./scripts/start"
-echo
+print("Pulling Docker images")
+print()
+print("This may take a while, please be patient...")
+os.system('docker-compose pull')
+print("Configuring permissions")
+print()
+os.system('chown -R 1000:1000 {}'.format(UMBREL_ROOT))
+# Touch status_dir/configured
+with open(status_dir+'/configured', 'w') as file:
+  file.write('')
+print("Configuration successful")
+print("You can now start Umbrel by running:")
+print("  sudo ./scripts/start")
