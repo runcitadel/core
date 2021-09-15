@@ -1,0 +1,66 @@
+version: 1
+
+metadata:
+  category: Wallet Servers
+  name: BlueWallet Lightning
+  version: 1.3.5
+  tagline: Connect BlueWallet to your Lightning node
+  description: >-
+    Run BlueWallet in the most private and secure way possible by removing
+    3rd parties and connecting it directly to your Umbrel's Lightning node.
+
+
+    You can pair multiple BlueWallet accounts, so your friends and family can pair
+    their BlueWallet with your Umbrel for a trust-minimized setup.
+  developer: BlueWallet
+  website: https://lndhub.io
+  dependencies:
+  - lnd
+  repo: https://github.com/BlueWallet/LndHub
+  support: https://t.me/bluewallet
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  mainContainer: lndhub
+
+
+containers:
+- name: redis
+  image: redis:6.2.2-buster@sha256:e10f55f92478715698a2cef97c2bbdc48df2a05081edd884938903aa60df6396
+  command: redis-server --requirepass moneyprintergobrrr
+  data:
+  - data/redis:/data
+  user: 1000:1000
+  init: true
+
+- name: lndhub
+  image: bluewalletorganization/lndhub:v1.3.5@sha256:bec3eb3509e6c90ba2cf9ac34ccd7294ea590461f2b4f08208417ea9273e9b05
+  permissions:
+  - lnd
+  depends_on:
+  - redis
+  environment:
+    PORT: ${APP_BLUEWALLET_LNDHUB_PORT}
+    TOR_URL: ${APP_HIDDEN_SERVICE}
+    LND_CERT_FILE: /lnd/tls.cert
+    LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
+    CONFIG: >
+      { 
+        "rateLimit": 10000,
+        "postRateLimit": 10000,
+        "redis": {
+          "port": 6379,
+          "host": "$APP_BLUEWALLET_REDIS_IP",
+          "family": 4,
+          "password": "moneyprintergobrrr",
+          "db": 0
+        },
+        "lnd": {
+          "url": "$LND_IP:$LND_GRPC_PORT",
+          "password": ""
+        }
+      }
+  # Some stuff for the container to run securely & stop properly
+  user: 1000:1000
+  init: true

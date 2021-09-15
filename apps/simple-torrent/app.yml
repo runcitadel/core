@@ -1,0 +1,51 @@
+metadata:
+  category: Networking
+  name: SimpleTorrent
+  version: 1.3.6
+  tagline: Download torrents with your Umbrel
+  description: 'SimpleTorrent is a a self-hosted remote torrent client that starts
+    torrents remotely, download sets of files on your Umbrel, which are then retrievable
+    or streamable via web browser over HTTP. This project is a re-branded fork of
+    cloud-torrent by jpillora. Features:
+
+
+    - Individual file download control
+
+    - Run external program on tasks completion: DoneCmd
+
+    - Stops task when seeding ratio reached: SeedRatio
+
+    - Download/Upload speed limiter: UploadRate/DownloadRate
+
+    - Detailed transfer stats in web UI.
+
+    - Torrent Watcher
+
+    - Extra trackers from external source
+
+    - Protocol Handler to magnet:
+
+    - Magnet RSS subscribing supported'
+  developer: Preston
+  website: https://github.com/boypt
+  dependencies: []
+  repo: https://github.com/boypt/simple-torrent
+  support: https://github.com/boypt/simple-torrent/issues
+  port: 8086
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+
+containers:
+- image: boypt/cloud-torrent:1.3.6@sha256:c64a87daec402aa0b539cb90376392c7f3de0329ca31a5ef7ae89333c416c9c9
+  user: 1000:1000
+  ports:
+  - ${APP_SIMPLE_TORRENT_PORT}:${APP_SIMPLE_TORRENT_PORT}
+  command: --port=${APP_SIMPLE_TORRENT_PORT} --config-path /config/simple-torrent.json
+  name: server
+  data:
+  - data/config:/config
+  - data/downloads:/downloads
+  - data/torrents:/torrents
+  ip: $APP_SIMPLE_TORRENT_IP

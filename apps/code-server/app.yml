@@ -1,0 +1,37 @@
+metadata:
+  category: Development
+  name: code-server
+  version: 3.11.1
+  tagline: Run VS Code on your Umbrel
+  description: >-
+    Run VS Code on your Umbrel and access it in the browser so you can
+    code on any device with a consistent development environment. This way you can
+    use your Umbrel not only to code from any device, anywhere, but to also speed
+    up tests, compilations, downloads, and more.
+
+
+    By running all intensive tasks run on your Umbrel, preserve battery life of your
+    devices when you're on the go.
+  developer: Coder
+  website: https://coder.com
+  dependencies: []
+  repo: https://github.com/cdr/code-server
+  support: https://github.com/cdr/code-server/discussions
+  port: 8091
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  defaultPassword: moneyprintergobrrr
+
+containers:
+- name: server
+  image: codercom/code-server:3.11.1@sha256:9bb2444f9d0c26765924e29155ac4a8febecb1e080f12c4e368e71dbe6a675b5
+  user: 1000:1000
+  ports:
+  - ${APP_CODE_SERVER_PORT}:8080
+  environment:
+    PASSWORD: moneyprintergobrrr
+  data:
+  - data:/home/coder
+  ip: $APP_CODE_SERVER_IP

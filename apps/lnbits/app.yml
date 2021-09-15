@@ -1,0 +1,50 @@
+metadata:
+  category: Lightning Node Management
+  name: LNbits
+  version: 3b9401e
+  tagline: Multi-user wallet management system
+  description: 'LNbits is a simple multi-user and account system for Lightning Network
+    that can be used for creating separate Lightning wallets for friends and family
+    members. You can also create multiple accounts for yourself to mitigate the risk
+    of exposing applications to your full balance via unique API keys for each wallet.
+
+
+    LNbits is packaged with tools to help manage funds, such as a table of transactions,
+    line chart of spending, export to CSV, and more to come. It provides an extendable
+    platform for expanding Lightning Network functionality via LNbits extension framework,
+    and can also be used as a fallback wallet for the LNURL scheme.'
+  developer: LNbits
+  website: https://github.com/lnbits/lnbits
+  dependencies:
+  - lnd
+  repo: https://github.com/lnbits/lnbits
+  support: https://t.me/lnbits
+  port: 3007
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+
+containers:
+- image: lnbitsdocker/lnbits:3b9401e@sha256:083a7e2d7822bf1a8dd938019ebc044450d74a5b1a9af89dfa5fa695d24ec317
+  user: 1000:1000
+  init: true
+  ports:
+  - $APP_LNBITS_PORT:$APP_LNBITS_PORT
+  environment:
+    LNBITS_BIND: 0.0.0.0:$APP_LNBITS_PORT
+    LNBITS_DATA_FOLDER: /data
+    LNBITS_BACKEND_WALLET_CLASS: LndWallet
+    LND_GRPC_ENDPOINT: $LND_IP
+    LND_GRPC_PORT: $LND_GRPC_PORT
+    LND_GRPC_CERT: /lnd/tls.cert
+    LND_GRPC_MACAROON: /lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon
+    LNBITS_SITE_TITLE: LNbits - Citadel
+    LNBITS_DEFAULT_WALLET_NAME: LNbits wallet
+    LNBITS_DISABLED_EXTENSIONS: amilk
+  name: web
+  data:
+  - data:/data
+  permissions:
+  - lnd
+  ip: $APP_LNBITS_IP

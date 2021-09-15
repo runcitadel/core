@@ -1,0 +1,66 @@
+metadata:
+  category: Wallets
+  name: Specter Desktop
+  version: 1.6.0
+  tagline: Multisig with hardware wallets made easy
+  description: >-
+    Specter Desktop connects to the Bitcoin Core running on your Umbrel
+    and functions as a watch-only coordinator for multi-signature and single-key Bitcoin
+    wallets. At the moment Specter Desktop is working with all major hardware wallets
+    including:
+
+
+    - Trezor
+
+    - Ledger
+
+    - KeepKey
+
+    - BitBox02
+
+    - ColdCard (optionally airgapped, using an SD card)
+
+    - Electrum (optionally airgapped, if running Electrum on an airgapped computer/phone)
+
+    - Specter DIY (optionally airgapped, using QR codes)
+
+    - Cobo (airgapped, using QR codes)
+
+
+    Specter Desktop also supports using the Bitcoin Core on your Umbrel as a hot wallet,
+    by importing or generating a random BIP39 mnemonic, but this feature is experimental
+    and we do not recommend using it at this stage. We plan to add support for other
+    hardware wallets as they come up.
+  developer: Crypto Advance
+  website: https://specter.solutions
+  dependencies:
+  - bitcoind
+  repo: https://github.com/cryptoadvance/specter-desktop
+  support: https://t.me/spectersupport
+  port: 25441
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: ''
+  defaultPassword: ''
+containers:
+- image: lncm/specter-desktop:v1.6.0@sha256:d641f3f81f2450e4f36803b39dc061a999f48eed8a8c4a1de4110391115938b0
+  stop_signal: SIGINT
+  ports:
+  - $APP_SPECTER_DESKTOP_PORT:$APP_SPECTER_DESKTOP_PORT
+  command:
+  - --host=0.0.0.0
+  - --specter-data-folder=/data
+  environment:
+    BTC_RPC_USER: $BITCOIN_RPC_USER
+    BTC_RPC_PASSWORD: $BITCOIN_RPC_PASS
+    BTC_RPC_HOST: $BITCOIN_IP
+    BTC_RPC_PORT: $BITCOIN_RPC_PORT
+    BTC_RPC_PROTOCOL: http
+  name: web
+  data:
+  - data:/data
+  permissions:
+  - bitcoind
+  ip: $APP_SPECTER_DESKTOP_IP

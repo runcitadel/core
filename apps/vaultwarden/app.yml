@@ -1,0 +1,40 @@
+metadata:
+  category: Password Managers
+  name: Vaultwarden
+  version: 1.22.2
+  tagline: "Unofficial Bitwarden\xAE compatible server"
+  description: "Vaultwarden (formerly known as Bitwarden_RS) is an alternative implementation\
+    \ of the Bitwarden\xAE server API written in Rust, compatible with upstream Bitwarden\xAE\
+    \ clients*. Vaultwarden is perfect for self-hosting all of your passwords in an\
+    \ encrypted vault on your Umbrel. Vaultwarden is a full implementation of Bitwarden\xAE\
+    \ API that includes:\n\n- Organizations support\n- Attachments\n- Vault API support\n\
+    - Serving the static files for Vault interface\n- Website icons API\n- Authenticator\
+    \ and U2F support\n- YubiKey and Duo support\n\n Please note that Vaultwarden\
+    \ is not associated with the Bitwarden\xAE project nor 8bit Solutions LLC. When\
+    \ using this app, please report any bugs or suggestions to us directly, regardless\
+    \ of whatever clients you are using (mobile, desktop, browser, etc), and do not\
+    \ use Bitwarden\xAE's official support channels."
+  developer: "Daniel Garc\xEDa"
+  website: https://github.com/dani-garcia
+  dependencies: []
+  repo: https://github.com/dani-garcia/vaultwarden
+  support: https://vaultwarden.discourse.group/
+  port: 8089
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: ''
+  defaultPassword: ''
+  torOnly: true
+containers:
+- image: vaultwarden/server:1.22.2@sha256:fe2a236b792fb2304ef50f86f1c25076ac5b2748e1b776fce260ad12ad29188d
+  user: 1000:1000
+  ports:
+  - $APP_VAULTWARDEN_PORT:$APP_VAULTWARDEN_PORT
+  environment:
+    ROCKET_PORT: ${APP_VAULTWARDEN_PORT}
+  name: server
+  data:
+  - data:/data
+  ip: $APP_VAULTWARDEN_IP

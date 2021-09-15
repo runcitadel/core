@@ -1,0 +1,87 @@
+version: 1
+
+metadata:
+  category: Files
+  name: Nextcloud
+  version: 22.1.1
+  tagline: Productivity platform that keeps you in control
+  description: >-
+    Nextcloud puts your data at your fingertips, under your control. Store
+    your documents, calendar, contacts and photos on your Umbrel instead of some
+    company's data center.
+    Features:
+
+
+    - Mobile and desktop sync 
+
+    - Versioning and undelete 
+
+    - Galleries and activity feed 
+
+    - File editing and preview support for PDF, images, text files, Open Document, Word files and more. 
+
+    - Smooth performance and easy user interface. 
+
+    - Fine-grained control over access to data and sharing capabilities by user and by group.
+
+
+    Note: After logging in to Nextcloud please change the password to something secure before sharing the address with anyone.
+  developer: Nextcloud GmbH
+  website: https://nextcloud.com
+  dependencies: []
+  repo: https://github.com/nextcloud/server
+  support: https://help.nextcloud.com/categories
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: /login?user=umbrel
+  defaultPassword: moneyprintergobrrr
+  mainContainer: web
+
+containers:
+- name: db
+  image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
+  user: 1000:1000
+  command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --skip-innodb-read-only-compressed
+  environment:
+    MYSQL_ROOT_PASSWORD: moneyprintergobrrr
+    MYSQL_PASSWORD: moneyprintergobrrr
+    MYSQL_DATABASE: nextcloud
+    MYSQL_USER: nextcloud
+  data:
+  - data/db:/var/lib/mysql
+
+- image: redis:6.2.2-buster@sha256:e10f55f92478715698a2cef97c2bbdc48df2a05081edd884938903aa60df6396
+  user: 1000:1000
+  name: redis
+  data:
+  - data/redis:/data
+
+- name: web
+  image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
+  port: 80
+  environment:
+    MYSQL_HOST: ${APP_NEXTCLOUD_DB_IP}
+    REDIS_HOST: ${APP_NEXTCLOUD_REDIS_IP}
+    MYSQL_PASSWORD: moneyprintergobrrr
+    MYSQL_DATABASE: nextcloud
+    MYSQL_USER: nextcloud
+    NEXTCLOUD_ADMIN_USER: umbrel
+    NEXTCLOUD_ADMIN_PASSWORD: moneyprintergobrrr
+    NEXTCLOUD_TRUSTED_DOMAINS: ${APP_DOMAIN}:${APP_NEXTCLOUD_WEB_PORT} ${APP_HIDDEN_SERVICE}
+  depends_on:
+  - db
+  - redis
+  name: web
+  data:
+  - data/nextcloud:/var/www/html
+
+- image: nextcloud:22.1.1-apache@sha256:f566c9fd6d904c9be23f0a1f9f61a02c23723f13eac56f6bfcea1a708636aa0f
+  entrypoint: /cron.sh
+  depends_on:
+  - db
+  - redis
+  name: cron
+  data:
+  - data/nextcloud:/var/www/html

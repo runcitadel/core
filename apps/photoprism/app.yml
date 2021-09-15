@@ -1,0 +1,74 @@
+metadata:
+  category: Files
+  name: PhotoPrism
+  version: 210523-b1856b9d
+  tagline: Self-host your photo and video library
+  description: "PhotoPrism\xAE is a privately hosted app for browsing, organizing,\
+    \ and sharing your photo collection. It makes use of the latest technologies to\
+    \ tag and find pictures automatically without getting in your way. Say goodbye\
+    \ to solutions that force you to upload your visual memories to the cloud!\n\n\
+    - Our intuitive user interface makes browsing and organizing your photo collection\
+    \ as easy as it should be \u2014 whether it\u2019s on a phone, tablet, or desktop\
+    \ computer.\n\n- Index everything without worrying about duplicates or RAW to\
+    \ JPEG conversion.\n\n- Automatic image classification based on Google TensorFlow.\
+    \ In addition, our indexer detects colors, chroma, luminance, quality, panoramic\
+    \ projection, location type, and many other properties.\n\n- Includes four high-resolution\
+    \ world maps to see where you've been, and for rediscovering long-forgotten shots.\n\
+    \n- WebDAV clients, like Microsoft\u2019s Windows Explorer or Apple's Finder,\
+    \ may connect directly to PhotoPrism so that you to can open, edit, and delete\
+    \ files from your computer or phone as if they were local. You may easily sync\
+    \ your pictures with PhotoSync as well.\n\n- Because PhotoPrism is built as a\
+    \ progressive web app, it provides a native app-like experience, and you may install\
+    \ it on your home screen. There's also a community-maintained native app in development."
+  developer: PhotoPrism
+  website: https://photoprism.app
+  dependencies: []
+  repo: https://github.com/photoprism/photoprism
+  support: https://gitter.im/browseyourlife/community
+  port: 8087
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  path: ''
+  defaultPassword: moneyprintergobrrr
+  torOnly: false
+containers:
+- image: photoprism/photoprism:preview@sha256:7fd6df5b78270d01299c1ce7dd8d4dc4de76540323a7c84f13e39cd48b12eac5
+  user: 1000:1000
+  ports:
+  - ${APP_PHOTOPRISM_PORT}:${APP_PHOTOPRISM_PORT}
+  environment:
+    PHOTOPRISM_ADMIN_PASSWORD: moneyprintergobrrr
+    PHOTOPRISM_ORIGINALS_LIMIT: 10000
+    PHOTOPRISM_HTTP_COMPRESSION: gzip
+    PHOTOPRISM_HTTP_PORT: ${APP_PHOTOPRISM_PORT}
+    PHOTOPRISM_DATABASE_DRIVER: mysql
+    PHOTOPRISM_DATABASE_SERVER: ${APP_PHOTOPRISM_DB_IP}:3306
+    PHOTOPRISM_DATABASE_NAME: photoprism
+    PHOTOPRISM_DATABASE_USER: photoprism
+    PHOTOPRISM_DATABASE_PASSWORD: photoprism
+    PHOTOPRISM_SITE_URL: http://${APP_DOMAIN}:${APP_PHOTOPRISM_PORT}/
+    PHOTOPRISM_SITE_TITLE: PhotoPrism
+    PHOTOPRISM_SITE_CAPTION: Digital Asset Management
+    PHOTOPRISM_SITE_DESCRIPTION: ''
+    PHOTOPRISM_SITE_AUTHOR: ''
+  name: web
+  data:
+  - storage:/photoprism/storage
+  - originals:/photoprism/originals
+  ip: ${APP_PHOTOPRISM_IP}
+- image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
+  user: 1000:1000
+  command: mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4
+    --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF
+    --innodb-lock-wait-timeout=50
+  environment:
+    MYSQL_ROOT_PASSWORD: photoprism
+    MYSQL_DATABASE: photoprism
+    MYSQL_USER: photoprism
+    MYSQL_PASSWORD: photoprism
+  name: db
+  data:
+  - database:/var/lib/mysql
+  ip: ${APP_PHOTOPRISM_DB_IP}
