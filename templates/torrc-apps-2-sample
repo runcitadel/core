@@ -12,14 +12,6 @@ HiddenServicePort 80 <app-samourai-server-ip>:8081
 HiddenServiceDir /var/lib/tor/app-samourai-server-whirlpool
 HiddenServicePort 80 <app-samourai-server-whirlpool-ip>:<app-samourai-server-whirlpool-port>
 
-# LndHub Hidden Service
-HiddenServiceDir /var/lib/tor/app-bluewallet
-HiddenServicePort 80 <app-bluewallet-lndhub-ip>:<app-bluewallet-lndhub-port>
-
-# nextcloud Hidden Service
-HiddenServiceDir /var/lib/tor/app-nextcloud
-HiddenServicePort 80 <app-nextcloud-ip>:80
-
 # pi-hole Hidden Service
 HiddenServiceDir /var/lib/tor/app-pi-hole
 HiddenServicePort 80 <app-pi-hole-ip>:80
