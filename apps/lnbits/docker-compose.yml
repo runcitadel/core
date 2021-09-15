@@ -1,33 +1,27 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
-    image: lnbitsdocker/lnbits:19ae1dd@sha256:6060022107ed0242826ef049bdcd109ebec9ef31331ab597ebb06c18051a3d85
+    image: lnbitsdocker/lnbits:3b9401e@sha256:083a7e2d7822bf1a8dd938019ebc044450d74a5b1a9af89dfa5fa695d24ec317
     user: 1000:1000
     init: true
-    restart: on-failure
-    stop_grace_period: 1m
     ports:
-      - "$APP_LNBITS_PORT:$APP_LNBITS_PORT"
-    volumes:
-      - ${APP_DATA_DIR}/data:/data
-      - ${LND_DATA_DIR}:/lnd:ro
+    - $APP_LNBITS_PORT:$APP_LNBITS_PORT
     environment:
-      # Global
-      LNBITS_BIND: "0.0.0.0:$APP_LNBITS_PORT"
-      LNBITS_DATA_FOLDER: "/data"
-
-      # LND
+      LNBITS_BIND: 0.0.0.0:$APP_LNBITS_PORT
+      LNBITS_DATA_FOLDER: /data
       LNBITS_BACKEND_WALLET_CLASS: LndWallet
       LND_GRPC_ENDPOINT: $LND_IP
       LND_GRPC_PORT: $LND_GRPC_PORT
-      LND_GRPC_CERT: "/lnd/tls.cert"
-      LND_GRPC_MACAROON: "/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
-
-      # App
-      LNBITS_SITE_TITLE: "LNbits - Umbrel"
-      LNBITS_DEFAULT_WALLET_NAME: "LNbits wallet"
-      LNBITS_DISABLED_EXTENSIONS: "amilk"
+      LND_GRPC_CERT: /lnd/tls.cert
+      LND_GRPC_MACAROON: /lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon
+      LNBITS_SITE_TITLE: LNbits - Citadel
+      LNBITS_DEFAULT_WALLET_NAME: LNbits wallet
+      LNBITS_DISABLED_EXTENSIONS: amilk
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${APP_DATA_DIR}/data:/data
     networks:
-        default:
-          ipv4_address: $APP_LNBITS_IP
+      default:
+        ipv4_address: $APP_LNBITS_IP
+    stop_grace_period: 1m
+    restart: on-failure

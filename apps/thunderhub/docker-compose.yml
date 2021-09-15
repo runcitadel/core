@@ -1,22 +1,21 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
-    image: apotdevin/thunderhub:v0.12.24@sha256:ea466edac18a8889d6e59f3697f16612fd25d7c3fffb712098ef337fe1d76f2b
-    user: "1000:1000"
-    restart: on-failure
-    stop_grace_period: 1m
+    image: apotdevin/thunderhub:v0.12.25@sha256:21f3610787b0824373238b02f77fcde5e944ce784c818796ee9740394de23e32
+    user: 1000:1000
     ports:
-      - "$APP_THUNDERHUB_PORT:$APP_THUNDERHUB_PORT"
-    volumes:
-      - ${LND_DATA_DIR}:/lnd:ro
-      - ${APP_DATA_DIR}/data:/data
+    - $APP_THUNDERHUB_PORT:$APP_THUNDERHUB_PORT
     environment:
-      NO_VERSION_CHECK: "true"
-      LOG_LEVEL: "debug"
-      ACCOUNT_CONFIG_PATH: "/data/thubConfig.yaml"
-      YML_ENV_1: "$LND_IP:$LND_GRPC_PORT"
-      TOR_PROXY_SERVER: "socks://$TOR_PROXY_IP:$TOR_PROXY_PORT"
+      NO_VERSION_CHECK: 'true'
+      LOG_LEVEL: debug
+      ACCOUNT_CONFIG_PATH: /data/thubConfig.yaml
+      YML_ENV_1: $LND_IP:$LND_GRPC_PORT
+      TOR_PROXY_SERVER: socks://$TOR_PROXY_IP:$TOR_PROXY_PORT
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${APP_DATA_DIR}/data:/data
     networks:
       default:
         ipv4_address: $APP_THUNDERHUB_IP
+    stop_grace_period: 1m
+    restart: on-failure

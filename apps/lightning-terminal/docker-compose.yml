@@ -1,25 +1,24 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
     image: lightninglabs/lightning-terminal:v0.5.0-alpha@sha256:1c9c59fe0316de5d64e89e205f91fb647660a865428daacfe582cb968fd42f87
-    user: "1000:1000"
-    restart: on-failure
-    stop_grace_period: 1m
+    user: 1000:1000
     ports:
-      - "$APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT"
-    volumes:
-      - ${APP_DATA_DIR}/data:/data
-      - ${LND_DATA_DIR}:/lnd:ro
+    - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
     environment:
-      HOME: "/data"
+      HOME: /data
     command:
-        - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
-        - --network="$BITCOIN_NETWORK"
-        - --lnd-mode="remote"
-        - --remote.lnd.rpcserver=$LND_IP:$LND_GRPC_PORT
-        - --remote.lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
-        - --remote.lnd.tlscertpath="/lnd/tls.cert"
+    - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
+    - --network="$BITCOIN_NETWORK"
+    - --lnd-mode="remote"
+    - --remote.lnd.rpcserver=$LND_IP:$LND_GRPC_PORT
+    - --remote.lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
+    - --remote.lnd.tlscertpath="/lnd/tls.cert"
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${APP_DATA_DIR}/data:/data
     networks:
       default:
         ipv4_address: $APP_LIGHTNING_TERMINAL_IP
+    stop_grace_period: 1m
+    restart: on-failure

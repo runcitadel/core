@@ -1,0 +1,134 @@
+[
+    {
+        "id": "thunderhub",
+        "name": "ThunderHub",
+        "repo": "https://github.com/apotdevin/thunderhub",
+        "version": "0.12.25"
+    },
+    {
+        "id": "ride-the-lightning",
+        "name": "Ride The Lightning",
+        "repo": "https://github.com/Ride-The-Lightning/RTL",
+        "version": "0.11.2"
+    },
+    {
+        "id": "squeaknode",
+        "name": "Squeaknode",
+        "repo": "https://github.com/yzernik/squeaknode",
+        "version": "0.1.152"
+    },
+    {
+        "id": "pi-hole",
+        "name": "Pi-hole",
+        "repo": "https://github.com/pi-hole/pi-hole",
+        "version": "5.3.1"
+    },
+    {
+        "id": "specter-desktop",
+        "name": "Specter Desktop",
+        "repo": "https://github.com/cryptoadvance/specter-desktop",
+        "version": "1.6.0"
+    },
+    {
+        "id": "element",
+        "name": "Element",
+        "repo": "https://github.com/vector-im/element-web",
+        "version": "2.1.5"
+    },
+    {
+        "id": "home-assistant",
+        "name": "Home Assistant",
+        "repo": "https://github.com/home-assistant/core",
+        "version": "2021.9.5"
+    },
+    {
+        "id": "photoprism",
+        "name": "PhotoPrism",
+        "repo": "https://github.com/photoprism/photoprism",
+        "version": "210523-b1856b9d"
+    },
+    {
+        "id": "mempool",
+        "name": "Mempool",
+        "repo": "https://github.com/mempool/mempool",
+        "version": "2.2.1"
+    },
+    {
+        "id": "samourai-server",
+        "name": "Samourai Server",
+        "repo": "https://github.com/louneskmt/umbrel-samourai-dojo/tree/v1.10.1-umbrel",
+        "version": "1.10.1"
+    },
+    {
+        "id": "btc-rpc-explorer",
+        "name": "BTC RPC Explorer",
+        "repo": "https://github.com/janoside/btc-rpc-explorer",
+        "version": "3.2.0"
+    },
+    {
+        "id": "nextcloud",
+        "name": "Nextcloud",
+        "repo": "https://github.com/nextcloud/server",
+        "version": "22.1.1"
+    },
+    {
+        "id": "sphinx-relay",
+        "name": "Sphinx Relay",
+        "repo": "https://github.com/stakwork/sphinx-relay",
+        "version": "2.2.0"
+    },
+    {
+        "id": "code-server",
+        "name": "code-server",
+        "repo": "https://github.com/cdr/code-server",
+        "version": "3.11.1"
+    },
+    {
+        "id": "vaultwarden",
+        "name": "Vaultwarden",
+        "repo": "https://github.com/dani-garcia/vaultwarden",
+        "version": "1.22.2"
+    },
+    {
+        "id": "bluewallet",
+        "name": "BlueWallet Lightning",
+        "repo": "https://github.com/BlueWallet/LndHub",
+        "version": "1.3.5"
+    },
+    {
+        "id": "gitea",
+        "name": "Gitea",
+        "repo": "https://github.com/go-gitea/gitea",
+        "version": "1.15.2"
+    },
+    {
+        "id": "lightning-terminal",
+        "name": "Lightning Terminal",
+        "repo": "https://github.com/lightninglabs/lightning-terminal",
+        "version": "v0.5.0-alpha"
+    },
+    {
+        "id": "btcpay-server",
+        "name": "BTCPay Server",
+        "repo": "https://github.com/btcpayserver/btcpayserver",
+        "version": "1.2.2"
+    },
+    {
+        "id": "lnbits",
+        "name": "LNbits",
+        "repo": "https://github.com/lnbits/lnbits",
+        "version": "3b9401e"
+    },
+    {
+        "id": "simple-torrent",
+        "name": "SimpleTorrent",
+        "repo": "https://github.com/boypt/simple-torrent",
+        "version": "1.3.6"
+    },
+    {
+        "id": "synapse",
+        "name": "Synapse",
+        "repo": "https://github.com/matrix-org/synapse",
+        "version": "1.42.0"
+    }
+]

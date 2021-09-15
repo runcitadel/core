@@ -1,12 +1,13 @@
-version: "3.7"
-
+version: '3.7'
 services:
   server:
-    image: homeassistant/home-assistant:2021.9.6@sha256:3b0b1d1e595a77fdca2e765d4441545ab873841fc311964f8d6cf9cb9e99f38e
-    ports:
-      - "${APP_HOME_ASSISTANT_PORT}:8123"
+    image: homeassistant/home-assistant:2021.9.5@sha256:66d80bef139d3039dc933f45f5d98b72829af39801e07f810d94648215e971fd
     volumes:
-      - ${APP_DATA_DIR}/data:/config
+    - ${APP_DATA_DIR}/data:/config
     networks:
       default:
-        ipv4_address: $APP_HOME_ASSISTANT_IP
+        ipv4_address: $APP_HOME_ASSISTANT_SERVER_IP
+    ports:
+    - ${APP_HOME_ASSISTANT_SERVER_PORT}:8123
+    stop_grace_period: 1m
+    restart: on-failure

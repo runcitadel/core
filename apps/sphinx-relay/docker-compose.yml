@@ -1,25 +1,23 @@
-version: "3.7"
-
+version: '3.7'
 services:
   sphinx-relay:
-    container_name: sphinx-relay
     image: sphinxlightning/sphinx-relay:v2.2.0@sha256:1a13a3c43d59225fd1b9663bc161a3d1b923454d9b1b274675117ac41bd1eb87
     init: true
-    restart: on-failure
-    stop_grace_period: 1m
-    volumes:
-      - ${LND_DATA_DIR}:/lnd:ro
-      - ${APP_DATA_DIR}/data:/relay/.lnd/
     ports:
-      - "$APP_SPHINX_RELAY_PORT:$APP_SPHINX_RELAY_PORT"
+    - $APP_SPHINX_RELAY_PORT:$APP_SPHINX_RELAY_PORT
     environment:
-      PUBLIC_URL: "$APP_HIDDEN_SERVICE:$APP_SPHINX_RELAY_PORT"
+      PUBLIC_URL: $APP_HIDDEN_SERVICE:$APP_SPHINX_RELAY_PORT
       LND_IP: $LND_IP
-      CONNECT_UI: "true"
+      CONNECT_UI: 'true'
       LND_PORT: $LND_GRPC_PORT
       TLS_LOCATION: /lnd/tls.cert
       MACAROON_LOCATION: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
       LND_LOG_LOCATION: /lnd/logs/bitcoin/${BITCOIN_NETWORK}/lnd.log
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${APP_DATA_DIR}/data:/relay/.lnd/
     networks:
       default:
         ipv4_address: $APP_SPHINX_RELAY_IP
+    stop_grace_period: 1m
+    restart: on-failure

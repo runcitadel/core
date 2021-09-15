@@ -1,24 +1,24 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
-    image: lncm/specter-desktop:v1.5.1@sha256:fcfd2d5b5808c48717af7830b6da92606fbd7f5edcdd62b5766a0cb2f08f2ffe
+    image: lncm/specter-desktop:v1.6.0@sha256:d641f3f81f2450e4f36803b39dc061a999f48eed8a8c4a1de4110391115938b0
     stop_signal: SIGINT
-    restart: on-failure
-    stop_grace_period: 1m
     ports:
-      - "$APP_SPECTER_DESKTOP_PORT:$APP_SPECTER_DESKTOP_PORT"
-    volumes:
-      - ${APP_DATA_DIR}/data:/data
+    - $APP_SPECTER_DESKTOP_PORT:$APP_SPECTER_DESKTOP_PORT
     command:
-      - --host=0.0.0.0
-      - --specter-data-folder=/data
+    - --host=0.0.0.0
+    - --specter-data-folder=/data
     environment:
       BTC_RPC_USER: $BITCOIN_RPC_USER
       BTC_RPC_PASSWORD: $BITCOIN_RPC_PASS
       BTC_RPC_HOST: $BITCOIN_IP
       BTC_RPC_PORT: $BITCOIN_RPC_PORT
       BTC_RPC_PROTOCOL: http
+    volumes:
+    - ${BITCOIN_DATA_DIR}:/bitcoin:ro
+    - ${APP_DATA_DIR}/data:/data
     networks:
       default:
         ipv4_address: $APP_SPECTER_DESKTOP_IP
+    stop_grace_period: 1m
+    restart: on-failure

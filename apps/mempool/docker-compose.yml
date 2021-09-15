@@ -1,30 +1,25 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
     image: mempool/frontend:v2.2.1@sha256:6c87505b89cce1bb3dd99ff2d59cfac5ff2b78136a0f17fe5c37c3f832b9aff6
-    user: "1000:1000"
+    user: 1000:1000
     init: true
-    restart: on-failure
-    stop_grace_period: 1m
-    command: "./wait-for mariadb:3306 --timeout=720 -- nginx -g 'daemon off;'"
+    command: ./wait-for mariadb:3306 --timeout=720 -- nginx -g 'daemon off;'
     ports:
-      - ${APP_MEMPOOL_PORT}:${APP_MEMPOOL_PORT}
+    - ${APP_MEMPOOL_PORT}:${APP_MEMPOOL_PORT}
     environment:
       FRONTEND_HTTP_PORT: $APP_MEMPOOL_PORT
       BACKEND_MAINNET_HTTP_HOST: $APP_MEMPOOL_API_IP
     networks:
       default:
         ipv4_address: $APP_MEMPOOL_IP
+    stop_grace_period: 1m
+    restart: on-failure
   api:
     image: mempool/backend:v2.2.1@sha256:175f33ab2e96319c2730c020f28207cef9d1f4cb330eab4f40fa4721d01fa272
-    user: "1000:1000"
+    user: 1000:1000
     init: true
-    restart: on-failure
-    stop_grace_period: 1m
-    command: "./wait-for-it.sh mariadb:3306 --timeout=720 --strict -- ./start.sh"
-    volumes:
-      - ${APP_DATA_DIR}/data:/backend/cache
+    command: ./wait-for-it.sh mariadb:3306 --timeout=720 --strict -- ./start.sh
     environment:
       RPC_HOST: $BITCOIN_IP
       RPC_PORT: $BITCOIN_RPC_PORT
@@ -32,31 +27,36 @@ services:
       RPC_PASS: $BITCOIN_RPC_PASS
       ELECTRUM_HOST: $ELECTRUM_IP
       ELECTRUM_PORT: $ELECTRUM_PORT
-      ELECTRUM_TLS: "false"
+      ELECTRUM_TLS: 'false'
       MYSQL_HOST: $APP_MEMPOOL_DB_IP
-      MYSQL_PORT: "3306"
-      MYSQL_DATABASE: "mempool"
-      MYSQL_USER: "mempool"
-      MYSQL_PASS: "mempool"
-      BACKEND_MAINNET_HTTP_PORT: "8999"
-      CACHE_DIR: "/backend/cache"
-      MEMPOOL_CLEAR_PROTECTION_MINUTES: "20"
+      MYSQL_PORT: '3306'
+      MYSQL_DATABASE: mempool
+      MYSQL_USER: mempool
+      MYSQL_PASS: mempool
+      BACKEND_MAINNET_HTTP_PORT: '8999'
+      CACHE_DIR: /backend/cache
+      MEMPOOL_CLEAR_PROTECTION_MINUTES: '20'
+    volumes:
+    - ${BITCOIN_DATA_DIR}:/bitcoin:ro
+    - ${APP_DATA_DIR}/data:/backend/cache
     networks:
-       default:
-         ipv4_address: $APP_MEMPOOL_API_IP
+      default:
+        ipv4_address: $APP_MEMPOOL_API_IP
+    stop_grace_period: 1m
+    restart: on-failure
   mariadb:
     image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
-    user: "1000:1000"
-    restart: on-failure
-    stop_grace_period: 1m
-    volumes:
-      - ${APP_DATA_DIR}/mysql/data:/var/lib/mysql
-      - ${APP_DATA_DIR}/mysql/db-scripts:/docker-entrypoint-initdb.d
+    user: 1000:1000
     environment:
-      MYSQL_DATABASE: "mempool"
-      MYSQL_USER: "mempool"
-      MYSQL_PASSWORD: "mempool"
-      MYSQL_ROOT_PASSWORD: "moneyprintergobrrr"
+      MYSQL_DATABASE: mempool
+      MYSQL_USER: mempool
+      MYSQL_PASSWORD: mempool
+      MYSQL_ROOT_PASSWORD: moneyprintergobrrr
+    volumes:
+    - ${APP_DATA_DIR}/mysql/db-scripts:/docker-entrypoint-initdb.d
+    - ${APP_DATA_DIR}/mysql/data:/var/lib/mysql
     networks:
-       default:
-         ipv4_address: $APP_MEMPOOL_DB_IP
+      default:
+        ipv4_address: $APP_MEMPOOL_DB_IP
+    stop_grace_period: 1m
+    restart: on-failure

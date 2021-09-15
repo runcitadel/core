@@ -1,34 +1,28 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
-    image: getumbrel/btc-rpc-explorer:v3.2.0@sha256:ae22dae91a00268c8e02b50da332c6ffcb8c12a1f32991a1f85dfc1496a1c673
-    restart: on-failure
-    stop_grace_period: 1m
-    ports:
-      - "$APP_BTC_RPC_EXPLORER_PORT:$APP_BTC_RPC_EXPLORER_PORT"
+    image: runcitadel/btc-rpc-explorer:v3.2.0@sha256:fabece1bbcf0ceebf4147a905407a8e952dc7a04f148a511375ed4d32915bf5e
     environment:
-      # Docker requirements
       BTCEXP_HOST: 0.0.0.0
-      # Bitcoin Core
       BTCEXP_BITCOIND_HOST: $BITCOIN_IP
       BTCEXP_BITCOIND_PORT: $BITCOIN_RPC_PORT
       BTCEXP_BITCOIND_USER: $BITCOIN_RPC_USER
       BTCEXP_BITCOIND_PASS: $BITCOIN_RPC_PASS
-      # Electrum
-      BTCEXP_ADDRESS_API: electrumx
-      BTCEXP_ELECTRUMX_SERVERS: "tcp://$ELECTRUM_IP:$ELECTRUM_PORT"
-      # Log level
-      DEBUG: "btcexp:*,electrumClient"
-      # Performance
-      BTCEXP_SLOW_DEVICE_MODE: "true"
-      BTCEXP_NO_INMEMORY_RPC_CACHE: "true"
-      # Privacy
-      BTCEXP_PRIVACY_MODE: "true"
-      BTCEXP_NO_RATES: "true"
-      # Disable RPC
-      BTCEXP_RPC_ALLOWALL: "false"
-      BTCEXP_BASIC_AUTH_PASSWORD: ""
+      BTCEXP_ADDRESS_API: electrum
+      BTCEXP_ELECTRUM_SERVERS: tcp://$ELECTRUM_IP:$ELECTRUM_PORT
+      DEBUG: btcexp:*,electrumClient
+      BTCEXP_SLOW_DEVICE_MODE: 'true'
+      BTCEXP_NO_INMEMORY_RPC_CACHE: 'true'
+      BTCEXP_PRIVACY_MODE: 'true'
+      BTCEXP_NO_RATES: 'true'
+      BTCEXP_RPC_ALLOWALL: 'false'
+      BTCEXP_BASIC_AUTH_PASSWORD: ''
+    volumes:
+    - ${BITCOIN_DATA_DIR}:/bitcoin:ro
     networks:
       default:
-        ipv4_address: $APP_BTC_RPC_EXPLORER_IP
+        ipv4_address: $APP_BTC_RPC_EXPLORER_WEB_IP
+    ports:
+    - ${APP_BTC_RPC_EXPLORER_WEB_PORT}:3002
+    stop_grace_period: 1m
+    restart: on-failure

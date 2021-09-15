@@ -31,7 +31,7 @@ cd  btc-rpc-explorer
 2\. Next, we'll create a `Dockerfile` in the app's directory:
 
 ```Dockerfile
-FROM node:12-buster-slim AS builder
+FROM node:16-bullseye-slim AS builder
 
 WORKDIR /build
 COPY . .
@@ -39,7 +39,7 @@ RUN apt-get update
 RUN apt-get install -y git python3 build-essential
 RUN npm ci --production
 
-FROM node:12-buster-slim
+FROM node:16-bullseye-slim
 
 USER 1000
 WORKDIR /build
@@ -50,7 +50,7 @@ CMD ["npm", "start"]
 
 ### A good Dockerfile:
 
-- [x] Uses `debian:buster-slim` (or its derivatives, like `node:12-buster-slim`) as the base image — resulting in less storage consumption and faster app installs as the base image is already cached on the user's Umbrel.
+- [x] Uses `debian:bullseye-slim` (or its derivatives, like `node:16-bullseye-slim`) as the base image — resulting in less storage consumption and faster app installs as the base image is already cached on the user's node.
 - [x] Uses [multi-stage builds](https://docs.docker.com/develop/develop-images/multistage-build/) for smaller image size.
 - [x] Ensures development files are not included in the final image.
 - [x] Has only one service per container.
@@ -58,23 +58,23 @@ CMD ["npm", "start"]
 - [x] Uses remote assets that are verified against a checksum.
 - [x] Results in deterministic image builds.
 
-3\. We're now ready to build the Docker image of BTC RPC Explorer. Umbrel supports both 64-bit ARM and x86 architectures, so we'll use `docker buildx` to build, tag, and push multi-architecture Docker images of our app to Docker Hub.
+3\. We're now ready to build the Docker image of BTC RPC Explorer. Citadel supports both 64-bit ARM and x86 architectures, so we'll use `docker buildx` to build, tag, and push multi-architecture Docker images of our app to Docker Hub.
 
 ```sh
-docker buildx build --platform linux/arm64,linux/amd64 --tag getumbrel/btc-rpc-explorer:v2.0.2 --output "type=registry" .
+docker buildx build --platform linux/arm64,linux/amd64 --tag runcitadel/btc-rpc-explorer:v3.2.0 --output "type=registry" .
 ```
 
 > You need to enable ["experimental features"](https://docs.docker.com/engine/reference/commandline/cli/#experimental-features) in Docker to use `docker buildx`.
 
 ___
 
-## 2. ☂️&nbsp;&nbsp;Packaging the app for Umbrel
+## 2. 📦&nbsp;&nbsp;Packaging the app
 
-1\. Let's fork the [getumbrel/umbrel](https://github.com/getumbrel/umbrel) repo on GitHub, clone our fork locally, create a new branch for our app, and then switch to it:
+1\. Let's fork the [runcitadel/compose-nonfree](https://github.com/runcitadel/compose-nonfree) repo on GitHub, clone our fork locally, create a new branch for our app, and then switch to it:
 
 ```sh
-git clone https://github.com/<username>/umbrel.git
-cd umbrel
+git clone https://github.com/<username>/compose-nonfree.git citadel
+cd citadel
 git checkout -b btc-rpc-explorer
 ```
 
@@ -87,30 +87,70 @@ mkdir apps/btc-rpc-explorer
 cd apps/btc-rpc-explorer
 ```
 
-3\. We'll now create a `docker-compose.yml` file in this directory to define our application.
+3\. We'll now create a `app.yml` file in this directory to define our application.
 
 > New to Docker Compose? It's a simple tool for defining and running Docker applications that can have multiple containers. Follow along the tutorial, we promise it's not hard if you already understand the basics of Docker.
 
-Let's copy-paste the following template `docker-compose.yml` file in a text editor and edit it according to our app.
+Let's copy-paste the following template `app.yml` file in a text editor and edit it according to our app.
 
 ```yml
-version: "3.7"
+# First, define some properties for the app
+metadata:
+  category: Explorers
+  name: BTC RPC Explorer
+  version: 3.2.0
+  # The tagline shouldn't have more than 50 characters.
+  tagline: Simple, database-free blockchain explorer
+  # 50 to 200 words description of the app
+  description: >-
+    BTC RPC Explorer is a full-featured, self-hosted explorer for the
+    Bitcoin blockchain. With this explorer, you can explore not just the blockchain
+    database, but also explore the functional capabilities of your Umbrel.
 
-services:
-  web:
+
+    It comes with a network summary dashboard, detailed view of blocks, transactions,
+    addresses, along with analysis tools for viewing stats on miner activity, mempool
+    summary, with fee, size, and age breakdowns. You can also search by transaction
+    ID, block hash/height, and addresses.
+
+
+    It's time to appreciate the "fullness" of your node.
+  developer: Dan Janosik
+  website: https://explorer.btc21.org
+  dependencies:
+  - electrum
+  - bitcoind
+  repo: https://github.com/janoside/btc-rpc-explorer
+  support: https://github.com/janoside/btc-rpc-explorer/discussions
+  port: 3002
+  # This property is used by the dashboard later to display preview images.
+  # You can ignore this property for now
+  gallery:
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+
+# Now, define the docker containers
+containers:
+  - name: web
     image: <docker-image>:<tag>
     restart: on-failure
     stop_grace_period: 1m
+    # Define the permissions your app needs.
+    permissions:
+      - bitcoind
+      - electrum
+      - lnd
     ports:
       # Replace <port> with the port that your app's web server
       # is listening inside the Docker container. If you need to
       # expose more ports, add them below.
       - <port>:<port>
-    volumes:
+    data:
       # Uncomment to mount your data directories inside
       # the Docker container for storing persistent data
-      # - ${APP_DATA_DIR}/foo:/foo
-      # - ${APP_DATA_DIR}/bar:/bar
+      # - foo:/foo
+      # - bar:/bar
 
       # Uncomment to mount LND's data directory as read-only
       # inside the Docker container at path /lnd
@@ -151,9 +191,9 @@ services:
       # App specific environment variables
       # $APP_HIDDEN_SERVICE - The address of the Tor hidden service your app will be exposed at
       # $APP_DOMAIN - Local domain name of the app ("umbrel.local" on Umbrel OS)
-  # If your app has more services, like a database container, you can define those
+  # If your app has more conrtainers, like a database, you can define those
   # services below:
-  # db:
+  # - name: db
   #   image: <docker-image>:<tag>
   #   ...
 
@@ -323,7 +363,7 @@ ___
 
 ## 4. 🚀&nbsp;&nbsp;Submitting the app
 
-We're now ready to open a pull request on the main [getumbrel/umbrel](https://github.com/getumbrel/umbrel) repo to submit our app. Let's copy-paste the following markdown for the pull request description, fill it up with the required details, and then open a pull request.
+We're now ready to open a pull request on the main [runcitadel/compose-nonfree](https://github.com/runcitadel/compose-nonfree) repo to submit our app. Let's copy-paste the following markdown for the pull request description, fill it up with the required details, and then open a pull request.
 
 ```
 # App Submission

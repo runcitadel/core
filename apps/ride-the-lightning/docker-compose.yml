@@ -1,53 +1,46 @@
-version: "3.7"
-
+version: '3.7'
 services:
   web:
-    image: shahanafarooqui/rtl:0.11.0@sha256:d0cd3d868acab40352bc3c8f4b62e49a7ae833878ac09d64debffdddfc063322
-    user: "1000:1000"
-    restart: on-failure
-    stop_grace_period: 1m
+    image: shahanafarooqui/rtl:0.11.2@sha256:225b47abcca053e3ea831431742a08b3f3e70b12654df6fd703f617ad965f34e
+    user: 1000:1000
     ports:
-      - "$APP_RIDE_THE_LIGHTNING_PORT:$APP_RIDE_THE_LIGHTNING_PORT"
-    volumes:
-      - ${APP_DATA_DIR}/rtl:/data
-      - ${APP_DATA_DIR}/loop:/loop
-      - ${LND_DATA_DIR}:/lnd:ro
-      - ${BITCOIN_DATA_DIR}:/bitcoin:ro
+    - $APP_RIDE_THE_LIGHTNING_PORT:$APP_RIDE_THE_LIGHTNING_PORT
     environment:
-        # App config
-        PORT: $APP_RIDE_THE_LIGHTNING_PORT
-        RTL_CONFIG_PATH: "/data"
-        CHANNEL_BACKUP_PATH: "/data/backup"
-        LN_IMPLEMENTATION: "LND"
-
-        # LND connection details
-        LN_SERVER_URL: "https://$LND_IP:$LND_REST_PORT"
-        MACAROON_PATH: "/lnd/data/chain/bitcoin/$BITCOIN_NETWORK"
-        CONFIG_PATH: "/lnd/lnd.conf"
-
-        # Loop
-        SWAP_SERVER_URL: "https://$APP_RIDE_THE_LIGHTNING_LOOP_IP:8081"
-        SWAP_MACAROON_PATH: "/loop/.loop/$BITCOIN_NETWORK"
+      PORT: $APP_RIDE_THE_LIGHTNING_PORT
+      RTL_CONFIG_PATH: /data
+      CHANNEL_BACKUP_PATH: /data/backup
+      LN_IMPLEMENTATION: LND
+      LN_SERVER_URL: https://$LND_IP:$LND_REST_PORT
+      MACAROON_PATH: /lnd/data/chain/bitcoin/$BITCOIN_NETWORK
+      CONFIG_PATH: /lnd/lnd.conf
+      SWAP_SERVER_URL: https://$APP_RIDE_THE_LIGHTNING_LOOP_IP:8081
+      SWAP_MACAROON_PATH: /loop/.loop/$BITCOIN_NETWORK
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${BITCOIN_DATA_DIR}:/bitcoin:ro
+    - ${APP_DATA_DIR}/loop:/loop
+    - ${APP_DATA_DIR}/rtl:/data
     networks:
       default:
         ipv4_address: $APP_RIDE_THE_LIGHTNING_IP
-
-  loop:
-    image: louneskmt/loop:v0.12.1-beta@sha256:f57abd0cbccfaa741d6f0eb301421be1649e7dd42c1fc804a7759d7521866436
-    user: "1000:1000"
-    restart: on-failure
     stop_grace_period: 1m
-    volumes:
-      - ${APP_DATA_DIR}/loop:/data
-      - ${LND_DATA_DIR}:/lnd:ro
+    restart: on-failure
+  loop:
+    image: runcitadel/loop:v0.15.0-beta@sha256:40561eed1de740eba99e4784703134a7d987c4c1f064d6759c449f56f34c7338
+    user: 1000:1000
     environment:
-      HOME: "/data"
+      HOME: /data
     command:
-      - --network=$BITCOIN_NETWORK
-      - --lnd.host="$LND_IP:$LND_GRPC_PORT"
-      - --lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
-      - --lnd.tlspath="/lnd/tls.cert"
-      - --restlisten=0.0.0.0:8081
+    - --network=$BITCOIN_NETWORK
+    - --lnd.host="$LND_IP:$LND_GRPC_PORT"
+    - --lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
+    - --lnd.tlspath="/lnd/tls.cert"
+    - --restlisten=0.0.0.0:8081
+    volumes:
+    - ${LND_DATA_DIR}:/lnd:ro
+    - ${APP_DATA_DIR}/loop:/data
     networks:
       default:
         ipv4_address: $APP_RIDE_THE_LIGHTNING_LOOP_IP
+    stop_grace_period: 1m
+    restart: on-failure

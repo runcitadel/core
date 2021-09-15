@@ -1,46 +1,39 @@
-version: "3.7"
-
+version: '3.7'
 services:
   db:
-    image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
+    image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
     init: true
-    restart: on-failure
     stop_grace_period: 5m
-    user: "1000:1000"
+    user: 1000:1000
     environment:
       MYSQL_DATABASE: samourai-main
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: samourai
       MYSQL_PASSWORD: password
     volumes:
-      - ${APP_DATA_DIR}/mysql/data:/var/lib/mysql
-      - ${APP_DATA_DIR}/mysql/db-scripts:/docker-entrypoint-initdb.d
-      - ${APP_DATA_DIR}/mysql/mysql-dojo.cnf:/etc/mysql/conf.d/mysql-dojo.cnf
-      - ${APP_DATA_DIR}/mysql/update-db.sh:/update-db.sh
+    - ${APP_DATA_DIR}/mysql/update-db.sh:/update-db.sh
+    - ${APP_DATA_DIR}/mysql/mysql-dojo.cnf:/etc/mysql/conf.d/mysql-dojo.cnf
+    - ${APP_DATA_DIR}/mysql/db-scripts:/docker-entrypoint-initdb.d
+    - ${APP_DATA_DIR}/mysql/data:/var/lib/mysql
     networks:
       default:
         ipv4_address: $APP_SAMOURAI_SERVER_DB_IP
-
+    restart: on-failure
   node:
     image: louneskmt/dojo-nodejs:1.10.1@sha256:d1460df18df091837718fcd0a6d3850e2f1a4a49da5914a697648c40d5477184
     init: true
-    restart: on-failure
-    command: "/home/node/app/wait-for-it.sh ${APP_SAMOURAI_SERVER_DB_IP}:3306 --timeout=720 --strict -- /home/node/app/restart.sh"
-    user: "1000:1000"
+    command: /home/node/app/wait-for-it.sh ${APP_SAMOURAI_SERVER_DB_IP}:3306 --timeout=720
+      --strict -- /home/node/app/restart.sh
+    user: 1000:1000
     environment:
-      # GLOBAL
       COMMON_BTC_NETWORK: $BITCOIN_NETWORK
       DOJO_NODEJS_VERSION_TAG: 1.10.1
       NET_DOJO_TOR_IPV4: $TOR_PROXY_IP
       NET_DOJO_TOR_PORT: $TOR_PROXY_PORT
       NET_DOJO_MYSQL_IPV4: $APP_SAMOURAI_SERVER_DB_IP
-
-      # MYSQL
       MYSQL_DATABASE: samourai-main
       MYSQL_USER: samourai
       MYSQL_PASSWORD: password
-
-      # NODEJS
       NODE_GAP_EXTERNAL: 100
       NODE_GAP_INTERNAL: 100
       NODE_ADDR_FILTER_THRESHOLD: 1000
@@ -58,85 +51,82 @@ services:
       NODE_TRACKER_UNCONF_TXS_PERIOD: 300000
       NODE_ACTIVE_INDEXER: local_indexer
       NODE_FEE_TYPE: ECONOMICAL
-
-      # SECURITY
-      NODE_API_KEY: $SAMOURAI_SERVER_NODE_API_KEY
-      NODE_ADMIN_KEY: $SAMOURAI_SERVER_NODE_ADMIN_KEY
-      NODE_JWT_SECRET: $SAMOURAI_SERVER_NODE_JWT_SECRET
-
-      # BITCOIN
+      NODE_API_KEY: $APP_SAMOURAI_SERVER_NODE_API_KEY
+      NODE_ADMIN_KEY: $APP_SAMOURAI_SERVER_NODE_ADMIN_KEY
+      NODE_JWT_SECRET: $APP_SAMOURAI_SERVER_NODE_JWT_SECRET
       BITCOIND_IP: $BITCOIN_IP
       BITCOIND_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIND_RPC_USER: $BITCOIN_RPC_USER
       BITCOIND_RPC_PASSWORD: $BITCOIN_RPC_PASS
       BITCOIND_ZMQ_RAWTXS: $BITCOIN_ZMQ_RAWTX_PORT
       BITCOIND_ZMQ_BLK_HASH: $BITCOIN_ZMQ_HASHBLOCK_PORT
-
-      # EXPLORER
-      EXPLORER_INSTALL: "off"
-
-      # INDEXER
+      EXPLORER_INSTALL: 'off'
       INDEXER_IP: $ELECTRUM_IP
       INDEXER_RPC_PORT: $ELECTRUM_PORT
-      INDEXER_BATCH_SUPPORT: inactive # 'active' for ElectrumX, 'inactive' otherwise
+      INDEXER_BATCH_SUPPORT: inactive
     depends_on:
-      - db
+    - db
+    volumes:
+    - ${BITCOIN_DATA_DIR}:/bitcoin:ro
     networks:
       default:
         ipv4_address: $APP_SAMOURAI_SERVER_NODE_IP
-
+    stop_grace_period: 1m
+    restart: on-failure
   whirlpool:
     image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
     init: true
-    restart: on-failure
-    user: "1000:1000"
+    user: 1000:1000
     command:
-      - "--listen"
-      - "--cli.apiKey=$SAMOURAI_SERVER_WHIRLPOOL_API_KEY"
-      - "--cli.api.http-enable=true"
-      - "--cli.api.http-port=$APP_SAMOURAI_SERVER_WHIRLPOOL_PORT"
-      - "--cli.tor=true"
-      - "--cli.torConfig.coordinator.enabled=true"
-      - "--cli.torConfig.coordinator.onion=true"
-      - "--cli.torConfig.backend.enabled=false"
-      - "--cli.torConfig.backend.onion=false"
-      - "--cli.mix.liquidityClient=true"
-      - "--cli.mix.clientsPerPool=1"
-      - "--resync"
+    - --listen
+    - --cli.apiKey=$APP_SAMOURAI_SERVER_WHIRLPOOL_API_KEY
+    - --cli.api.http-enable=true
+    - --cli.api.http-port=$APP_SAMOURAI_SERVER_WHIRLPOOL_PORT
+    - --cli.tor=true
+    - --cli.torConfig.coordinator.enabled=true
+    - --cli.torConfig.coordinator.onion=true
+    - --cli.torConfig.backend.enabled=false
+    - --cli.torConfig.backend.onion=false
+    - --cli.mix.liquidityClient=true
+    - --cli.mix.clientsPerPool=1
+    - --resync
     environment:
       WHIRLPOOL_BITCOIN_NETWORK: $BITCOIN_NETWORK
-      WHIRLPOOL_DOJO: "on"
+      WHIRLPOOL_DOJO: 'on'
       WHIRLPOOL_DOJO_IP: $APP_SAMOURAI_SERVER_IP
     volumes:
-      - ${APP_DATA_DIR}/whirlpool:/home/whirlpool/.whirlpool-cli
+    - ${APP_DATA_DIR}/whirlpool:/home/whirlpool/.whirlpool-cli
     networks:
       default:
         ipv4_address: $APP_SAMOURAI_SERVER_WHIRLPOOL_IP
-
+    stop_grace_period: 1m
+    restart: on-failure
   nginx:
     image: nginx:1.19-alpine@sha256:c2ce58e024275728b00a554ac25628af25c54782865b3487b11c21cafb7fabda
     init: true
-    restart: on-failure
-    command: /bin/sh -c "envsubst < /var/www/connect/js/conf.template.js > /var/www/connect/js/conf.js && /wait-for node:8080 --timeout=720 -- nginx"
-    volumes:
-      - ${APP_DATA_DIR}/nginx/wait-for:/wait-for
-      - ${APP_DATA_DIR}/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ${APP_DATA_DIR}/nginx/${BITCOIN_NETWORK}.conf:/etc/nginx/sites-enabled/dojo.conf
-      - ${APP_DATA_DIR}/nginx/connect.conf:/etc/nginx/sites-enabled/connect.conf
-      - ${APP_DATA_DIR}/nginx/connect:/var/www/connect
+    command: /bin/sh -c "envsubst < /var/www/connect/js/conf.template.js > /var/www/connect/js/conf.js
+      && /wait-for node:8080 --timeout=720 -- nginx"
     environment:
       COMMON_BTC_NETWORK: $BITCOIN_NETWORK
       DOJO_LOCAL_PORT: $APP_SAMOURAI_SERVER_DOJO_PORT
-      DOJO_HIDDEN_SERVICE: $SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE
-      WHIRLPOOL_HIDDEN_SERVICE: $SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE
+      DOJO_HIDDEN_SERVICE: $APP_SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE
+      WHIRLPOOL_HIDDEN_SERVICE: $APP_SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE
       NODE_PREFIX_SUPPORT: support
-      NODE_ADMIN_KEY: $SAMOURAI_SERVER_NODE_ADMIN_KEY
-      WHIRLPOOL_API_KEY: $SAMOURAI_SERVER_WHIRLPOOL_API_KEY
+      NODE_ADMIN_KEY: $APP_SAMOURAI_SERVER_NODE_ADMIN_KEY
+      WHIRLPOOL_API_KEY: $APP_SAMOURAI_SERVER_WHIRLPOOL_API_KEY
     ports:
-      - "$APP_SAMOURAI_SERVER_DOJO_PORT:80"
-      - "$APP_SAMOURAI_SERVER_CONNECT_PORT:8081"
+    - $APP_SAMOURAI_SERVER_DOJO_PORT:80
+    - $APP_SAMOURAI_SERVER_CONNECT_PORT:8081
     depends_on:
-      - node
+    - node
+    volumes:
+    - ${APP_DATA_DIR}/nginx/connect:/var/www/connect
+    - ${APP_DATA_DIR}/nginx/connect.conf:/etc/nginx/sites-enabled/connect.conf
+    - ${APP_DATA_DIR}/nginx/${BITCOIN_NETWORK}.conf:/etc/nginx/sites-enabled/dojo.conf
+    - ${APP_DATA_DIR}/nginx/nginx.conf:/etc/nginx/nginx.conf
+    - ${APP_DATA_DIR}/nginx/wait-for:/wait-for
     networks:
       default:
         ipv4_address: $APP_SAMOURAI_SERVER_IP
+    stop_grace_period: 1m
+    restart: on-failure
