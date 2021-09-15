@@ -121,6 +121,7 @@ echo "Removing status server iptables entry..."
 echo
 echo "Starting installed apps..."
 echo
+./app/app-manager.py update
 # Unlock the user file on each start of Umbrel to avoid issues
 # Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
 if [[ -f "${UMBREL_ROOT}/db/user.json.lock" ]]; then
