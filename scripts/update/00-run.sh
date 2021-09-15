@@ -31,7 +31,7 @@ echo "Thanks for joining us on the Citadel beta, we're installing the update."
 sleep 3
 echo "Please do not install an update from the dashboard if it asks you to, or you might go back to Umbrel."
 sleep 3
-echo "We're sorry aboutany other potential issues, we're working alpha 3 with more improvements."
+echo "We're sorry about any other potential issues, we're working on another update with more improvements."
 sleep 3
 echo "If you have any questions, please DM us on Twitter."
 sleep 3
