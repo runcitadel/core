@@ -27,16 +27,6 @@ if [[ ! -z "${UMBREL_OS:-}" ]]; then
     echo "============================================="
     echo
 
-    # In Umbrel OS v0.1.2, we need to bind Avahi to only
-    # eth0,wlan0 interfaces to prevent hostname cycling
-    # https://github.com/getumbrel/umbrel-os/issues/76
-    # This patch can be safely removed from Umbrel v0.3.x+
-    if [[ $UMBREL_OS == "v0.1.2" ]] && [[ -f "/etc/avahi/avahi-daemon.conf" ]]; then
-        echo "Binding Avahi to eth0 and wlan0"
-        sed -i "s/#allow-interfaces=eth0/allow-interfaces=eth0,wlan0/g;" "/etc/avahi/avahi-daemon.conf"
-        systemctl restart avahi-daemon.service
-    fi
-
     # Update SD card installation
     if  [[ -f "${SD_CARD_UMBREL_ROOT}/.umbrel" ]]; then
         echo "Replacing ${SD_CARD_UMBREL_ROOT} on SD card with the new release"
@@ -53,20 +43,6 @@ if [[ ! -z "${UMBREL_OS:-}" ]]; then
     else
         echo "ERROR: No Umbrel installation found at SD root ${SD_CARD_UMBREL_ROOT}"
         echo "Skipping updating on SD Card..."
-    fi
-
-    # Install unattended-updates for automatic security updates
-    # The binary is unattended-upgrade, the package is unattended-upgrades
-    if ! command -v unattended-upgrade &> /dev/null; then
-        DEBIAN_FRONTEND=noninteractive apt-get install unattended-upgrades -y
-    fi
-
-    # Make sure dhcpd ignores virtual network interfaces
-    dhcpd_conf="/etc/dhcpcd.conf"
-    dhcpd_rule="denyinterfaces veth*"
-    if [[ -f "${dhcpd_conf}" ]] && ! cat "${dhcpd_conf}" | grep --quiet "${dhcpd_rule}"; then
-      echo "${dhcpd_rule}" | tee -a "${dhcpd_conf}"
-      systemctl restart dhcpcd
     fi
 
     # This makes sure systemd services are always updated (and new ones are enabled).
@@ -107,14 +83,7 @@ echo "Updating installed apps"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 60, "description": "Updating installed apps", "updateTo": "$RELEASE"}
 EOF
-# We can just loop over this once everyone has the latest app script
-# "$UMBREL_ROOT/scripts/app" ls-installed
-# but for now we need to implement it here manually
-USER_FILE="${UMBREL_ROOT}/db/user.json"
-list_installed_apps() {
-  cat "${USER_FILE}" 2> /dev/null | jq -r 'if has("installedApps") then .installedApps else [] end | join("\n")' || true
-}
-for app in $(list_installed_apps); do
+for app in $("$UMBREL_ROOT/scripts/app" ls-installed); do
   if [[ "${app}" != "" ]]; then
     echo "${app}..."
     scripts/app compose "${app}" pull &
@@ -129,24 +98,6 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 EOF
 cd "$UMBREL_ROOT"
 ./scripts/stop
-
-# Fix broken Nextcloud installs from Umbrel v0.4.0 to be accessible from both
-# <hostname>.local and Tor
-current_umbrel_version=$(cat "${UMBREL_ROOT}/info.json" | jq -r .version)
-nextcloud_config_file="${UMBREL_ROOT}/app-data/nextcloud/data/nextcloud/config/config.php"
-nextcloud_tor_file="${UMBREL_ROOT}/tor/data/app-nextcloud/hostname"
-if [[ "${current_umbrel_version}" = "0.4.0" ]] && [[ -f "${nextcloud_config_file}" ]] && [[ -f "${nextcloud_tor_file}" ]]; then
-  echo
-  echo "Fixing broken Umbrel v0.4.0 Nextcloud install..."
-  nextcloud_hs=$(cat "${nextcloud_tor_file}")
-  nextcloud_local_url="$(hostname -s 2>/dev/null || echo "umbrel").local:8081"
-  sed \
-    -e '/trusted_domains\x27 => $/,/)/!b' \
-    -e '/)/!d;a\  \x27trusted_domains\x27 => array ( 0 => \x27localhost\x27, 1 => \x27'$nextcloud_local_url'\x27, 2 => \x27'$nextcloud_hs'\x27),' \
-    -e 'd' \
-    -i "${nextcloud_config_file}"
-  echo
-fi
 
 # Move Docker data dir to external storage now if this is an old install.
 # This is only needed temporarily until all users have transitioned Docker to SSD.
@@ -195,28 +146,12 @@ rsync --archive \
     "$UMBREL_ROOT"/.umbrel-"$RELEASE"/ \
     "$UMBREL_ROOT"/
 
-# Handle updating static assets for samourai-server app
-samourai_app_dir="${UMBREL_ROOT}/apps/samourai-server/nginx"
-samourai_data_dir="${UMBREL_ROOT}/app-data/samourai-server/nginx"
-if [[ -d "${samourai_app_dir}" ]] && [[ -d "${samourai_data_dir}" ]]; then
-  echo "Found samourai-server install, attempting to update static assets and nginx configuration..."
-  rsync --archive --verbose "${samourai_app_dir}/" "${samourai_data_dir}"
-fi
-
 # Handle updating mysql conf for samourai-server app
 samourai_app_mysql_conf="${UMBREL_ROOT}/apps/samourai-server/mysql/mysql-dojo.cnf"
 samourai_data_mysql_conf="${UMBREL_ROOT}/app-data/samourai-server/mysql/mysql-dojo.cnf"
 if [[ -f "${samourai_app_mysql_conf}" ]] && [[ -f "${samourai_data_mysql_conf}" ]]; then
   echo "Found samourai-server install, attempting to update DB configuration..."
   cp "${samourai_app_mysql_conf}" "${samourai_data_mysql_conf}"
-fi
-
-# Handle hidden service migration for samourai-server app
-samourai_app_dojo_tor_dir="${UMBREL_ROOT}/tor/data/app-samourai-server"
-samourai_app_new_dojo_tor_dir="${UMBREL_ROOT}/tor/data/app-samourai-server-dojo"
-if [[ -d "${samourai_app_dojo_tor_dir}" ]] && [[ ! -d "${samourai_app_new_dojo_tor_dir}" ]]; then
-  echo "Found samourai-server install, attempting to migrate dojo hidden service directory..."
-  mv "${samourai_app_dojo_tor_dir}/" "${samourai_app_new_dojo_tor_dir}"
 fi
 
 # Fix permissions
@@ -239,11 +174,6 @@ EOF
 cd "$UMBREL_ROOT"
 ./scripts/start
 
-# Delete obselete backup lock file
-# https://github.com/getumbrel/umbrel/pull/213
-# Remove this in the next breaking update
-[[ -f "${UMBREL_ROOT}/statuses/backup-in-progress" ]] && rm -f "${UMBREL_ROOT}/statuses/backup-in-progress"
-
 # Make Umbrel OS specific post-update changes
 if [[ ! -z "${UMBREL_OS:-}" ]]; then
 
@@ -253,39 +183,4 @@ if [[ ! -z "${UMBREL_OS:-}" ]]; then
 {"state": "installing", "progress": 90, "description": "Deleting previous images", "updateTo": "$RELEASE"}
 EOF
   docker image prune --all --force
-
-  # Uninstall dphys-swapfile since we now use our own swapfile logic
-  # Remove this in the next breaking update
-  if command -v dphys-swapfile >/dev/null 2>&1; then
-    echo "Removing unused dependency \"dphys-swapfile\""
-    cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 95, "description": "Removing unused dependencies", "updateTo": "$RELEASE"}
-EOF
-    apt-get remove -y dphys-swapfile
-  fi
-
-  # Setup swap if it doesn't already exist
-  # Remove this in the next breaking update
-  MOUNT_POINT="/mnt/data"
-  SWAP_DIR="/swap"
-  SWAP_FILE="${SWAP_DIR}/swapfile"
-  if ! df -h "${SWAP_DIR}" 2> /dev/null | grep --quiet '/dev/sd'; then
-    cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 97, "description": "Setting up swap", "updateTo": "$RELEASE"}
-EOF
-
-    echo "Bind mounting external storage to ${SWAP_DIR}"
-    mkdir -p "${MOUNT_POINT}/swap" "${SWAP_DIR}"
-    mount --bind "${MOUNT_POINT}/swap" "${SWAP_DIR}"
-
-    echo "Checking ${SWAP_DIR} is now on external storage..."
-    df -h "${SWAP_DIR}" | grep --quiet '/dev/sd'
-
-    echo "Setting up swapfile"
-    rm "${SWAP_FILE}" || true
-    fallocate -l 4G "${SWAP_FILE}"
-    chmod 600 "${SWAP_FILE}"
-    mkswap "${SWAP_FILE}"
-    swapon "${SWAP_FILE}"
-  fi
 fi
