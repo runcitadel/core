@@ -167,6 +167,13 @@ EOF
 pkill -f "\./karen"
 
 # Start updated containers
+echo "Resetting electrs"
+cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 78, "description": "Resetting electrs", "updateTo": "$RELEASE"}
+EOF
+rm -rf "$UMBREL_ROOT/electrs/*"
+
+# Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
