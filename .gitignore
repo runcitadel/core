@@ -47,3 +47,4 @@ app-data/*
 !tor/data/.gitkeep
 !tor/run/.gitkeep
 apps/networking.json
+apps/registry.json
