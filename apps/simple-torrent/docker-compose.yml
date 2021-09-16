@@ -1,8 +1,4 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
-version: '3.7'
+version: '3.8'
 services:
   server:
     image: boypt/cloud-torrent:1.3.6@sha256:c64a87daec402aa0b539cb90376392c7f3de0329ca31a5ef7ae89333c416c9c9

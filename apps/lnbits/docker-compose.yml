@@ -1,8 +1,4 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
-version: '3.7'
+version: '3.8'
 services:
   web:
     image: lnbitsdocker/lnbits:3b9401e@sha256:083a7e2d7822bf1a8dd938019ebc044450d74a5b1a9af89dfa5fa695d24ec317

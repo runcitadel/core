@@ -1,8 +1,4 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
-version: '3.7'
+version: '3.8'
 services:
   server:
     image: homeassistant/home-assistant:2021.9.5@sha256:66d80bef139d3039dc933f45f5d98b72829af39801e07f810d94648215e971fd

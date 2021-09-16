@@ -30,6 +30,6 @@ def createComposeConfigFromV0(app: dict):
     del app['metadata']
     if("version" in app):
         del app["version"]
-    # Set version to 3.7 (current compose file version)
-    app = {'version': '3.7', **app}
+    # Set version to 3.8 (current compose file version)
+    app = {'version': '3.8', **app}
     return app

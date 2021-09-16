@@ -1,8 +1,4 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
-version: '3.7'
+version: '3.8'
 services:
   nbxplorer:
     image: nicolasdorier/nbxplorer:2.2.5@sha256:2e6464de3ac4b2496491319bd25e6b9a43604db0c02fb4b9d9899f6170f61b5e
