@@ -90,19 +90,24 @@ print("======================================")
 print()
 
 # Parse a dotenv file
+# Values can either be KEY=VALUE or KEY="VALUE" or KEY='VALUE'
+# Returns all env vars as a dict
 def parse_dotenv(file_path):
-    with open(file_path, 'r') as file:
-      file_contents = file.read()
-    values = {}
-    lines = file_contents.split('\n')
-    for line in lines:
+  envVars: dict = {}
+  with open(file_path, 'r') as file:
+    for line in file:
       line = line.strip()
-      if line.startswith('#') or not line:
+      if line.startswith('#') or len(line) == 0:
         continue
-      # Append to values
-      key, value = line.split('=', 1)
-      values[key] = value
-    return values
+      if '=' in line:
+        key, value = line.split('=', 1)
+        value = value.strip('"').strip("'")
+        envVars[key] = value
+      else:
+        print("Error: Invalid line in {}: {}".format(file_path, line))
+        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
+        exit(1)
+  return envVars
 
   
 ##########################################################
