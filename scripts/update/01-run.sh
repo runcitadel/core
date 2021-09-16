@@ -6,7 +6,7 @@ UMBREL_ROOT=$2
 
 ./check-memory "${RELEASE}" "${UMBREL_ROOT}" "notfirstrun"
 
-# Only used on Umbrel OS
+# Only used on Umbrel OS and Citadel OS
 SD_CARD_UMBREL_ROOT="/sd-root${UMBREL_ROOT}"
 
 echo
@@ -18,30 +18,46 @@ echo "======================================="
 echo
 
 [[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
+[[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
+
+IS_MIGRATING=0
+# Check if UMBREL_OS is set and CITADEL_OS is not
+if [[ -z "$UMBREL_OS" ]] && [[ -n "$CITADEL_OS" ]]; then
+    echo "Umbrel OS is being used..."
+    echo "Upgrading to Citadel OS..."
+    echo "export CITADEL_OS='0.0.1'" > /etc/default/citadel
+    IS_MIGRATING=1
+    CITADEL_OS='0.0.1'
+fi
+
+if [[ -f "$UMBREL_ROOT/is-legacy-umbrel" ]]; then
+# If this file exists, we are migrating
+  IS_MIGRATING=1
+fi
 
 # Make Umbrel OS specific updates
-if [[ ! -z "${UMBREL_OS:-}" ]]; then
+if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
     echo "============================================="
-    echo "Installing on Umbrel OS $UMBREL_OS"
+    echo "Installing on Citadel OS $CITADEL_OS"
     echo "============================================="
     echo
-
+    
     # Update SD card installation
-    if  [[ -f "${SD_CARD_UMBREL_ROOT}/.umbrel" ]]; then
+    if  [[ -f "${SD_CARD_UMBREL_ROOT}/.umbrel" ]] || [[ -f "${SD_CARD_UMBREL_ROOT}/.citadel" ]]; then
         echo "Replacing ${SD_CARD_UMBREL_ROOT} on SD card with the new release"
         rsync --archive \
             --verbose \
-            --include-from="${UMBREL_ROOT}/.umbrel-${RELEASE}/scripts/update/.updateinclude" \
-            --exclude-from="${UMBREL_ROOT}/.umbrel-${RELEASE}/scripts/update/.updateignore" \
+            --include-from="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateinclude" \
+            --exclude-from="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateignore" \
             --delete \
-            "${UMBREL_ROOT}/.umbrel-${RELEASE}/" \
+            "${UMBREL_ROOT}/.citadel-${RELEASE}/" \
             "${SD_CARD_UMBREL_ROOT}/"
 
         echo "Fixing permissions"
         chown -R 1000:1000 "${SD_CARD_UMBREL_ROOT}/"
     else
-        echo "ERROR: No Umbrel installation found at SD root ${SD_CARD_UMBREL_ROOT}"
+        echo "ERROR: No Umbrel or Citadel installation found at SD root ${SD_CARD_UMBREL_ROOT}"
         echo "Skipping updating on SD Card..."
     fi
 
@@ -83,6 +99,7 @@ echo "Updating installed apps"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 60, "description": "Updating installed apps", "updateTo": "$RELEASE"}
 EOF
+"${UMBREL_ROOT}/app/app-manager.py" update
 for app in $("$UMBREL_ROOT/scripts/app" ls-installed); do
   if [[ "${app}" != "" ]]; then
     echo "${app}..."
@@ -140,8 +157,8 @@ fi
 echo "Overlaying $UMBREL_ROOT/ with new directory tree"
 rsync --archive \
     --verbose \
-    --include-from="$UMBREL_ROOT/.umbrel-$RELEASE/scripts/update/.updateinclude" \
-    --exclude-from="$UMBREL_ROOT/.umbrel-$RELEASE/scripts/update/.updateignore" \
+    --include-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
+    --exclude-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
     --delete \
     "$UMBREL_ROOT"/.umbrel-"$RELEASE"/ \
     "$UMBREL_ROOT"/
@@ -167,11 +184,14 @@ EOF
 pkill -f "\./karen"
 
 # Start updated containers
-echo "Resetting electrs"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+# If we're migrating (IS_MIGRATING is set to 1, not 0) then we reset the electrs data
+if [[ "${IS_MIGRATING}" == "1" ]]; then
+  echo "Resetting electrs"
+  cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 78, "description": "Resetting electrs", "updateTo": "$RELEASE"}
 EOF
-rm -rf "$UMBREL_ROOT/electrs/*"
+  rm -rf "$UMBREL_ROOT/electrs/*"
+fi
 
 # Start updated containers
 echo "Starting new containers"
@@ -181,10 +201,10 @@ EOF
 cd "$UMBREL_ROOT"
 ./scripts/start
 
-# Make Umbrel OS specific post-update changes
-if [[ ! -z "${UMBREL_OS:-}" ]]; then
+# Make Citadel OS specific post-update changes
+if [[ ! -z "${CITADEL_OS:-}" ]]; then
 
-  # Delete unused Docker images on Umbrel OS
+  # Delete unused Docker images on Citadel OS
   echo "Deleting previous images"
   cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 90, "description": "Deleting previous images", "updateTo": "$RELEASE"}

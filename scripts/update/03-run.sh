@@ -20,6 +20,7 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 95, "description": "Removing backup"}
 EOF
 [[ -d "$UMBREL_ROOT"/.umbrel-backup ]] && rm -rf "$UMBREL_ROOT"/.umbrel-backup
+[[ -d "$UMBREL_ROOT"/.citadel-backup ]] && rm -rf "$UMBREL_ROOT"/.citadel-backup
 
 echo "Successfully installed Umbrel $RELEASE"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
