@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
 from pathlib import Path
 
 # A status file has status entries, one per line, in the format:

@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+
+SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+-->
+
 [![Umbrel](https://static.getumbrel.com/github/github-banner-umbrel.svg)](https://github.com/getumbrel/umbrel)
 
 [![Version](https://img.shields.io/github/v/release/getumbrel/umbrel?color=%235351FB&label=version)](https://github.com/getumbrel/umbrel/releases)

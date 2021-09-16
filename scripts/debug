@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+REM
+# SPDX-License-Identifier: MIT
+
 NODE_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 cd "${NODE_ROOT}"
 

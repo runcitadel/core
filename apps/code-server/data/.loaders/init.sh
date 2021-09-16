@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
 lazy_load() {
   local command="${1}"
   local loader="${2}"

@@ -2,6 +2,10 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+# SPDX-FileCopyrightText: 2015-2018 The Bitcoin Core developers
+#
+# SPDX-License-Identifier: MIT
+
 from argparse import ArgumentParser
 from base64 import urlsafe_b64encode
 from binascii import hexlify

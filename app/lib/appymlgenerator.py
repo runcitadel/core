@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 def convertServicesToContainers(app: dict):
     app['containers'] = []
     # Loop through the dict app['services']

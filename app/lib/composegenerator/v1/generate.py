@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 from lib.composegenerator.v1.networking import configureIps, configureMainPort
 from lib.composegenerator.shared.main import convertDataDirToVolume, convertContainerPermissions, addStopConfig, convertContainersToServices
 from lib.composegenerator.shared.env import validateEnv

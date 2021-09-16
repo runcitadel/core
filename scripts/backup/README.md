@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
 # Automatic Encrypted Backups
 
 The backups are encrypted client side before being uploaded over Tor and are padded with random data. Backups are made immediately as soon as the channel state changes. However, Umbrel also makes decoy backups at random intervals to prevent timing-analysis attacks.

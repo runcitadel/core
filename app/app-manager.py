@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 import yaml
 import json
 from lib.composegenerator.v0.generate import createComposeConfigFromV0

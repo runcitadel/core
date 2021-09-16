@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+//
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
 const isIframe = (window.self !== window.top);
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));

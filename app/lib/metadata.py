@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 from lib.validate import findAndValidateApps
 import os
 import yaml

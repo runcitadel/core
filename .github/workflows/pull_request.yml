@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: MIT
+
 name: Build OS image on PR
 
 on: [pull_request]

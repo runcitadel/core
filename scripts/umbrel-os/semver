@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# SPDX-License-Identifier: MIT
+#
+# SPDX-FileCopyrightText: Copyright (c) 2014 Józef Sokołowski
+
 # https://github.com/qzb/sh-semver
 # Commit: 2ac2437
 
