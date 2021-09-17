@@ -1,26 +1,35 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: MIT
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
 metadata:
   category: Password Managers
   name: Vaultwarden
   version: 1.22.2
-  tagline: "Unofficial Bitwarden\xAE compatible server"
-  description: "Vaultwarden (formerly known as Bitwarden_RS) is an alternative implementation\
-    \ of the Bitwarden\xAE server API written in Rust, compatible with upstream Bitwarden\xAE\
-    \ clients*. Vaultwarden is perfect for self-hosting all of your passwords in an\
-    \ encrypted vault on your Umbrel. Vaultwarden is a full implementation of Bitwarden\xAE\
-    \ API that includes:\n\n- Organizations support\n- Attachments\n- Vault API support\n\
-    - Serving the static files for Vault interface\n- Website icons API\n- Authenticator\
-    \ and U2F support\n- YubiKey and Duo support\n\n Please note that Vaultwarden\
-    \ is not associated with the Bitwarden\xAE project nor 8bit Solutions LLC. When\
-    \ using this app, please report any bugs or suggestions to us directly, regardless\
-    \ of whatever clients you are using (mobile, desktop, browser, etc), and do not\
-    \ use Bitwarden\xAE's official support channels."
-  developer: "Daniel Garc\xEDa"
+  tagline: Unofficial Bitwarden® compatible server
+  description: >-
+    Vaultwarden (formerly known as Bitwarden_RS) is an alternative implementation\
+    of the Bitwarden® server API written in Rust, compatible with upstream BitwardenÂ®\
+    clients*. Vaultwarden is perfect for self-hosting all of your passwords in an\
+    encrypted vault on your Umbrel. Vaultwarden is a full implementation of BitwardenÂ®\
+    API that includes:
+    
+    - Organizations support
+    
+    - Attachments
+    
+    - Vault API support
+
+    - Serving the static files for Vault interface
+    
+    - Website icons API
+    
+    - Authenticator and U2F support
+    
+    - YubiKey and Duo support
+    
+    
+    Please note that Vaultwarden is not associated with the Bitwarden® project nor 8bit Solutions LLC.
+    When using this app, please report any bugs or suggestions to us directly, regardless
+    of whatever clients you are using (mobile, desktop, browser, etc), and do not
+    use Bitwarden®'s official support channels.
+  developer: Daniel García
   website: https://github.com/dani-garcia
   dependencies: []
   repo: https://github.com/dani-garcia/vaultwarden
