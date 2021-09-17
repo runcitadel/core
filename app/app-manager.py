@@ -29,6 +29,7 @@ appsDir = os.path.join(nodeRoot, "apps")
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database either list, download, update or update-online.')
 parser.add_argument('--invoked-by-configure', action='store_true')
+parser.add_argument('--verbose', '-v', action='store_true')
 args = parser.parse_args()
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
@@ -81,7 +82,7 @@ def update():
     simpleRegistry = getSimpleAppRegistry(apps, appsDir)
     with open(os.path.join(appsDir, "apps.json"), "w") as f:
         json.dump(simpleRegistry, f, indent=4, sort_keys=True)
-    print("Wrote simple registry to apps.json")
+    print("Wrote version information to apps.json")
     
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
@@ -91,6 +92,8 @@ def update():
             appCompose = getApp(appYml, app)
             if(appCompose):
                 f.write(yaml.dump(appCompose, sort_keys=False))
+                if args.verbose:
+                    print("Wrote " + app + " to " + composeFile)
     print("Generated configuration successfully")
 
 def download():
