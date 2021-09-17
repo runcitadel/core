@@ -2,11 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from lib.validate import findAndValidateApps
 import os
 import yaml
-# List all apps using findAndValidateApps()
-# then parse the app.yml in ../apps/[name] and
+# For every app, parse the app.yml in ../apps/[name] and
 # check their metadata, and return a list of all app's metadata
 # Also check the path and defaultPassword and set them to an empty string if they don't exist
 # In addition, set id on the metadata to the name of the app
