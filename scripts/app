@@ -22,6 +22,12 @@ Commands:
     uninstall                  Removes images and destroys all data for an app
     compose                    Passes all arguments to docker compose
     ls-installed               Lists installed apps
+
+
+Looking for something else?
+In Citadel, we moved a lot of functionality into ${UMBREL_ROOT}/app/app-manager.py
+All options from this script should also be there now, and some are only available there.
+Please use that script instead of this one.
 EOF
 }
 
