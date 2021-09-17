@@ -11,9 +11,9 @@ USER_FILE="${UMBREL_ROOT}/db/user.json"
 
 show_help() {
   cat << EOF
-app 0.0.1
+app 0.1.0
 
-CLI for managing Umbrel apps
+CLI for managing Citadel apps
 
 Usage: app <command> <app> [<arguments>]
 
@@ -37,7 +37,7 @@ check_dependencies () {
 }
 
 list_installed_apps() {
-  cat "${USER_FILE}" 2> /dev/null | jq -r 'if has("installedApps") then .installedApps else [] end | join("\n")' || true
+  "${UMBREL_ROOT}/app/app-manager.py" ls-installed || true
 }
 
 # Deterministically derives 128 bits of cryptographically secure entropy
