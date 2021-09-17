@@ -41,9 +41,10 @@ parser.add_argument(
     'other', help='Anything else (For compose)', nargs="*")
 args = parser.parse_args()
 
+def runCompose(app: str, args: str):
+    os.system("{script} compose {app} {args}".format(script=legacyScript, app=app, args=args))
+    
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-
-
 def getArguments():
     arguments = ""
     for i in range(3, len(argv)):
@@ -216,17 +217,22 @@ elif args.action == 'stop':
     if not args.app:
         print("No app provided")
         exit(1)
-    os.system(legacyScript + " stop " + args.app)
+    print("Stopping app {}...".format(args.app))
+    runCompose(args.app, "rm --force --stop")
 elif args.action == 'start':
     if not args.app:
         print("No app provided")
         exit(1)
-    os.system(legacyScript + " start " + args.app)
+    with open(userFile, "r") as f:
+        userData = json.load(f)
+    if not "installedApps" in userData or args.app not in userData["installedApps"]:
+        print("App {} is not yet installed".format(args.app))
+    runCompose(args.app, "up --detach")
 elif args.action == 'compose':
     if not args.app:
         print("No app provided")
         exit(1)
-    os.system(legacyScript + " compose " + args.app + " " + " ".join(args.other))
+    runCompose(args.app, " ".join(args.other))
 else:
     print("Error: Unknown action")
     print("See --help for usage")
