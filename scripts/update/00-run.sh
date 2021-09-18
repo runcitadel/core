@@ -19,7 +19,6 @@ if [ -d "$UMBREL_ROOT/.umbrel-$RELEASE" ]; then
     echo "Waiting 5 seconds, then the migration will start"
     sleep 5
     mv "$UMBREL_ROOT/.umbrel-$RELEASE" "$UMBREL_ROOT/.citadel-$RELEASE"
-    touch "$UMBREL_ROOT/is-legacy-umbrel"
 fi
 
 # Functions which work like echo, but color the text red, green, and yellow

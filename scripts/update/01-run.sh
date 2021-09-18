@@ -35,11 +35,6 @@ if [[ -z "$UMBREL_OS" ]] && [[ -n "$CITADEL_OS" ]]; then
     CITADEL_OS='0.0.1'
 fi
 
-if [[ -f "$UMBREL_ROOT/is-legacy-umbrel" ]]; then
-# If this file exists, we are migrating
-  IS_MIGRATING=1
-fi
-
 # Make Umbrel OS specific updates
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
@@ -187,16 +182,6 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 75, "description": "Killing background daemon", "updateTo": "$RELEASE"}
 EOF
 pkill -f "\./karen"
-
-# Start updated containers
-# If we're migrating (IS_MIGRATING is set to 1, not 0) then we reset the electrs data
-if [[ "${IS_MIGRATING}" == "1" ]]; then
-  echo "Resetting electrs"
-  cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 78, "description": "Resetting electrs", "updateTo": "$RELEASE"}
-EOF
-  rm -rf "$UMBREL_ROOT/electrs/*"
-fi
 
 # Start updated containers
 echo "Starting new containers"
