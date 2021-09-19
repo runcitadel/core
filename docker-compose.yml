@@ -164,7 +164,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: runcitadel/middleware:main@sha256:23cf5bbf1465b6f0308a919edbdb31cbd4d15bff88b266c6888df1989c862be8
+                image: runcitadel/middleware:main@sha256:092e6d9a84c2dffe3be6c517770116402f76e7d4620aac1fc02230ef571e85ac
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
