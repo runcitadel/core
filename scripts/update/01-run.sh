@@ -62,7 +62,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     fi
 
     # This makes sure systemd services are always updated (and new ones are enabled).
-    UMBREL_SYSTEMD_SERVICES="${UMBREL_ROOT}/.umbrel-${RELEASE}/scripts/umbrel-os/services/*.service"
+    UMBREL_SYSTEMD_SERVICES="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/umbrel-os/services/*.service"
     for service_path in $UMBREL_SYSTEMD_SERVICES; do
       service_name=$(basename "${service_path}")
       install -m 644 "${service_path}" "/etc/systemd/system/${service_name}"
@@ -75,7 +75,7 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 EOF
 
 # Checkout to the new release
-cd "$UMBREL_ROOT"/.umbrel-"$RELEASE"
+cd "$UMBREL_ROOT"/.citadel-"$RELEASE"
 
 # Configure new install
 echo "Configuring new release"
@@ -160,7 +160,7 @@ rsync --archive \
     --include-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
     --exclude-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
     --delete \
-    "$UMBREL_ROOT"/.umbrel-"$RELEASE"/ \
+    "$UMBREL_ROOT"/.citadel-"$RELEASE"/ \
     "$UMBREL_ROOT"/
 
 # Handle updating mysql conf for samourai-server app
