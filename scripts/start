@@ -133,7 +133,7 @@ if [[ -f "${UMBREL_ROOT}/db/user.json.lock" ]]; then
   echo "WARNING: The user file was locked, Umbrel probably wasn't shut down properly"
   rm "${UMBREL_ROOT}/db/user.json.lock"
 fi
-"${UMBREL_ROOT}/scripts/app" start installed
+"${UMBREL_ROOT}/app/app-manager.py" start installed
 echo
 
 echo "Umbrel is now accessible at"

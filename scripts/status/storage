@@ -30,7 +30,7 @@ used=$(filesystem_used_storage_bytes "${UMBREL_ROOT}")
 json=$(echo $json | jq --arg used "${used}" '. + {used: $used|tonumber}')
 
 cumulative_app_size="0"
-for app in $( "${UMBREL_ROOT}/scripts/app" ls-installed)
+for app in $( "${UMBREL_ROOT}/app/app-manager.py" ls-installed)
 do
   app_size=$(directory_size_bytes "${UMBREL_ROOT}/app-data/${app}")
   cumulative_app_size=$(($cumulative_app_size+$app_size))

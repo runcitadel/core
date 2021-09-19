@@ -153,7 +153,7 @@ if [[ "${1}" == "--run" ]]; then
     echo
     docker compose logs --tail=30 tor
     
-    installed_apps=$(./scripts/app ls-installed)
+    installed_apps=$(./app/app-manager.py ls-installed)
     if [[ ! -z "${installed_apps:-}" ]]; then
         echo
         echo "App logs"
@@ -163,7 +163,7 @@ if [[ "${1}" == "--run" ]]; then
             echo "${app}"
             echo
             # Double tail because we want 30 lines total not per container
-            ./scripts/app compose $app logs --tail 30 | tail -n 30;
+            ./app/app-manager.py compose $app logs --tail 30 | tail -n 30;
         done
     fi
 else

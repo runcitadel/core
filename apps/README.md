@@ -346,7 +346,7 @@ sudo scripts/update/update --repo <username>/umbrel#btc-rpc-explorer
 3\. Once the installation has updated, it's time to test our app:
 
 ```sh
-scripts/app install btc-rpc-explorer
+app/app-manager.py install btc-rpc-explorer
 ```
 
 The app should now be accessible at http://umbrel.local:3002
@@ -354,12 +354,12 @@ The app should now be accessible at http://umbrel.local:3002
 4\. To uninstall:
 
 ```sh
-scripts/app uninstall btc-rpc-explorer
+app/app-manager.py uninstall btc-rpc-explorer
 ```
 
 > When testing your app, make sure to verify that any application state that needs to be persisted is in-fact being persisted in volumes.
 >
-> A good way to test this is to restart the app with `scripts/app stop <app-id> && scripts/app start <app-id>`. If any state is lost, it means that state should be mapped to a persistent volume.
+> A good way to test this is to restart the app with `app/app-manager.py stop <app-id> && app/app-manager.py start <app-id>`. If any state is lost, it means that state should be mapped to a persistent volume.
 >
 > When stopping/starting the app, all data in volumes will be persisted and anything else will be discarded. When uninstalling/installing an app, even persistent data will be discarded.
 
@@ -446,7 +446,7 @@ This is where the above information is used when the app goes live in the Umbrel
 
 1. **How do users install apps?**
 
-    Users install apps via the Umbrel App Store. They do not use the `scripts/app` CLI directly as it's only meant for development use.
+    Users install apps via the Umbrel App Store. They do not use the `app/app-manager.py` CLI directly as it's only meant for development use.
 
 1. **I need help with something else?**
 

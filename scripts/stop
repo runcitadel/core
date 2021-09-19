@@ -31,7 +31,7 @@ export COMPOSE_HTTP_TIMEOUT=240
 
 echo "Stopping installed apps..."
 echo
-"${UMBREL_ROOT}/scripts/app" stop installed
+"${UMBREL_ROOT}/app/app-manager.py" stop installed
 echo
 
 echo "Stopping Docker services..."

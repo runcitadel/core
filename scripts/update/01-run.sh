@@ -95,23 +95,10 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 EOF
 docker compose pull
 
-echo "Updating installed apps"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 60, "description": "Updating installed apps", "updateTo": "$RELEASE"}
-EOF
-"${UMBREL_ROOT}/app/app-manager.py" update
-for app in $("$UMBREL_ROOT/scripts/app" ls-installed); do
-  if [[ "${app}" != "" ]]; then
-    echo "${app}..."
-    scripts/app compose "${app}" pull &
-  fi
-done
-wait
-
 # Stop existing containers
 echo "Stopping existing containers"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 70, "description": "Removing old containers", "updateTo": "$RELEASE"}
+{"state": "installing", "progress": 60, "description": "Removing old containers", "updateTo": "$RELEASE"}
 EOF
 cd "$UMBREL_ROOT"
 ./scripts/stop
@@ -124,7 +111,7 @@ EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
 if [[ ! -z "${UMBREL_OS:-}" ]] && [[ ! -d "${EXTERNAL_DOCKER_DIR}" ]]; then
   echo "Attempting to move Docker to external storage..."
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 72, "description": "Migrating Docker install to external storage", "updateTo": "$RELEASE"}
+{"state": "installing", "progress": 62, "description": "Migrating Docker install to external storage", "updateTo": "$RELEASE"}
 EOF
 
   echo "Stopping Docker service..."
@@ -179,9 +166,24 @@ chmod -R 700 "$UMBREL_ROOT"/tor/data/*
 # Killing karen
 echo "Killing background daemon"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 75, "description": "Killing background daemon", "updateTo": "$RELEASE"}
+{"state": "installing", "progress": 65, "description": "Killing background daemon", "updateTo": "$RELEASE"}
 EOF
 pkill -f "\./karen"
+
+
+
+echo "Updating installed apps"
+cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 70, "description": "Updating installed apps", "updateTo": "$RELEASE"}
+EOF
+"${UMBREL_ROOT}/app/app-manager.py" update
+for app in $("$UMBREL_ROOT/app/app-manager.py" ls-installed); do
+  if [[ "${app}" != "" ]]; then
+    echo "${app}..."
+    app/app-manager.py compose "${app}" pull &
+  fi
+done
+wait
 
 # Start updated containers
 echo "Starting new containers"
