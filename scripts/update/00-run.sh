@@ -62,15 +62,9 @@ echo "========= Stage: Pre-update ==========="
 echo "======================================="
 echo
 
-# Check if $UMBREL_ROOT/.umbrel-$RELEASE exists, if it does, rename it to $UMBREL_ROOT/.citadel-$RELEASE
-if [ -d "$UMBREL_ROOT/.umbrel-$RELEASE" ]; then
-    echo "Migrating from Umbrel..."
-    mv "$UMBREL_ROOT/.umbrel-$RELEASE" "$UMBREL_ROOT/.citadel-$RELEASE"
-fi
-
 # Make sure any previous backup doesn't exist
 if [[ -d "$UMBREL_ROOT"/.citadel-backup ]]; then
-    echo "Cannot install update. A previous backup already exists at $UMBREL_ROOT/.umbrel-backup"
+    echo "Cannot install update. A previous backup already exists at $UMBREL_ROOT/.citadel-backup"
     echo "This can only happen if the previous update installation wasn't successful"
     exit 1
 fi
