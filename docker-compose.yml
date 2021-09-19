@@ -206,7 +206,7 @@ services:
               container_name: electrs
               image: runcitadel/electrs:v0.9.0-rc1@sha256:da4da59ac9a940734dd874f7b6fe8b8b22712e5306b8bcfb42bb4b86f4110d6c
               volumes:
-                - ${PWD}/bitcoin:/data/.bitcoin:ro
+                - ${PWD}/bitcoin:/data/.bitcoin
                 - ${PWD}/electrs:/data
               restart: on-failure
               stop_grace_period: 5m
