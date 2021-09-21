@@ -181,6 +181,8 @@ elif args.action == 'update':
         os.system("docker compose start app_tor")
         os.system("docker compose stop app_2_tor")
         os.system("docker compose start app_2_tor")
+        os.system("docker compose stop app_3_tor")
+        os.system("docker compose start app_3_tor")
     exit(0)
 elif args.action == 'update-online':
     download()
@@ -193,6 +195,8 @@ elif args.action == 'update-online':
         os.system("docker compose start app_tor")
         os.system("docker compose stop app_2_tor")
         os.system("docker compose start app_2_tor")
+        os.system("docker compose stop app_3_tor")
+        os.system("docker compose start app_3_tor")
     exit(0)
 elif args.action == 'ls-installed':
     # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps
