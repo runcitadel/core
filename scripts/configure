@@ -118,6 +118,8 @@ def parse_dotenv(file_path):
 ############ Generate configuration variables ############
 ##########################################################
 
+NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
+
 if reconfiguring:
   if os.path.isfile('../.umbrel'):
     dotenv=parse_dotenv('../.env')
@@ -138,6 +140,7 @@ if reconfiguring:
   BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
   TOR_PASSWORD=dotenv['TOR_PASSWORD']
   TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
+  NGINX_PORT=dotenv['NGINX_PORT']
 else:
   # Generate RPC credentials
   print("Generating auth credentials")
@@ -195,7 +198,6 @@ else:
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
 NGINX_IP="10.21.21.2"
-NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
 MIDDLEWARE_IP="10.21.21.5"
@@ -217,7 +219,6 @@ APPS_2_TOR_IP="10.21.21.48"
 APPS_3_TOR_IP="10.21.21.49"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
-NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 
 
 # Apps
