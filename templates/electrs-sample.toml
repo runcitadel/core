@@ -6,7 +6,7 @@
 # modifications you make can break the functionality of your umbrel. These files
 # are automatically reset with every Umbrel update.
 
-verbose = 4
+verbose = 2
 network = "bitcoin"
 db_dir = "/data/db"
 daemon_dir = "/bitcoin"
