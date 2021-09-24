@@ -163,7 +163,7 @@ if [[ "${1}" == "--run" ]]; then
             echo "${app}"
             echo
             # Double tail because we want 30 lines total not per container
-            ./app/app-manager.py compose $app logs --tail 30 | tail -n 30;
+            ./scripts/app compose $app logs --tail 30 | tail -n 30;
         done
     fi
 else
