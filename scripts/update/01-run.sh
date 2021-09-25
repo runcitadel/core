@@ -33,6 +33,7 @@ if [[ -z "$UMBREL_OS" ]] && [[ -n "$CITADEL_OS" ]]; then
     echo "export CITADEL_OS='0.0.1'" > /etc/default/citadel
     IS_MIGRATING=1
     CITADEL_OS='0.0.1'
+    rm -rf "${UMBREL_ROOT}/electrs/db"
 fi
 
 # Make Umbrel OS specific updates
