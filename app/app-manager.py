@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import threading
+from typing import List
 import yaml
 import json
 from lib.composegenerator.v0.generate import createComposeConfigFromV0
@@ -15,6 +17,11 @@ import os
 import argparse
 import requests
 from sys import argv
+
+# For an array of threads, join them and wait for them to finish
+def joinThreads(threads: List[threading.Thread]):
+    for thread in threads:
+        thread.join()
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -227,10 +234,26 @@ elif args.action == 'start':
     if not args.app:
         print("No app provided")
         exit(1)
-    with open(userFile, "r") as f:
-        userData = json.load(f)
+    # If userfile doen't exist, just do nothing
+    userData = {}
+    if os.path.isfile(userFile):
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+    if(args.app == "installed"):
+        if "installedApps" in userData:
+            threads = []
+            for app in userData["installedApps"]:
+                print("Starting app {}...".format(app))
+                # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
+                thread = threading.Thread(target=runCompose, args=(app, "up --detach"))
+                thread.start()
+                threads.append(thread)
+                joinThreads(threads)
+        exit(0)
+            
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
+        exit(1)
     runCompose(args.app, "up --detach")
 elif args.action == 'compose':
     if not args.app:
