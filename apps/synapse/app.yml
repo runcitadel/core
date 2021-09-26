@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 metadata:
   category: Social
   name: Synapse
-  version: 1.42.0
+  version: 1.43.0
   tagline: Matrix reference homeserver
   description: >-
     Synapse is a reference "homeserver" implementation of Matrix from
@@ -48,7 +46,7 @@ metadata:
   defaultPassword: ''
   torOnly: false
 containers:
-- image: matrixdotorg/synapse:v1.42.0@sha256:10a1dd576504af002a1107d6d1edddc5bb891ccfc404218fbd99a15531cef742
+- image: matrixdotorg/synapse:v1.43.0
   user: 1000:1000
   ports:
   - $APP_SYNAPSE_PORT:$APP_SYNAPSE_PORT

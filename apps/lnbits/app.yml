@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 metadata:
   category: Lightning Node Management
   name: LNbits
-  version: 3b9401e
+  version: 0f8d6e3
   tagline: Multi-user wallet management system
   description: 'LNbits is a simple multi-user and account system for Lightning Network
     that can be used for creating separate Lightning wallets for friends and family
@@ -32,7 +30,7 @@ metadata:
   - 3.jpg
 
 containers:
-- image: lnbitsdocker/lnbits:3b9401e@sha256:083a7e2d7822bf1a8dd938019ebc044450d74a5b1a9af89dfa5fa695d24ec317
+- image: lnbitsdocker/lnbits:0f8d6e3@sha256:df563d0b7a73b75e2adf2d8410e5f8c4e00a707908973185f9b3f73055495b43
   user: 1000:1000
   init: true
   ports:
