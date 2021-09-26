@@ -39,14 +39,14 @@ sleep 5
 red "Please read the following notes carefully, they explain important details about bugs and other issues in the beta."
 sleep 5
 echo
-echo "This version of Citadel can only be installed on Umbrel 0.4.2 or existing Citadel installatios. If you're on an older version of Umbrel, please cancel the update now"
+echo "This version of Citadel can only be installed on Umbrel 0.4.2 or existing Citadel installations. If you're on an older version of Umbrel, please cancel the update now"
 echo "by pressing CTRL+C."
 sleep 10
 echo "Thanks for joining us on the Citadel beta! Your node will now be upgraded."
 sleep 3
 echo "Please do not install an update from the dashboard if it asks you to, or you might go back to Umbrel."
 sleep 3
-echo "We're sorry about any potential issues in this beta, if you experince problems or have questions, please DM us on Twitter."
+echo "We're sorry about any potential issues in this beta, if you experience problems or have questions, please DM us on Twitter."
 sleep 5
 echo "Waiting 10 seconds, if you want to cancel the update, press CTRL+C now."
 
