@@ -99,7 +99,7 @@ services:
         dashboard:
                 container_name: dashboard
                 #image: getumbrel/dashboard:v0.3.25@sha256:03ac7a94d08f2e678e494baf748152a4d6905d2b4dd1726ae55e3c5b154bec62
-                image: runcitadel/dashboard-old:main@sha256:e1864d80790718c359a382c316724a5f28e60846d7ced8f7293cdfe67661da3c
+                image: runcitadel/dashboard-old:main@sha256:7652c8b9c097542dc919b1ddaff58edb6a2540d3a13eded0188542e5cb31a891
                 restart: on-failure
                 stop_grace_period: 1m30s
                 networks:
@@ -107,7 +107,7 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: runcitadel/manager:main@sha256:5ca40d3e8e01d775e162c768d93cd30515609048e5118d65b32cb9566b11bac0
+                image: runcitadel/manager:main@sha256:8dfc1426a28cd56f8548e9ae711c44a0eda9c0b382ab1dd3e8e8a14e50f6f3c6
                 depends_on: [ tor ]
                 restart: on-failure
                 init: true
