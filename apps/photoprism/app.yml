@@ -1,7 +1,7 @@
 metadata:
   category: Files
   name: PhotoPrism
-  version: 210523-b1856b9d
+  version: 210925-96168e4b
   tagline: Self-host your photo and video library
   description: >-
     PhotoPrism® is a privately hosted app for browsing, organizing,
@@ -46,7 +46,7 @@ metadata:
   defaultPassword: moneyprintergobrrr
   torOnly: false
 containers:
-- image: photoprism/photoprism:preview@sha256:7fd6df5b78270d01299c1ce7dd8d4dc4de76540323a7c84f13e39cd48b12eac5
+- image: photoprism/photoprism:preview@sha256:e0fdf255dcb486ba212d94f39010ba3d06991ff468b05ddddbe9113f3988efd5
   user: 1000:1000
   ports:
   - ${APP_PHOTOPRISM_PORT}:${APP_PHOTOPRISM_PORT}

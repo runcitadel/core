@@ -150,7 +150,7 @@ def configureMainPort(app: dict, nodeRoot: str):
 
     for registryApp in registry:
         if(registryApp['id'] == app['metadata']['id']):
-            registry[registry.index(registryApp)] = app['metadata']
+            registry[registry.index(registryApp)]['port'] = int(containerPort)
             break
 
     with open(registryFile, 'w') as f:

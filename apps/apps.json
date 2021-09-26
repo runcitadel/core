@@ -15,7 +15,7 @@
         "id": "squeaknode",
         "name": "Squeaknode",
         "repo": "https://github.com/yzernik/squeaknode",
-        "version": "0.1.152"
+        "version": "0.1.154"
     },
     {
         "id": "pi-hole",
@@ -39,19 +39,19 @@
         "id": "home-assistant",
         "name": "Home Assistant",
         "repo": "https://github.com/home-assistant/core",
-        "version": "2021.9.5"
+        "version": "2021.9.7"
     },
     {
         "id": "photoprism",
         "name": "PhotoPrism",
         "repo": "https://github.com/photoprism/photoprism",
-        "version": "210523-b1856b9d"
+        "version": "210925-96168e4b"
     },
     {
         "id": "mempool",
         "name": "Mempool",
         "repo": "https://github.com/mempool/mempool",
-        "version": "2.2.1"
+        "version": "2.2.2"
     },
     {
         "id": "samourai-server",
@@ -75,13 +75,13 @@
         "id": "sphinx-relay",
         "name": "Sphinx Relay",
         "repo": "https://github.com/stakwork/sphinx-relay",
-        "version": "2.2.0"
+        "version": "2.2.1"
     },
     {
         "id": "code-server",
         "name": "code-server",
         "repo": "https://github.com/cdr/code-server",
-        "version": "3.11.1"
+        "version": "3.12.0"
     },
     {
         "id": "vaultwarden",

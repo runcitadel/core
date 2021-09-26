@@ -16,11 +16,13 @@ def getAppRegistry(apps, app_path):
         if os.path.isfile(app_yml_path):
             with open(app_yml_path, 'r') as f:
                 app_yml = yaml.safe_load(f.read())
-                metadata: dict = app_yml['metadata']
-                metadata['id'] = app
-                metadata['path'] = metadata.get('path', '')
-                metadata['defaultPassword'] = metadata.get('defaultPassword', '')
-                app_metadata.append(metadata)
+            metadata: dict = app_yml['metadata']
+            metadata['id'] = app
+            metadata['path'] = metadata.get('path', '')
+            metadata['defaultPassword'] = metadata.get('defaultPassword', '')
+            if("mainContainer" in metadata):
+                metadata.pop("mainContainer")
+            app_metadata.append(metadata)
     return app_metadata
 
 # Creates a registry with just the things we need in the update checker so we can remove registry.json from this repo.
