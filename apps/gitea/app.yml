@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 metadata:
   category: Development
   name: Gitea
-  version: 1.15.2
+  version: 1.15.3
   tagline: A painless self-hosted Git service
   description: 'Gitea is a painless self-hosted Git service. It is similar to GitHub,
     Bitbucket, and GitLab. It is a community managed lightweight code hosting solution
@@ -46,7 +44,7 @@ metadata:
   defaultPassword: ''
   torOnly: false
 containers:
-- image: gitea/gitea:1.15.2-rootless@sha256:6caabcf0e1a21a2d885f44c8f19693ce44ec3d443e2116f86a2937db453566a8
+- image: gitea/gitea:1.15.3-rootless@sha256:3902efd5f11da1fb60cbe4a39ceb5f75630900af46bee86c90c49eddd4efd4d5
   user: 1000:1000
   ports:
   - ${APP_GITEA_PORT}:${APP_GITEA_PORT}

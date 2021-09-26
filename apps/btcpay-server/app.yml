@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 metadata:
   category: Payments
   name: BTCPay Server
-  version: 1.2.2
+  version: 1.2.4
   tagline: Accept Bitcoin payments with 0 fees & no 3rd party
   description: >-
     BTCPay Server is a payment processor that allows you to receive payments
@@ -40,7 +38,7 @@ metadata:
 
 containers:
 - name: nbxplorer
-  image: nicolasdorier/nbxplorer:2.2.5@sha256:2e6464de3ac4b2496491319bd25e6b9a43604db0c02fb4b9d9899f6170f61b5e
+  image: nicolasdorier/nbxplorer:2.2.10@sha256:bfec52de14dba187176e1bdd53a4fcb97bc2a18932e247a6ab2882dda6515ee1
   user: 1000:1000
   environment:
     NBXPLORER_DATADIR: /data
@@ -60,7 +58,7 @@ containers:
   ip: $APP_BTCPAY_SERVER_NBXPLORER_IP
 
 - name: web
-  image: btcpayserver/btcpayserver:1.2.2@sha256:8c1b890d720e81164d0215b04a1ff6533093397ec4d067e00e12fed7c045e413
+  image: btcpayserver/btcpayserver:1.2.4@sha256:2929130a4cc3323a917564091ccb2243e3e28959727154174448a3458287ed5c
   depends_on:
   - nbxplorer
   - postgres

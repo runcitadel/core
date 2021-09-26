@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 metadata:
   category: Lightning Node Management
   name: Lightning Terminal
-  version: v0.5.0-alpha
+  version: v0.5.1-alpha
   tagline: The easiest way to manage channel liquidity
   description: "Lightning Terminal is the easiest way to manage inbound and outbound\
     \ liquidity on the Lightning Network. Keep your channels open and the funds flowing.\
@@ -38,7 +36,7 @@ metadata:
   path: ''
   defaultPassword: moneyprintergobrrr
 containers:
-- image: lightninglabs/lightning-terminal:v0.5.0-alpha@sha256:1c9c59fe0316de5d64e89e205f91fb647660a865428daacfe582cb968fd42f87
+- image: lightninglabs/lightning-terminal:v0.5.1-alpha@sha256:6c71d4b5a5076187db75abaf2eceafdd763d7b7369c451a302600a64ae90fde5
   user: 1000:1000
   ports:
   - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
