@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 NODE_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
-RESULT_FILE="${NODE_ROOT}/scripts/debug"
+RESULT_FILE="${NODE_ROOT}/statuses/debug-status.json"
 cat <<EOF > "${RESULT_FILE}"
 {"status": "processing"}
 EOF
