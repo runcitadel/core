@@ -93,7 +93,7 @@
         "id": "bluewallet",
         "name": "BlueWallet Lightning",
         "repo": "https://github.com/BlueWallet/LndHub",
-        "version": "1.4.0"
+        "version": "1.4.1"
     },
     {
         "id": "gitea",

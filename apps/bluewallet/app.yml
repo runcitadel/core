@@ -7,7 +7,7 @@ version: 1
 metadata:
   category: Wallet Servers
   name: BlueWallet Lightning
-  version: 1.4.0
+  version: 1.4.1
   tagline: Connect BlueWallet to your Lightning node
   description: >-
     Run BlueWallet in the most private and secure way possible by removing
@@ -39,7 +39,7 @@ containers:
   init: true
 
 - name: lndhub
-  image: bluewalletorganization/lndhub:v1.4.0@sha256:6878841bfe75d06a3983249293643ee034bedc9f9cf1528dbbd4edfb5ba3e0bd
+  image: bluewalletorganization/lndhub:v1.4.1@sha256:db673a8d360982984d05f97303e26dc0e5a3eea36ba54d0abdae5bbbeef31d3a
   permissions:
   - lnd
   depends_on:
