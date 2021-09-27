@@ -104,13 +104,15 @@ def configureMainPort(app: dict, nodeRoot: str):
     if len(app['containers']) == 1:
         mainContainer = app['containers'][0]
     else:
-        if not "mainContainer" in app['metadata']:
-            raise Exception("No main container defined")
-
+        mainContainer = None
+        if not 'mainContainer' in app['metadata']:
+            app['metadata']['mainContainer'] = 'main'
         for container in app['containers']:
-            if(container['name'] == app['metadata']['mainContainer']):
+            if container['name'] == app['metadata']['mainContainer']:
                 mainContainer = container
                 break
+        if mainContainer is None:
+            raise Exception("No main container found")
     
 
     portDetails = assignPort(mainContainer, app['metadata']['id'], path.join(

@@ -1,6 +1,8 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 #
 # SPDX-License-Identifier: MIT
+
+# yaml-language-server: $schema=../../app/app-standard-v1.json
 
 version: 1
 
@@ -26,8 +28,6 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  mainContainer: lndhub
-
 
 containers:
 - name: redis
@@ -38,7 +38,7 @@ containers:
   user: 1000:1000
   init: true
 
-- name: lndhub
+- name: main
   image: bluewalletorganization/lndhub:v1.4.1@sha256:db673a8d360982984d05f97303e26dc0e5a3eea36ba54d0abdae5bbbeef31d3a
   permissions:
   - lnd

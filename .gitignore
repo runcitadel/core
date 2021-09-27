@@ -53,3 +53,4 @@ app-data/*
 apps/networking.json
 apps/registry.json
 apps/*/docker-compose.yml
+!**/*.license

@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 # SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
 #
-# SPDX-License-Identifier: MIT
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
+# yaml-language-server: $schema=../../app/app-standard-v1.json
 
 version: 1
 
@@ -35,10 +35,9 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  mainContainer: web
 
 containers:
-  - name: web
+  - name: main
     image: runcitadel/btc-rpc-explorer:v3.2.0@sha256:fabece1bbcf0ceebf4147a905407a8e952dc7a04f148a511375ed4d32915bf5e
     permissions:
     - electrum

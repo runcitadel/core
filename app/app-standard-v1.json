@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "The cleaner app.yml format",
+  "title": "app.yml specification v1",
   "description": "The app.yml format, cleaned up. This format should be used for new apps, but the autoconverter can only convert to v0, so v0 will be kept for some time.",
   "type": "object",
   "properties": {
