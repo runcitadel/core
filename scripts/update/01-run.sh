@@ -181,7 +181,7 @@ EOF
 for app in $("$UMBREL_ROOT/app/app-manager.py" ls-installed); do
   if [[ "${app}" != "" ]]; then
     echo "${app}..."
-    app/app-manager.py compose "${app}" pull &
+    app/app-manager.py compose "${app}" pull
   fi
 done
 wait

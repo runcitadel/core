@@ -21,7 +21,7 @@
         "id": "pi-hole",
         "name": "Pi-hole",
         "repo": "https://github.com/pi-hole/pi-hole",
-        "version": "5.3.1"
+        "version": "2021.09"
     },
     {
         "id": "specter-desktop",

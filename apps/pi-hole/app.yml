@@ -5,7 +5,7 @@
 metadata:
   category: Networking
   name: Pi-hole
-  version: 2021.09
+  version: "2021.09"
   tagline: Block ads on your entire network
   description: >-
     Instead of browser plugins or other software on each computer, install

@@ -37,7 +37,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "list", "download", "update", "update-online", "ls-installed", "install", "uninstall", "stop", "start", "compose"])
+                    "list", "download", "update", "update-online", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart"])
 # Add the --invoked-by-configure option, which is hidden from the user in --help
 parser.add_argument('--invoked-by-configure',
                     action='store_true', help=argparse.SUPPRESS)
@@ -138,9 +138,44 @@ def download():
         else:
             print("Warning: Could not download " + args.app)
 
+def getUserData():
+    userData = {}
+    if os.path.isfile(userFile):
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+    return userData
+
+def startInstalled():
+    # If userfile doen't exist, just do nothing
+    userData = {}
+    if os.path.isfile(userFile):
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+    threads = []
+    for app in userData["installedApps"]:
+        print("Sarting app {}...".format(app))
+        # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
+        thread = threading.Thread(target=runCompose, args=(app, "up --detach"))
+        thread.start()
+        threads.append(thread)
+    joinThreads(threads)
+
+def stopInstalled():
+    # If userfile doen't exist, just do nothing
+    userData = {}
+    if os.path.isfile(userFile):
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+    threads = []
+    for app in userData["installedApps"]:
+        print("Stopping app {}...".format(app))
+        # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
+        thread = threading.Thread(target=runCompose, args=(app, "rm --force --stop"))
+        thread.start()
+        threads.append(thread)
+    joinThreads(threads)
+
 # Loads an app.yml and converts it to a docker-compose.yml
-
-
 def getApp(appFile: str, appId: str):
     with open(appFile, 'r') as f:
         app = yaml.safe_load(f)
@@ -228,33 +263,45 @@ elif args.action == 'stop':
     if not args.app:
         print("No app provided")
         exit(1)
+    userData = getUserData()
+    if(args.app == "installed"):
+        if "installedApps" in userData:
+            stopInstalled()
+        exit(0)
     print("Stopping app {}...".format(args.app))
     runCompose(args.app, "rm --force --stop")
 elif args.action == 'start':
     if not args.app:
         print("No app provided")
         exit(1)
-    # If userfile doen't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
+
+    userData = getUserData()
     if(args.app == "installed"):
         if "installedApps" in userData:
-            threads = []
-            for app in userData["installedApps"]:
-                print("Starting app {}...".format(app))
-                # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-                thread = threading.Thread(target=runCompose, args=(app, "up --detach"))
-                thread.start()
-                threads.append(thread)
-                joinThreads(threads)
+            startInstalled()
         exit(0)
             
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
         exit(1)
     runCompose(args.app, "up --detach")
+
+elif args.action == 'restart':
+    if not args.app:
+        print("No app provided")
+        exit(1)
+    if(args.app == "installed"):
+        startInstalled()
+        stopInstalled()
+        exit(0)
+    
+    userData = getUserData()
+    if not "installedApps" in userData or args.app not in userData["installedApps"]:
+        print("App {} is not yet installed".format(args.app))
+        exit(1)
+    runCompose(args.app, "rm --force --stop")
+    runCompose(args.app, "up --detach")
+
 elif args.action == 'compose':
     if not args.app:
         print("No app provided")

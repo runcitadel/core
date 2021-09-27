@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app/app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Explorers
   name: Mempool
@@ -43,15 +47,16 @@ metadata:
   - bitcoind
   repo: https://github.com/mempool/mempool
   support: https://t.me/mempoolspace
-  port: 3006
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
   path: ''
   defaultPassword: ''
+
 containers:
-- image: mempool/frontend:v2.2.2@sha256:515b9a3ab3cc593fe599393b316d4d016335801fbba02ef8c6bb38082597f7cc
+- name: main
+  image: mempool/frontend:v2.2.2@sha256:515b9a3ab3cc593fe599393b316d4d016335801fbba02ef8c6bb38082597f7cc
   user: 1000:1000
   init: true
   command: ./wait-for mariadb:3306 --timeout=720 -- nginx -g 'daemon off;'
@@ -60,9 +65,9 @@ containers:
   environment:
     FRONTEND_HTTP_PORT: $APP_MEMPOOL_PORT
     BACKEND_MAINNET_HTTP_HOST: $APP_MEMPOOL_API_IP
-  name: web
-  ip: $APP_MEMPOOL_IP
-- image: mempool/backend:v2.2.2@sha256:c758345017587dd9e42047528cf6cd71ceae70cebd1a09ce875959259612a2ee
+
+- name: api
+  image: mempool/backend:v2.2.2@sha256:c758345017587dd9e42047528cf6cd71ceae70cebd1a09ce875959259612a2ee
   user: 1000:1000
   init: true
   command: ./wait-for-it.sh mariadb:3306 --timeout=720 --strict -- ./start.sh
@@ -82,22 +87,20 @@ containers:
     BACKEND_MAINNET_HTTP_PORT: '8999'
     CACHE_DIR: /backend/cache
     MEMPOOL_CLEAR_PROTECTION_MINUTES: '20'
-  name: api
   data:
   - data:/backend/cache
   permissions:
   - electrum
   - bitcoind
-  ip: $APP_MEMPOOL_API_IP
-- image: mariadb:10.5.8@sha256:8040983db146f729749081c6b216a19d52e0973134e2e34c0b4fd87f48bc15b0
+
+- name: mariadb
+  image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
   user: 1000:1000
   environment:
     MYSQL_DATABASE: mempool
     MYSQL_USER: mempool
     MYSQL_PASSWORD: mempool
     MYSQL_ROOT_PASSWORD: moneyprintergobrrr
-  name: mariadb
   data:
   - mysql/db-scripts:/docker-entrypoint-initdb.d
   - mysql/data:/var/lib/mysql
-  ip: $APP_MEMPOOL_DB_IP
