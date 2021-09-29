@@ -27,7 +27,7 @@ echo
 
 IS_MIGRATING=0
 # Check if UMBREL_OS is set and CITADEL_OS is not
-if [[ -z "${UMBREL_OS:-}" ]] && [[ -n "${UMBREL_OS:-}" ]]; then
+if [[ -z "${UMBREL_OS:-}" ]] && [[ -n "${CITADEL_OS:-}" ]]; then
     echo "Umbrel OS is being used..."
     echo "Upgrading to Citadel OS..."
     echo "export CITADEL_OS='0.0.1'" > /etc/default/citadel
