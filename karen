@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
 # karen watches for signals and executes triggers in the events dir
 # karen gets triggered a lot
 
@@ -58,10 +54,7 @@ fswatch -0 --event=PlatformSpecific $signal_dir | while read -d "" event; do
   trigger="$trigger_dir/$signal"
   args=""
 
-  if [[ ! -z "$signal" ]]; then
-    echo "Got signal: $signal"
-  fi
-
+  echo "Got signal: $signal"
 
   app_prefix="app-"
   if [[ "$signal" == "$app_prefix"* ]]; then
@@ -70,13 +63,10 @@ fswatch -0 --event=PlatformSpecific $signal_dir | while read -d "" event; do
     args="${signal#$app_prefix}"
   fi
 
-  if [[ -x "$trigger" ]] && [[ ! -d "$trigger" ]]; then
+  if test -x "$trigger"; then
     echo "karen is getting triggered!"
     "$trigger" $args &
   else
-    if [[ ! -z "$signal" ]]; then
-      echo "No trigger found"
-    fi
+    echo "No trigger found"
   fi
 done
-
