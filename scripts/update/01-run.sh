@@ -104,6 +104,21 @@ EOF
 cd "$UMBREL_ROOT"
 ./scripts/stop
 
+echo "Installing dependencies"
+cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 61, "description": "Installing dependencies", "updateTo": "$RELEASE"}
+EOF
+
+# If apt is available, install python3-pip
+if command -v apt >/dev/null 2>&1; then
+  apt install -y python3-pip
+fi
+
+# If pip3 is available, install pyyaml and jsonschema
+if command -v pip3 >/dev/null 2>&1; then
+  pip3 install pyyaml jsonschema
+fi
+
 # Move Docker data dir to external storage now if this is an old install.
 # This is only needed temporarily until all users have transitioned Docker to SSD.
 DOCKER_DIR="/var/lib/docker"
