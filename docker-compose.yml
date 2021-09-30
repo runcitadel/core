@@ -107,7 +107,7 @@ services:
                         ipv4_address: $DASHBOARD_IP
         manager:
                 container_name: manager
-                image: runcitadel/manager:main@sha256:c3a371766e2c4a98093e473217648a3c4f9d05ce4224a705c2078fd6132e1521
+                image: runcitadel/manager:main@sha256:b9d49a8ecdf1be2b9c8f2000166ec4aca975a8efced1fed611e51dbaa6100978
                 depends_on: [ tor ]
                 restart: on-failure
                 init: true
@@ -165,7 +165,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: runcitadel/middleware:main@sha256:99c4bff0420de3023770dbf696fd1f6df5210e2136ab4ccd7ada5b1d1c7f787b
+                image: runcitadel/middleware:main@sha256:57d97471309cfa7df62e482e2d29b95e0f4d14e2fc40a88d5e021550fd0e3cdd
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
@@ -205,7 +205,7 @@ services:
                         ipv4_address: $NEUTRINO_SWITCHER_IP
         electrs:
               container_name: electrs
-              image: runcitadel/electrs:v0.9.0-rc1@sha256:da4da59ac9a940734dd874f7b6fe8b8b22712e5306b8bcfb42bb4b86f4110d6c
+              image: runcitadel/electrs:v0.9.0@sha256:351a59c56ea269d169a8f1ae6acd8227474a31db9d2fa58ce8cbf7c868865406
               working_dir: /data
               volumes:
                 - ${PWD}/bitcoin:/bitcoin:ro
