@@ -103,7 +103,7 @@ if [[ "${update_type}" == "ota" ]]; then
   echo "Downloading Citadel ${RELEASE}"
   mkdir -p "${UMBREL_ROOT}/.citadel-${RELEASE}"
   cd "${UMBREL_ROOT}/.citadel-${RELEASE}"
-  curl -L "https://github.com/runcitadel/compose/archive/$RELEASE.tar.gz" | tar -xz --strip-components=1
+  curl -L "https://github.com/runcitadel/compose-nonfree/archive/$RELEASE.tar.gz" | tar -xz --strip-components=1
 fi
 
 # Copy over new release from path

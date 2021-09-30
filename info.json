@@ -1,6 +1,6 @@
 {
-    "version": "0.4.3",
-    "name": "Citadel Update test",
+    "version": "0.4.6",
+    "name": "Citadel update test",
     "requires": ">=0.2.1",
-    "notes": "We're just testing the update system. If you see this and are able to install the update, please DM me on Telegram (t.me/AaronDewes) or on Twitter (twitter.com/runcitadel)."
+    "notes": "We're sorry, but updating doesn't work right now. Please watch this update notification. If you get a notification Citadel 0.4.7 is available, please open it and read the instructions there."
 }
