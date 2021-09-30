@@ -156,6 +156,13 @@ EOF
   systemctl start docker
 fi
 
+# Stopping karen
+echo "Stopping background daemon"
+cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 65, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
+EOF
+pkill -f "\./karen"
+
 # Overlay home dir structure with new dir tree
 echo "Overlaying $UMBREL_ROOT/ with new directory tree"
 rsync --archive \
@@ -178,14 +185,6 @@ fi
 echo "Fixing permissions"
 find "$UMBREL_ROOT" -path "$UMBREL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 chmod -R 700 "$UMBREL_ROOT"/tor/data/*
-
-# Stopping karen
-echo "Stopping background daemon"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 65, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
-EOF
-pkill -f "\./karen"
-
 
 
 echo "Updating installed apps"
