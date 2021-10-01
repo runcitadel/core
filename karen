@@ -47,8 +47,9 @@ if [[ ! -d "$root_dir" ]]; then
   exit 1
 fi
 
-echo "karen is running in $root_dir"
+echo "karen will start in 30 seconds"
 sleep 30
+echo "karen is running in $root_dir"
 fswatch -0 --event=AttributeModified $signal_dir | while read -d "" event; do
   signal="${event#"$signal_dir"}"
   signal="${signal#"/"}"
