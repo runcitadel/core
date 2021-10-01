@@ -48,6 +48,7 @@ if [[ ! -d "$root_dir" ]]; then
 fi
 
 echo "karen is running in $root_dir"
+sleep 30
 fswatch -0 --event=AttributeModified $signal_dir | while read -d "" event; do
   signal="${event#"$signal_dir"}"
   signal="${signal#"/"}"
