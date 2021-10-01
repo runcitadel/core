@@ -163,6 +163,7 @@ else:
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
+ADDITIONAL_BITCOIN_OPTIONS=""
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
@@ -173,6 +174,10 @@ if os.path.isfile("./lnd/lnd.conf"):
         ALIAS_AND_COLOR += "\n" + line.strip()
       if line.startswith("color="):
         ALIAS_AND_COLOR += "\n" + line.strip()
+      if line.startswith("bitcoin.basefee"):
+        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
+      if line.startswith("bitcoin.feerate"):
+        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
 
 NEUTRINO_PEERS=""
 if BITCOIN_NETWORK == "mainnet":
@@ -339,10 +344,6 @@ for template_path, output_path in templates_to_build.items():
 print("Installing docker-compose")
 print()
 download_docker_compose()
-print("Pulling Docker images")
-print()
-print("This may take a while, please be patient...")
-os.system('docker compose pull')
 print("Updating apps")
 print()
 os.system('./app/app-manager.py --invoked-by-configure update')
