@@ -50,6 +50,9 @@ echo "========= Stage: Pre-update ==========="
 echo "======================================="
 echo
 
+# Stop karen early
+pkill -f "\./karen"
+
 # Make sure any previous backup doesn't exist
 if [[ -d "$UMBREL_ROOT"/.citadel-backup ]]; then
     echo "Cannot install update. A previous backup already exists at $UMBREL_ROOT/.citadel-backup"
