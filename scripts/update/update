@@ -32,7 +32,7 @@ elif [[ "${1}" == "--repo" ]]; then
   update_type="repo"
   descriptor="${2}"
   if [[ "${descriptor}" != *"#"* ]]; then
-    descriptor="${descriptor}#master"
+    descriptor="${descriptor}#main"
   fi
   repo="${descriptor%%#*}"
   branch="${descriptor#*#}"
