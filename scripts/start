@@ -111,6 +111,11 @@ echo
 ./scripts/backup/decoy-trigger &>> "${UMBREL_LOGS}/backup-decoy-trigger.log" &
 
 echo
+echo "Resetting config files"
+echo
+./scripts/configure
+
+echo
 echo "Starting Docker services..."
 echo
 docker compose up --detach --build --remove-orphans || {
@@ -123,17 +128,17 @@ echo
 echo "Removing status server iptables entry..."
 "${UMBREL_ROOT}/scripts/umbrel-os/status-server/setup-iptables" --delete
 
-echo
-echo "Starting installed apps..."
-echo
-./app/app-manager.py update
 # Unlock the user file on each start of Umbrel to avoid issues
 # Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
 if [[ -f "${UMBREL_ROOT}/db/user.json.lock" ]]; then
   echo "WARNING: The user file was locked, Umbrel probably wasn't shut down properly"
   rm "${UMBREL_ROOT}/db/user.json.lock"
 fi
-"${UMBREL_ROOT}/app/app-manager.py" start installed
+
+echo
+echo "Starting installed apps..."
+echo
+./app/app-manager.py start installed
 echo
 
 echo "Umbrel is now accessible at"

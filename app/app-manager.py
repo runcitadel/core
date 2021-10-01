@@ -228,6 +228,7 @@ elif args.action == 'update':
     exit(0)
 elif args.action == 'update-online':
     download()
+    print("Downloaded all updates")
     if(args.invoked_by_configure):
         update()
     else:
