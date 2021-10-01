@@ -51,7 +51,7 @@ echo "======================================="
 echo
 
 # Stop karen early
-pkill -f "\./karen"
+pkill -f "\./karen" || true
 
 # Make sure any previous backup doesn't exist
 if [[ -d "$UMBREL_ROOT"/.citadel-backup ]]; then

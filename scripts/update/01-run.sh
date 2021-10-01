@@ -161,7 +161,7 @@ echo "Stopping background daemon"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 65, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
 EOF
-pkill -f "\./karen"
+pkill -f "\./karen" || true
 
 # Overlay home dir structure with new dir tree
 echo "Overlaying $UMBREL_ROOT/ with new directory tree"
