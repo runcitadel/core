@@ -167,6 +167,7 @@ ADDITIONAL_BITCOIN_OPTIONS=""
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
+    # We generally don't want to allow changing lnd.conf, but we keep as many custom settings as possible
     for line in file:
       if line.startswith("bitcoin.node="):
         BITCOIN_NODE = line.split("=")[1].strip()
