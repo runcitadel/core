@@ -10,10 +10,7 @@ RELEASE=$1
 UMBREL_ROOT=$2
 first_run=$3
 
-# We add a 200MB offset becuase the 2GB Pi actually only has ~1.9GB of RAM
-MIN_RAM=2000000
-OFFSET=200000
-LIMIT=$((MIN_RAM-OFFSET))
+LIMIT=3500000
 
 # Abort on low memory devices
 memory="$(awk '/MemTotal/{printf "%d\n", $2}' /proc/meminfo)"
