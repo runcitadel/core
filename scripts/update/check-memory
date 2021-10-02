@@ -21,7 +21,7 @@ if ((memory<LIMIT)); then
 EOF
     # Sleep for a few seconds so the user has been redirected to the update screen
     sleep 10
-    memory_error="Sorry, this update isn't compatible with your device, it requires at least $((MIN_RAM/1000000))GB RAM."
+    memory_error="Sorry, this update isn't compatible with your device, it requires at least $((LIMIT/1000000))GB RAM."
     echo "${memory_error}"
     cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "failed", "progress": 100, "description": "${memory_error}", "updateTo": "${RELEASE}"}
