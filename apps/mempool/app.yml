@@ -60,10 +60,8 @@ containers:
   user: 1000:1000
   init: true
   command: ./wait-for mariadb:3306 --timeout=720 -- nginx -g 'daemon off;'
-  ports:
-  - ${APP_MEMPOOL_PORT}:${APP_MEMPOOL_PORT}
   environment:
-    FRONTEND_HTTP_PORT: $APP_MEMPOOL_PORT
+    FRONTEND_HTTP_PORT: $APP_MEMPOOL_MAIN_PORT
     BACKEND_MAINNET_HTTP_HOST: $APP_MEMPOOL_API_IP
 
 - name: api
@@ -79,7 +77,7 @@ containers:
     ELECTRUM_HOST: $ELECTRUM_IP
     ELECTRUM_PORT: $ELECTRUM_PORT
     ELECTRUM_TLS: 'false'
-    MYSQL_HOST: $APP_MEMPOOL_DB_IP
+    MYSQL_HOST: $APP_MEMPOOL_MARIADB_IP
     MYSQL_PORT: '3306'
     MYSQL_DATABASE: mempool
     MYSQL_USER: mempool
