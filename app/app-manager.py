@@ -153,7 +153,7 @@ def startInstalled():
             userData = json.load(f)
     threads = []
     for app in userData["installedApps"]:
-        print("Sarting app {}...".format(app))
+        print("Starting app {}...".format(app))
         # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
         thread = threading.Thread(target=runCompose, args=(app, "up --detach"))
         thread.start()
@@ -259,6 +259,12 @@ elif args.action == 'uninstall':
     if not args.app:
         print("No app provided")
         exit(1)
+    userData = getUserData()
+    if not "installedApps" in userData or args.app not in userData["installedApps"]:
+        print("App {} is not installed".format(args.app))
+        exit(1)
+    print("Stopping app {}...".format(args.app))
+    runCompose(args.app, "rm --force --stop")
     os.system(legacyScript + " uninstall " + args.app)
 elif args.action == 'stop':
     if not args.app:
@@ -281,7 +287,7 @@ elif args.action == 'start':
         if "installedApps" in userData:
             startInstalled()
         exit(0)
-            
+
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
         exit(1)
@@ -292,8 +298,8 @@ elif args.action == 'restart':
         print("No app provided")
         exit(1)
     if(args.app == "installed"):
-        startInstalled()
         stopInstalled()
+        startInstalled()
         exit(0)
     
     userData = getUserData()

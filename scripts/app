@@ -13,7 +13,10 @@ show_help() {
   cat << EOF
 app 0.1.0
 
-CLI for managing Citadel apps
+low-level tool for managing Citadel apps
+
+Only used internally, do NOT use it manually unless you know what you're doing.
+Not supposed to be used in custom scripts, breaking changes may occur.
 
 Usage: app <command> <app> [<arguments>]
 
@@ -21,8 +24,6 @@ Commands:
     install                    Pulls down images for an app and starts it
     uninstall                  Removes images and destroys all data for an app
     compose                    Passes all arguments to docker compose
-    ls-installed               Lists installed apps
-
 
 Looking for something else?
 In Citadel, we moved a lot of functionality into ${UMBREL_ROOT}/app/app-manager.py
@@ -46,7 +47,7 @@ list_installed_apps() {
 
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
-  # Make sure we use the seed from the real Umbrel installation if this is
+  # Make sure we use the seed from the real installation if this is
   # an OTA update.
   SEED_FILE="${UMBREL_ROOT}/db/umbrel-seed/seed"
   if [[ ! -f "${SEED_FILE}" ]] && [[ -f "${UMBREL_ROOT}/../.umbrel" ]]; then
@@ -61,8 +62,8 @@ derive_entropy () {
     exit 1
   fi
 
-  # We need `sed 's/^.* //'` to trim the "(stdin)= " prefix from some versions of openssl
-  printf "%s" "${identifier}" | openssl dgst -sha256 -hmac "${umbrel_seed}" | sed 's/^.* //'
+  # We output as binary, then convert to he so we don't have to deal with openssl adding a prefix, and remove newlines openSSL adds after a character limit
+  echo $(printf "%s" "${identifier}" | openssl dgst -sha256 -binary -hmac "${umbrel-seed}" | xxd -p | tr --delete "\n")
 }
 
 # Check dependencies
@@ -88,15 +89,6 @@ else
   app="$2"
   app_dir="${UMBREL_ROOT}/apps/${app}"
   app_data_dir="${UMBREL_ROOT}/app-data/${app}"
-  if [[ "${app}" == "installed" ]]; then
-    for app in $(list_installed_apps); do
-      if [[ "${app}" != "" ]]; then
-        "${0}" "${1}" "${app}" "${@:3}" &
-      fi
-    done
-    wait
-    exit
-  fi
   if [[ -z "${app}" ]] || [[ ! -d "${app_dir}" ]]; then
     echo "Error: \"${app}\" is not a valid app"
     exit 1
@@ -189,10 +181,6 @@ fi
 
 # Removes images and destroys all data for an app
 if [[ "$command" = "uninstall" ]]; then
-
-  echo "Removing images for app ${app}..."
-  compose "${app}" down --rmi all --remove-orphans
-
   echo "Deleting app data for app ${app}..."
   if [[ -d "${app_data_dir}" ]]; then
     rm -rf "${app_data_dir}"
