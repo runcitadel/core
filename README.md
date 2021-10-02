@@ -4,36 +4,28 @@ SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
 SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 -->
 
-[![Umbrel](https://static.getumbrel.com/github/github-banner-umbrel.svg)](https://github.com/getumbrel/umbrel)
 
-[![Version](https://img.shields.io/github/v/release/getumbrel/umbrel?color=%235351FB&label=version)](https://github.com/getumbrel/umbrel/releases)
-[![Community Chat](https://img.shields.io/badge/community%20chat-telegram-%235351FB)](https://t.me/getumbrel)
-[![Developer Chat](https://img.shields.io/badge/dev%20chat-keybase-%235351FB)](https://keybase.io/team/getumbrel)
+[![Version](https://img.shields.io/github/v/release/rubcitadel/dashboard?color=%235351FB&label=version)](https://github.com/runcitadel/dashboard/releases)
+[![Docker Build](https://img.shields.io/github/workflow/status/runcitadel/umbrel-dashboard/Docker%20build%20on%20push?color=%235351FB)](https://github.com/runcitadel/dashboard/actions?query=workflow%3A"Docker+build+on+push")
+[![Docker Pulls](https://img.shields.io/docker/pulls/runcitadel/dashboard?color=%235351FB)](https://hub.docker.com/repository/registry-1.docker.io/runcitadel/dashboard/tags?page=1)
+[![Discord Server](https://img.shields.io/badge/Community%20Chat-Discord-%235351FB)](https://discord.gg/6U3kM2cjdB)
+[![Twitter](https://img.shields.io/twitter/follow/runcitadel?style=social)](https://twitter.com/runcitadel)
 
-[![Twitter](https://img.shields.io/twitter/follow/getumbrel?style=social)](https://twitter.com/getumbrel)
-[![Reddit](https://img.shields.io/reddit/subreddit-subscribers/getumbrel?label=Subscribe%20%2Fr%2Fgetumbrel&style=social)](https://reddit.com/r/getumbrel)
+# 🏰 Citadel — a personal server for everyone
+> ⚠️ Citadel is currently in beta and is not considered secure. Please see [SECURITY.md](SECURITY.md) for more details.
 
-# ☂️ Umbrel — a personal server for everyone
-> ⚠️ Umbrel is currently in beta and is not considered secure. Please see [SECURITY.md](SECURITY.md) for more details.
+## ⚠️ Outdated information
 
-[![Umbrel](https://static.getumbrel.com/github/umbrel-github-hero.png)](https://getumbrel.com)
+The information below might be outdated and / or refering to Umbrel. This project is not yet fully off it's Umbrel roots.
 
-This is the master repository of Umbrel and contains the framework for orchestration of all containerized services running on [Umbrel OS](https://github.com/getumbrel/umbrel-os).
-
-It is platform and architecture-agnostic, thus can be used to directly spin up instances of Umbrel without installing the [Umbrel OS](https://github.com/getumbrel/umbrel-os) since all orchestrated services use multi-architecture Docker images.
-
-We run it on Raspbery Pis (ARMv8) as a part of [Umbrel OS](https://github.com/getumbrel/umbrel-os), Ubuntu (x64) for [testnet.getumbrel.com](https://testnet.getumbrel.com) and macOS (x64) for local development.
 
 ## 🚀 Getting started
 
-If you're looking to run Umbrel on:
-
-- A Raspberry Pi 4 with at least 4GB RAM (recommended) - [Download Umbrel OS](https://github.com/getumbrel/umbrel-os)
-- Anything else (**not recommended** as it's experimental at the moment) - [Install Umbrel](#-installation)
+TBD
 
 ## 🛠 Installation
 
-[Umbrel OS for Raspberry Pi](https://github.com/getumbrel/umbrel-os) is the easiest and the **recommended** way to run Umbrel. If you don't have a Raspberry Pi, you can manually install Umbrel on any hardware running a Linux-based operating system such as Ubuntu, Debian, etc by following the instructions below, but please note it's not the recommended way to run Umbrel as it's still very experimental.
+TBD
 
 ### Installation Requirements
 
@@ -81,16 +73,7 @@ sudo ./scripts/stop
 
 ## 🎹 Services orchestrated
 
-- [`Umbrel Dashboard`](https://github.com/getumbrel/umbrel-dashboard)
-- [`Umbrel Manager`](https://github.com/runcitadel/manager)
-- [`Umbrel Middleware`](https://github.com/runcitadel/middleware)
-- [`Bitcoin Core`](https://github.com/getumbrel/docker-bitcoind)
-- [`LND`](https://github.com/lightingnetwork-lnd)
-- [`Tor`](https://github.com/lncm/docker-tor)
-- [`Nginx`](https://github.com/nginx/nginx)
-- [`Neutrino Switcher`](https://github.com/lncm/docker-lnd-neutrino-switch)
-- [`Electrs`](https://github.com/getumbrel/docker-electrs)
-
+TBD
 
 **Architecture**
 
@@ -135,14 +118,14 @@ You're also recommended to download a backup of your payment channels regularly 
 
 We welcome and appreciate new contributions.
 
-If you're a developer looking to help but not sure where to begin, check out [these issues](https://github.com/getumbrel/umbrel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) that have specifically been marked as being friendly to new contributors.
-
-If you're looking for a bigger challenge, before opening a pull request please [create an issue](https://github.com/getumbrel/umbrel/issues/new/choose) or [join our community chat](https://t.me/getumbrel) to get feedback, discuss the best way to tackle the challenge, and to ensure that there's no duplication of work.
 
 ## 📜 License
 
-Umbrel is licensed under the PolyForm Noncommercial 1.0.0 license. TL;DR — You're free to use, fork, modify, and redestribute Umbrel for personal and nonprofit use under the same license. If you're interested to use Umbrel for commercial purposes, such as selling plug-and-play home servers with Umbrel, etc — please reach out to us at partner@getumbrel.com.
+
+### ⚠️ This information is refering Citadel's Umbrel basis, it is migrating off Umbrel to AGPL.
+
+
+Umbrel is licensed under the PolyForm Noncommercial 1.0.0 license.
 
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-%235351FB)](https://github.com/getumbrel/umbrel/blob/master/LICENSE.md)
 
-[getumbrel.com](https://getumbrel.com)
