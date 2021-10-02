@@ -1,6 +1,6 @@
 {
-    "version": "0.4.6",
-    "name": "Citadel update test",
+    "version": "0.4.8",
+    "name": "Citadel update",
     "requires": ">=0.2.1",
-    "notes": "We're sorry, but updating doesn't work right now. Please watch this update notification. If you get a notification Citadel 0.4.7 is available, please open it and read the instructions there."
+    "notes": "This update fixes  many of the recent issues. If your update gets stuck on starting while updating, please install it via SSH like you did when first upgrading to Citadel."
 }
