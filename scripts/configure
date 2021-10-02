@@ -342,10 +342,10 @@ for template_path, output_path in templates_to_build.items():
     file.write(replace_vars(template_path))
       
 
-print("Installing docker-compose")
+print("Installing docker-compose...")
 print()
 download_docker_compose()
-print("Updating apps")
+print("Updating apps...")
 print()
 os.system('./app/app-manager.py --invoked-by-configure update-online')
 print("Configuring permissions")
