@@ -124,6 +124,8 @@ def configureMainPort(app: dict, nodeRoot: str):
     if "port" in mainContainer:
         portToAppend = "{}:{}".format(portAsEnvVar, mainContainer['port'])
         del mainContainer['port']
+    else:
+        portToAppend = "{}:{}".format(portAsEnvVar, portAsEnvVar)
 
     if "ports" in mainContainer:
         mainContainer['ports'].append(portToAppend)
