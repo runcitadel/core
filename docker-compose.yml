@@ -99,7 +99,7 @@ services:
         dashboard:
                 container_name: dashboard
                 #image: getumbrel/dashboard:v0.3.25@sha256:03ac7a94d08f2e678e494baf748152a4d6905d2b4dd1726ae55e3c5b154bec62
-                image: runcitadel/dashboard-old:main@sha256:4c38ecc7c036565a67c907999cbe621ab3c8646dada61e3b5138f97daced4a4f
+                image: runcitadel/dashboard:main@sha256:e70c0ee1ce386fd4d93c24fb8ca6a459797877ece5e668a46932b05f2879da06
                 restart: on-failure
                 stop_grace_period: 1m30s
                 networks:
@@ -166,7 +166,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: runcitadel/middleware:main@sha256:b79d897c2121fe994b4cfa3540a26eb985d72962f22e703c0f289029a1db8f91
+                image: runcitadel/middleware:main@sha256:68352ed43edbae3365b0f72e3edd25e91207edd8a951bb32a3da202f87317e06
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
