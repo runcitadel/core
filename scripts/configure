@@ -164,6 +164,8 @@ else:
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
 ADDITIONAL_BITCOIN_OPTIONS=""
+BOLT_DB_OPTIONS=""
+CHANNEL_LIMITATIONS=""
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
@@ -179,6 +181,17 @@ if os.path.isfile("./lnd/lnd.conf"):
         ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
       if line.startswith("bitcoin.feerate"):
         ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
+      if line.startswith("minchansize"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("maxchansize"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("maxpendingchannels"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("db.bolt.auto-compact"):
+        BOLT_DB_OPTIONS += "\n" + line.strip()
+
+if(BOLT_DB_OPTIONS == ""):
+  BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
 
 NEUTRINO_PEERS=""
 if BITCOIN_NETWORK == "mainnet":
@@ -200,7 +213,6 @@ else:
   exit(1)
 
 # IP addresses for services
-
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
 NGINX_IP="10.21.21.2"
@@ -225,7 +237,6 @@ APPS_2_TOR_IP="10.21.21.48"
 APPS_3_TOR_IP="10.21.21.49"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
-
 
 # Apps
 APP_THUNDERHUB_IP="10.21.21.13"

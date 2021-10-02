@@ -27,6 +27,7 @@ docker-compose.override.yml
 *.cookie
 *.pid
 *.env
+.backup
 bitcoin/*
 db/*
 electrs/*
