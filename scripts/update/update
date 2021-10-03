@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 # SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
 if [[ $UID != 0 ]]; then
     echo "Update script must be run as root"
@@ -46,15 +47,6 @@ if [[ "${update_type}" == "repo" ]]; then
   rm -rf "${repo_path}" 2> /dev/null || true
   mkdir -p "${repo_path}"
   git clone --single-branch --branch "${branch}" "https://github.com/${repo}.git" "${repo_path}"
-
-  # Patch version to show development build
-  commit=$(git --git-dir "${repo_path}/.git" rev-parse --short HEAD)
-  mv "${repo_path}/info.json" "${repo_path}/info.json.orig"
-  jq \
-    --arg commit "${commit}" \
-    '.build = $commit' \
-    "${repo_path}/info.json.orig" \
-    > "${repo_path}/info.json"
 
   # Now hand over to the path updater
   update_type="path"
@@ -137,18 +129,5 @@ echo "Deleting cloned repository"
 
 echo "Removing lock"
 rm -f "$UMBREL_ROOT"/statuses/update-in-progress
-
-# Make sure the update-status file isn't stuck in an 
-# unresolved state (i.e anything except "success" or "failed")
-
-update_state=$(cat "${UMBREL_ROOT}/statuses/update-status.json" | jq .state -r)
-
-if [[ "${update_state}" != "success" ]] && [[ "${update_state}" != "failed" ]]; then
-    # Sleep for a few seconds to make sure the user is on the update view
-    sleep 8
-    cat <<EOF > "${UMBREL_ROOT}/statuses/update-status.json"
-{"state": "failed", "progress": 100, "description": "An unexpected error occured", "updateTo": ""}
-EOF
-fi
 
 exit 0

@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
 set -euo pipefail
 
 RELEASE=$1
 UMBREL_ROOT=$2
-
-./check-memory "${RELEASE}" "${UMBREL_ROOT}" "notfirstrun"
 
 echo
 echo "======================================="

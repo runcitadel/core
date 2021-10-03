@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
 set -euo pipefail
 
 RELEASE=$1
 UMBREL_ROOT=$2
-
-./check-memory "${RELEASE}" "${UMBREL_ROOT}" "firstrun"
 
 # Check if $UMBREL_ROOT/.umbrel-$RELEASE exists, if it does, rename it to $UMBREL_ROOT/.citadel-$RELEASE
 if [ -d "$UMBREL_ROOT/.umbrel-$RELEASE" ]; then
@@ -67,9 +66,6 @@ cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 20, "description": "Backing up", "updateTo": "$RELEASE"}
 EOF
 
-# Fix permissions
-echo "Fixing permissions"
-find "$UMBREL_ROOT" -path "$UMBREL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 
 # Backup
 echo "Backing up existing directory tree"
