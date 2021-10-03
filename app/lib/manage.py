@@ -200,7 +200,10 @@ def remove_readonly(func, path, _):
 
 def deleteData(app: str):
     dataDir = os.path.join(appDataDir, app)
-    shutil.rmtree(dataDir, onerror=remove_readonly)
+    try:
+        shutil.rmtree(dataDir, onerror=remove_readonly)
+    except FileNotFoundError:
+        pass
 
 
 def setInstalled(app: str):
@@ -209,7 +212,7 @@ def setInstalled(app: str):
         userData["installedApps"] = []
     userData["installedApps"].append(app)
     userData["installedApps"] = list(set(userData["installedApps"]))
-    with open(userFile) as f:
+    with open(userFile, "w") as f:
         json.dump(userData, f)
 
 
@@ -219,5 +222,5 @@ def setRemoved(app: str):
         return
     userData["installedApps"] = list(set(userData["installedApps"]))
     userData["installedApps"].remove(app)
-    with open(userFile) as f:
+    with open(userFile, "w") as f:
         json.dump(userData, f)

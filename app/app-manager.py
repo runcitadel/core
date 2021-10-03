@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from lib.manage import deleteData, download, getUserData, runCompose, startInstalled, stopInstalled, update
+from lib.manage import deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -90,6 +90,7 @@ elif args.action == 'install':
         print("No app provided")
         exit(1)
     os.system(legacyScript + " install " + args.app)
+    setInstalled(args.app)
 elif args.action == 'uninstall':
     if not args.app:
         print("No app provided")
@@ -100,8 +101,10 @@ elif args.action == 'uninstall':
         exit(1)
     print("Stopping app {}...".format(args.app))
     runCompose(args.app, "rm --force --stop")
+    print("Deleting data...")
     deleteData(args.app)
-    os.system(legacyScript + " uninstall " + args.app)
+    print("Removing from the list of installed apps...")
+    setRemoved(args.app)
 elif args.action == 'stop':
     if not args.app:
         print("No app provided")

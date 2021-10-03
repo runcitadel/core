@@ -22,7 +22,6 @@ Usage: app <command> <app> [<arguments>]
 
 Commands:
     install                    Pulls down images for an app and starts it
-    uninstall                  Removes images and destroys all data for an app
     compose                    Passes all arguments to docker compose
 
 Looking for something else?
@@ -129,25 +128,6 @@ compose() {
     "${@}"
 }
 
-update_installed_apps() {
-  local action="${1}"
-  local app="${2}"
-
-  while ! (set -o noclobber; echo "$$" > "${USER_FILE}.lock") 2> /dev/null; do
-    echo "Waiting for JSON lock to be released for ${app} update..."
-    sleep 1
-  done
-  # This will cause the lock-file to be deleted in case of a
-  # premature exit.
-  trap "rm -f "${USER_FILE}.lock"; exit $?" INT TERM EXIT
-
-  [[ "${action}" == "add" ]] && operator="+" || operator="-"
-  updated_json=$(cat "${USER_FILE}" | jq ".installedApps |= (. ${operator} [\"${app}\"] | unique)")
-  echo "${updated_json}" > "${USER_FILE}"
-
-  rm -f "${USER_FILE}.lock"
-}
-
 # Pulls down images for an app and starts it
 if [[ "$command" = "install" ]]; then
 
@@ -161,19 +141,7 @@ if [[ "$command" = "install" ]]; then
   echo "Starting app ${app}..."
   compose "${app}" up --detach
 
-  echo "Saving app ${app} in DB..."
-  update_installed_apps add "${app}"
-
   echo "Successfully installed app ${app}"
-  exit
-fi
-
-# Removes images and destroys all data for an app
-if [[ "$command" = "uninstall" ]]; then
-  echo "Removing app ${app} from DB..."
-  update_installed_apps remove "${app}"
-
-  echo "Successfully uninstalled app ${app}"
   exit
 fi
 
