@@ -4,26 +4,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-import stat
-import threading
-from typing import List
-import yaml
 import json
-from lib.composegenerator.v0.generate import createComposeConfigFromV0
-from lib.composegenerator.v1.generate import createComposeConfigFromV1
-from lib.appymlgenerator import convertComposeYMLToAppYML
+from lib.manage import deleteData, download, getUserData, runCompose, startInstalled, stopInstalled, update
 from lib.validate import findAndValidateApps
-from lib.metadata import getAppRegistry, getSimpleAppRegistry
 import os
 import argparse
-import requests
-from sys import argv
-import shutil
-
-# For an array of threads, join them and wait for them to finish
-def joinThreads(threads: List[threading.Thread]):
-    for thread in threads:
-        thread.join()
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -51,178 +36,9 @@ parser.add_argument(
     'other', help='Anything else (For compose)', nargs="*")
 args = parser.parse_args()
 
-def runCompose(app: str, args: str):
-    os.system("{script} compose {app} {args}".format(script=legacyScript, app=app, args=args))
-    
-# Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-def getArguments():
-    arguments = ""
-    for i in range(3, len(argv)):
-        arguments += argv[i] + " "
-    return arguments
-
-
 # If no action is specified, the list action is used
 if args.action is None:
     args.action = 'list'
-
-
-def getAppYml(name):
-    url = 'https://raw.githubusercontent.com/runcitadel/compose-nonfree/main/apps/' + \
-        name + '/' + 'app.yml'
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return False
-
-
-def getAppYmlPath(app):
-    return os.path.join(appsDir, app, 'app.yml')
-
-
-def composeToAppYml(app):
-    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-    appYml = os.path.join(appsDir, app, "app.yml")
-    # Read the compose file and parse it
-    with open(composeFile, "r") as f:
-        compose = yaml.safe_load(f)
-    registry = os.path.join(appsDir, "registry.json")
-    # Load the registry
-    with open(registry, "r") as f:
-        registryData = json.load(f)
-    converted = convertComposeYMLToAppYML(compose, app, registryData)
-    # Put converted into the app.yml after encoding it as YAML
-    with open(appYml, "w") as f:
-        f.write(yaml.dump(converted, sort_keys=False))
-
-
-def update():
-    apps = findAndValidateApps(appsDir)
-    # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir)
-    with open(os.path.join(appsDir, "registry.json"), "w") as f:
-        json.dump(registry, f, indent=4, sort_keys=True)
-    print("Wrote registry to registry.json")
-
-    simpleRegistry = getSimpleAppRegistry(apps, appsDir)
-    with open(os.path.join(appsDir, "apps.json"), "w") as f:
-        json.dump(simpleRegistry, f, indent=4, sort_keys=True)
-    print("Wrote version information to apps.json")
-
-    # Loop through the apps and generate valid compose files from them, then put these into the app dir
-    for app in apps:
-        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-        appYml = os.path.join(appsDir, app, "app.yml")
-        with open(composeFile, "w") as f:
-            appCompose = getApp(appYml, app)
-            if(appCompose):
-                f.write(yaml.dump(appCompose, sort_keys=False))
-                if args.verbose:
-                    print("Wrote " + app + " to " + composeFile)
-    print("Generated configuration successfully")
-
-
-def download():
-    if(args.app is None):
-        apps = findAndValidateApps(appsDir)
-        for app in apps:
-            data = getAppYml(app)
-            if data:
-                with open(getAppYmlPath(app), 'w') as f:
-                    f.write(data)
-            else:
-                print("Warning: Could not download " + app)
-    else:
-        data = getAppYml(args.app)
-        if data:
-            with open(getAppYmlPath(args.app), 'w') as f:
-                f.write(data)
-        else:
-            print("Warning: Could not download " + args.app)
-
-def getUserData():
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    return userData
-
-def startInstalled():
-    # If userfile doen't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    threads = []
-    for app in userData["installedApps"]:
-        print("Starting app {}...".format(app))
-        # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        thread = threading.Thread(target=runCompose, args=(app, "up --detach"))
-        thread.start()
-        threads.append(thread)
-    joinThreads(threads)
-
-def stopInstalled():
-    # If userfile doen't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    threads = []
-    for app in userData["installedApps"]:
-        print("Stopping app {}...".format(app))
-        # Run runCompose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        thread = threading.Thread(target=runCompose, args=(app, "rm --force --stop"))
-        thread.start()
-        threads.append(thread)
-    joinThreads(threads)
-
-# Loads an app.yml and converts it to a docker-compose.yml
-def getApp(appFile: str, appId: str):
-    with open(appFile, 'r') as f:
-        app = yaml.safe_load(f)
-
-    if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appFile)
-    app["metadata"]["id"] = appId
-
-    if('version' in app and str(app['version']) == "1"):
-        return createComposeConfigFromV1(app, nodeRoot)
-    else:
-        return createComposeConfigFromV0(app)
-
-
-def compose(app, arguments):
-    # Runs a compose command in the app dir
-    # Before that, check if a docker-compose.yml exists in the app dir
-    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-    if not os.path.isfile(composeFile):
-        print("Error: Could not find docker-compose.yml in " + app)
-        exit(1)
-    # Save the previous working directory and return to it later
-    oldDir = os.getcwd()
-    os.chdir(os.path.join(nodeRoot, "apps", app))
-    os.system(
-        "docker compose --env-file '{}' {}".format(os.path.join(nodeRoot, ".env"), arguments))
-    os.chdir(oldDir)
-
-def remove_readonly(func, path, _):
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
-
-def deleteData(app: str):
-    dataDir = os.path.join(appDataDir, app)
-    shutil.rmtree(dataDir, onerror=remove_readonly)
-
-def setInstalled(app: str):
-    userData = getUserData()
-    if not "installedApps" in userData:
-        userData["installedApps"] = []
-    userData["installedApps"].append(app)
-    userData["installedApps"] = list(set(userData["installedApps"]))
-    with open(userFile) as f:
-        json.dump(userData, f)
 
 if args.action == 'list':
     apps = findAndValidateApps(appsDir)
@@ -230,11 +46,11 @@ if args.action == 'list':
         print(app)
     exit(0)
 elif args.action == 'download':
-    download()
+    download(args.app)
     exit(0)
 elif args.action == 'update':
     if(args.invoked_by_configure):
-        update()
+        update(args.app)
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
@@ -249,7 +65,7 @@ elif args.action == 'update-online':
     download()
     print("Downloaded all updates")
     if(args.invoked_by_configure):
-        update()
+        update(args.app)
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
@@ -269,17 +85,11 @@ elif args.action == 'ls-installed':
     else:
         # To match the behavior of the old script, print a newline if there are no apps installed
         print("\n")
-
-
-
 elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
     os.system(legacyScript + " install " + args.app)
-
-
-
 elif args.action == 'uninstall':
     if not args.app:
         print("No app provided")
@@ -292,8 +102,6 @@ elif args.action == 'uninstall':
     runCompose(args.app, "rm --force --stop")
     deleteData(args.app)
     os.system(legacyScript + " uninstall " + args.app)
-
-
 elif args.action == 'stop':
     if not args.app:
         print("No app provided")
