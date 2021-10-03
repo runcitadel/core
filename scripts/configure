@@ -31,18 +31,31 @@ if not is_arm64() and not is_amd64():
   print('Umbrel only works on arm64 and amd64!')
   exit(1)
 
-# Download docker-compose from https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-arm64
-# or https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-amd64
+# Check the output of "docker compose version", if it matches "Docker Compose version v2.0.0-rc.3", return true
+# Otherwise, return false
+def is_compose_rc():
+  try:
+    output = subprocess.check_output(['docker', 'compose', 'version'])
+    if(output.decode('utf-8').strip() == 'Docker Compose version v2.0.0-rc.3'):
+      print("Using rc docker compose, updating...")
+      return True
+    else:
+      return False
+  except:
+    return True
+
+# Download docker-compose from https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64
+# or https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64
 # and put it in $HOME/.docker/cli-plugins/docker-compose
 def download_docker_compose():
   # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
   subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
-  if os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')):
+  if os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) and not is_compose_rc():
     return
   if is_arm64():
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-arm64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   elif is_amd64():
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.0-rc.3/docker-compose-linux-amd64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
 
 
@@ -190,7 +203,7 @@ if os.path.isfile("./lnd/lnd.conf"):
       if line.startswith("db.bolt.auto-compact"):
         BOLT_DB_OPTIONS += "\n" + line.strip()
 
-if(BOLT_DB_OPTIONS == ""):
+if(BOLT_DB_OPTIONS != ""):
   BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
 
 NEUTRINO_PEERS=""

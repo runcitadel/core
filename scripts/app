@@ -9,28 +9,6 @@ set -euo pipefail
 UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 USER_FILE="${UMBREL_ROOT}/db/user.json"
 
-show_help() {
-  cat << EOF
-app 0.1.0
-
-low-level tool for managing Citadel apps
-
-Only used internally, do NOT use it manually unless you know what you're doing.
-Not supposed to be used in custom scripts, breaking changes may occur.
-
-Usage: app <command> <app> [<arguments>]
-
-Commands:
-    install                    Pulls down images for an app and starts it
-    compose                    Passes all arguments to docker compose
-
-Looking for something else?
-In Citadel, we moved a lot of functionality into ${UMBREL_ROOT}/app/app-manager.py
-All options from this script should also be there now, and some are only available there.
-Please use that script instead of this one.
-EOF
-}
-
 check_dependencies () {
   for cmd in "$@"; do
     if ! command -v $cmd >/dev/null 2>&1; then
@@ -71,7 +49,6 @@ else
 fi
 
 if [ -z ${2+x} ]; then
-  show_help
   exit 1
 else
   app="$2"
@@ -153,6 +130,4 @@ if [[ "$command" = "compose" ]]; then
 fi
 
 # If we get here it means no valid command was supplied
-# Show help and exit
-show_help
 exit 1

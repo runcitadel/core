@@ -220,7 +220,7 @@ services:
                       ipv4_address: $ELECTRUM_IP
 networks:
     default:
-      name: umbrel_main_network
+      name: citadel_main_network
       ipam:
           driver: default
           config:

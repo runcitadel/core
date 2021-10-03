@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
-version: "3.7"
+version: "3.8"
 
 networks:
   default:
-    name: umbrel_main_network
+    name: citadel_main_network
     external: true
