@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import stat
 import threading
 from typing import List
 import yaml
@@ -17,6 +18,7 @@ import os
 import argparse
 import requests
 from sys import argv
+import shutil
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
@@ -32,6 +34,7 @@ if os.getuid() != 0:
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..")
 appsDir = os.path.join(nodeRoot, "apps")
+appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
@@ -204,6 +207,22 @@ def compose(app, arguments):
         "docker compose --env-file '{}' {}".format(os.path.join(nodeRoot, ".env"), arguments))
     os.chdir(oldDir)
 
+def remove_readonly(func, path, _):
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+def deleteData(app: str):
+    dataDir = os.path.join(appDataDir, app)
+    shutil.rmtree(dataDir, onerror=remove_readonly)
+
+def setInstalled(app: str):
+    userData = getUserData()
+    if not "installedApps" in userData:
+        userData["installedApps"] = []
+    userData["installedApps"].append(app)
+    userData["installedApps"] = list(set(userData["installedApps"]))
+    with open(userFile) as f:
+        json.dump(userData, f)
 
 if args.action == 'list':
     apps = findAndValidateApps(appsDir)
@@ -250,11 +269,17 @@ elif args.action == 'ls-installed':
     else:
         # To match the behavior of the old script, print a newline if there are no apps installed
         print("\n")
+
+
+
 elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
     os.system(legacyScript + " install " + args.app)
+
+
+
 elif args.action == 'uninstall':
     if not args.app:
         print("No app provided")
@@ -265,7 +290,10 @@ elif args.action == 'uninstall':
         exit(1)
     print("Stopping app {}...".format(args.app))
     runCompose(args.app, "rm --force --stop")
+    deleteData(args.app)
     os.system(legacyScript + " uninstall " + args.app)
+
+
 elif args.action == 'stop':
     if not args.app:
         print("No app provided")

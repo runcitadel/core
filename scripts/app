@@ -41,10 +41,6 @@ check_dependencies () {
   done
 }
 
-list_installed_apps() {
-  "${UMBREL_ROOT}/app/app-manager.py" ls-installed || true
-}
-
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   # Make sure we use the seed from the real installation if this is
@@ -73,13 +69,6 @@ if [ -z ${1+x} ]; then
   command=""
 else
   command="$1"
-fi
-
-# Lists installed apps
-if [[ "$command" = "ls-installed" ]]; then
-  list_installed_apps
-
-  exit
 fi
 
 if [ -z ${2+x} ]; then
@@ -181,11 +170,6 @@ fi
 
 # Removes images and destroys all data for an app
 if [[ "$command" = "uninstall" ]]; then
-  echo "Deleting app data for app ${app}..."
-  if [[ -d "${app_data_dir}" ]]; then
-    rm -rf "${app_data_dir}"
-  fi
-
   echo "Removing app ${app} from DB..."
   update_installed_apps remove "${app}"
 
