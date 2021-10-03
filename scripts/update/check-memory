@@ -12,20 +12,8 @@ first_run=$3
 
 LIMIT=3500000
 
-# Abort on low memory devices
+# Warn on low memory devices
 memory="$(awk '/MemTotal/{printf "%d\n", $2}' /proc/meminfo)"
 if ((memory<LIMIT)); then
-  if [[ "${first_run}" == "firstrun" ]]; then
-    cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 20, "description": "Checking device memory", "updateTo": "${RELEASE}"}
-EOF
-    # Sleep for a few seconds so the user has been redirected to the update screen
-    sleep 10
-    memory_error="Sorry, this update isn't compatible with your device, it requires at least $((LIMIT/1000000))GB RAM."
-    echo "${memory_error}"
-    cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
-{"state": "failed", "progress": 100, "description": "${memory_error}", "updateTo": "${RELEASE}"}
-EOF
-  fi
-  exit 1
+    echo "WARNING: Citadel has been designed for devices with 4GB of RAM or more. You may run into issues on this system."
 fi
