@@ -1,6 +1,8 @@
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+<!--
+SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+
+SPDX-License-Identifier: MIT
+-->
 
 # Over-The-Air (OTA) Updates
 How over-the-air updates work on Citadel.
