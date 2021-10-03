@@ -5,7 +5,7 @@
 metadata:
   category: Lightning Node Management
   name: ThunderHub
-  version: 0.12.25
+  version: 0.12.28
   tagline: Take full control of your Lightning node
   description: 'ThunderHub allows you to take full control of your Lightning node
     with a slick and awesome UI. Explore all the options that ThunderHub has to offer,
@@ -31,7 +31,7 @@ metadata:
   path: ''
   defaultPassword: moneyprintergobrrr
 containers:
-- image: apotdevin/thunderhub:v0.12.25@sha256:21f3610787b0824373238b02f77fcde5e944ce784c818796ee9740394de23e32
+- image: apotdevin/thunderhub:v0.12.28@sha256:0d987cc6a4a3c0571b5babac7c5a18a96999879d6eb6a8a59815ed0e225dc128
   user: 1000:1000
   ports:
   - $APP_THUNDERHUB_PORT:$APP_THUNDERHUB_PORT

@@ -3,7 +3,7 @@
         "id": "thunderhub",
         "name": "ThunderHub",
         "repo": "https://github.com/apotdevin/thunderhub",
-        "version": "0.12.25"
+        "version": "0.12.28"
     },
     {
         "id": "ride-the-lightning",
@@ -15,7 +15,7 @@
         "id": "squeaknode",
         "name": "Squeaknode",
         "repo": "https://github.com/yzernik/squeaknode",
-        "version": "0.1.154"
+        "version": "0.1.158"
     },
     {
         "id": "pi-hole",

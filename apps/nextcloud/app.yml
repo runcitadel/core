@@ -77,7 +77,6 @@ containers:
   depends_on:
   - db
   - redis
-  name: web
   data:
   - data/nextcloud:/var/www/html
 
