@@ -42,3 +42,12 @@ HiddenServiceDir /var/lib/tor/app-{}
 HiddenServicePort 80 {}:{}
 
             '''.format(appName, appId, appIp, appPort)
+
+
+def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str) -> str:
+                return '''
+# {} {} Hidden Service
+HiddenServiceDir /var/lib/tor/app-{}-{}
+HiddenServicePort 80 {}:{}
+
+            '''.format(appName, container["name"], appId, container["name"], containerIp, container["port"])

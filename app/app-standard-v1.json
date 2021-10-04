@@ -161,6 +161,10 @@
           "noNetwork": {
             "type": "boolean",
             "description": "Set this to true if the container shouldn't get an IP & port exposed."
+          },
+          "needsHiddenService": {
+            "type": "boolean",
+            "description": "Set this to true if the container should be assigned a hidden service even if it's not the main container."
           }
         },
         "additionalProperties": false

@@ -90,6 +90,8 @@ elif args.action == 'install':
         print("No app provided")
         exit(1)
     os.system(legacyScript + " install " + args.app)
+    runCompose(args.app, "pull")
+    runCompose(args.app, "up --detach")
     setInstalled(args.app)
 elif args.action == 'uninstall':
     if not args.app:

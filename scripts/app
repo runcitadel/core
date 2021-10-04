@@ -9,15 +9,6 @@ set -euo pipefail
 UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 USER_FILE="${UMBREL_ROOT}/db/user.json"
 
-check_dependencies () {
-  for cmd in "$@"; do
-    if ! command -v $cmd >/dev/null 2>&1; then
-      echo "This script requires \"${cmd}\" to be installed"
-      exit 1
-    fi
-  done
-}
-
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   # Make sure we use the seed from the real installation if this is
@@ -38,9 +29,6 @@ derive_entropy () {
   # We output as binary, then convert to he so we don't have to deal with openssl adding a prefix, and remove newlines openSSL adds after a character limit
   echo $(printf "%s" "${identifier}" | openssl dgst -sha256 -binary -hmac "${umbrel-seed}" | xxd -p | tr --delete "\n")
 }
-
-# Check dependencies
-check_dependencies docker jq openssl
 
 if [ -z ${1+x} ]; then
   command=""
@@ -107,25 +95,14 @@ compose() {
 
 # Pulls down images for an app and starts it
 if [[ "$command" = "install" ]]; then
-
-  echo "Setting up data dir for app ${app}..."
   mkdir -p "${app_data_dir}"
   rsync --archive --verbose --exclude ".gitkeep" "${app_dir}/." "${app_data_dir}"
-
-  echo "Pulling images for app ${app}..."
-  compose "${app}" pull
-
-  echo "Starting app ${app}..."
-  compose "${app}" up --detach
-
-  echo "Successfully installed app ${app}"
   exit
 fi
 
 # Passes all arguments to docker compose
 if [[ "$command" = "compose" ]]; then
   compose "${app}" ${args}
-
   exit
 fi
 
