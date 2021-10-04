@@ -13,6 +13,7 @@ import requests
 import shutil
 import json
 import yaml
+import subprocess
 
 from lib.composegenerator.v0.generate import createComposeConfigFromV0
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
@@ -225,12 +226,16 @@ def setRemoved(app: str):
     with open(userFile, "w") as f:
         json.dump(userData, f)
 
-def deriveEntropy():
-    seedFile = os.path.join(nodeRoot, "db", "umbrel-seed")
-    alternativeSeedFile = os.path.join(nodeRoot, "db", "umbrel-seed")
+def deriveEntropy(identifier: str):
+    seedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
+    alternativeSeedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
     if not os.path.isfile(seedFile):
         if(os.path.isfile(alternativeSeedFile)):
             seedFile = alternativeSeedFile
         else:
             print("No seed file found, exiting...")
             exit(1)
+    with open(seedFile, "r") as f:
+        data = f.read().strip()
+    entropy = subprocess.check_output('printf "%s" "{}" | openssl dgst -sha256 -binary -hmac "{}" | xxd -p | tr --delete "\n"'.format(data, identifier), shell=True)
+    return entropy.decode("utf-8")

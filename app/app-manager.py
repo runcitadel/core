@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from lib.manage import deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update
+from lib.manage import deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -25,7 +25,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "list", "download", "update", "update-online", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart"])
+                    "list", "download", "update", "update-online", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
 # Add the --invoked-by-configure option, which is hidden from the user in --help
 parser.add_argument('--invoked-by-configure',
                     action='store_true', help=argparse.SUPPRESS)
@@ -155,6 +155,10 @@ elif args.action == 'compose':
         print("No app provided")
         exit(1)
     runCompose(args.app, " ".join(args.other))
+
+elif args.action == "entropy":
+    print(deriveEntropy(args.app))
+
 else:
     print("Error: Unknown action")
     print("See --help for usage")
