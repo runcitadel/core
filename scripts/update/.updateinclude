@@ -5,3 +5,4 @@ tor/torrc-apps-2
 tor/torrc-apps-3
 tor/torrc-umbrel
 electrs/electrs.toml
+apps/docker-compose.common.yml
