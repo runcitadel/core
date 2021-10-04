@@ -48,6 +48,6 @@ def getContainerHiddenService(appName: str, appId: str, container: dict, contain
                 return '''
 # {} {} Hidden Service
 HiddenServiceDir /var/lib/tor/app-{}-{}
-HiddenServicePort 80 {}:{}
+HiddenServicePort {} {}:{}
 
-            '''.format(appName, container["name"], appId, container["name"], containerIp, container["port"])
+            '''.format(appName, container["name"], appId, container["name"], container["port"], containerIp, container["port"])
