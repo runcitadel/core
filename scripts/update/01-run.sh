@@ -200,6 +200,7 @@ for app in $("$UMBREL_ROOT/app/app-manager.py" ls-installed); do
 done
 wait
 
+docker network rm umbrel_main_network || true
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
