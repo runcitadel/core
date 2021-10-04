@@ -26,7 +26,7 @@ derive_entropy () {
     exit 1
   fi
 
-  # We output as binary, then convert to he so we don't have to deal with openssl adding a prefix, and remove newlines openSSL adds after a character limit
+  # We output as binary, then convert to hex so we don't have to deal with openssl adding a prefix, and remove newlines openSSL adds after a character limit
   echo $(printf "%s" "${identifier}" | openssl dgst -sha256 -binary -hmac "${umbrel-seed}" | xxd -p | tr --delete "\n")
 }
 

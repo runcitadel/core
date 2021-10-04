@@ -224,3 +224,10 @@ def setRemoved(app: str):
     userData["installedApps"].remove(app)
     with open(userFile, "w") as f:
         json.dump(userData, f)
+
+def deriveEntropy():
+    seedFile = os.path.join(nodeRoot, "db", "umbrel-seed")
+    alternativeSeedFile = os.path.join(nodeRoot, "db", "umbrel-seed")
+    if not os.path.isfile(seedFile):
+        if(os.path.isfile(alternativeSeedFile)):
+            seedFile = alternativeSeedFile
