@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+# yaml-language-server: $schema=../../app/app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Social
   name: Squeaknode
@@ -23,7 +27,6 @@ metadata:
   - lnd
   repo: https://github.com/yzernik/squeaknode
   support: https://github.com/yzernik/squeaknode/discussions
-  port: 12994
   gallery:
   - 1.jpg
   - 2.jpg
@@ -36,9 +39,9 @@ containers:
 - name: web
   image: yzernik/squeaknode:v0.1.158@sha256:f9a7e539f606bf412d86fb37563486493479d3fa298aa757f13cd5a40cb38f9d
   stop_grace_period: 1m
+  port: 12994
   ports:
-  - $APP_SQUEAKNODE_PORT:$APP_SQUEAKNODE_PORT
-  - $APP_SQUEAKNODE_GRPC_PORT:$APP_SQUEAKNODE_GRPC_PORT
+  - 8994:8994
   user: 1000:1000
 
   environment:
@@ -73,3 +76,7 @@ containers:
   permissions:
   - bitcoind
   - lnd
+  hiddenServicePorts:
+    p2p:
+      - 8555
+      - 18555

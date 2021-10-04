@@ -37,6 +37,18 @@ def getFreePort(networkingFile: str, appId: str):
     return port
 
 
+def getHiddenServiceMultiPort(name: str, id: str, internalIp: str, ports: list) -> str:
+    hiddenServices = '''
+# {} Hidden Service
+HiddenServiceDir /var/lib/tor/app-{}
+'''.format(name, id)
+    for port in ports:
+        hiddenServices += 'HiddenServicePort {} {}:{}'.format(
+            port, internalIp, port)
+        hiddenServices += "\n"
+    return hiddenServices
+
+
 def getHiddenServiceString(name: str, id: str, internalPort, internalIp: str, publicPort) -> str:
     return '''
 # {} Hidden Service
@@ -50,26 +62,29 @@ def getHiddenService(appName: str, appId: str, appIp: str, appPort: str) -> str:
     return getHiddenServiceString(appName, appId, appPort, appIp, appPort)
 
 
-def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str, isMainContainer: bool = False) -> str:
+def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str, isMainContainer: bool) -> str:
     if not "needsHiddenService" in container and not isMainContainer:
         return ""
     if (("ports" in container and not "hiddenServicePort" in container) or not "port" in container) and not isMainContainer:
         print("Container {} for app {} isn't compatible with hidden service assignment".format(
             container["name"], appName))
         return ""
-    
-    if  isMainContainer:
+
+    if isMainContainer:
         if not "hiddenServicePorts" in container:
-            print("Container {} for app {} isn't compatible with hidden service assignment".format(
-                container["name"], appName))
             return ""
         # hiddenServicePorts is a map of hidden service name to port
         # We need to generate a hidden service for each one
         hiddenServices = ""
         for name, port in container["hiddenServicePorts"].items():
-            hiddenServices += getHiddenServiceString(name, appId, port, containerIp, port)
+            # If port is a list, use getHiddenServiceMultiPort
+            if isinstance(port, list):
+                hiddenServices += getHiddenServiceMultiPort("{} {}".format(appName, name), "{}-{}".format(
+                    appId, name), containerIp, port)
+            else:
+                hiddenServices += getHiddenServiceString("{} {}".format(appName, name), "{}-{}".format(
+                    appId, name), port, containerIp, port)
         return hiddenServices
 
     return getHiddenServiceString(appName + container["name"], "{}-{}".format(
         appId, container["name"]), container["port"], containerIp, container["port"])
-

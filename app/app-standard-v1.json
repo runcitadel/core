@@ -175,7 +175,7 @@
             "description": "Set this to a map of service names to hidden service ports if your container exposes multiple ports, and all of them should be hidden services.",
             "patternProperties": {
               "^[a-zA-Z0-9_]+$": {
-                "type": "number"
+                "type": ["number", "array"]
               }
             }
           }

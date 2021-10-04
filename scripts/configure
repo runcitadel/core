@@ -297,11 +297,13 @@ APP_VAULTWARDEN_IP="10.21.21.46"
 APP_VAULTWARDEN_PORT="8089"
 APP_CODE_SERVER_IP="10.21.21.53"
 APP_CODE_SERVER_PORT="8091"
+'''
 APP_SQUEAKNODE_IP="10.21.21.54"
 APP_SQUEAKNODE_PORT="12994"
 APP_SQUEAKNODE_GRPC_PORT="8994"
 APP_SQUEAKNODE_P2P_PORT="8555"
 APP_SQUEAKNODE_P2P_TESTNET_PORT="18555"
+'''
 
 DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
 # run "which docker" using subprocess and read STDERR
@@ -365,7 +367,7 @@ print()
 download_docker_compose()
 print("Updating apps...")
 print()
-os.system('./app/app-manager.py --invoked-by-configure update-online')
+os.system('./app/app-manager.py --invoked-by-configure update')
 print("Configuring permissions")
 print()
 os.system('chown -R 1000:1000 {}'.format(UMBREL_ROOT))

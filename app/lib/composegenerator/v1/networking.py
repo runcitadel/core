@@ -179,6 +179,7 @@ def configureIps(app: dict, networkingFile: str, envFile: str):
     return app
 
 def configureHiddenServices(app: dict, nodeRoot: str):
+    dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
     hiddenServices = ""
 
     if len(app['containers']) == 1:
@@ -195,7 +196,11 @@ def configureHiddenServices(app: dict, nodeRoot: str):
             raise Exception("No main container found")
     
     for container in app['containers']:
-        hiddenServices += getContainerHiddenService(app["metadata"]["name"], app["metadata"]["id"], container, container["name"] == mainContainer["name"])
+        env_var = "APP_{}_{}_IP".format(
+            app["metadata"]["id"].upper().replace("-", "_"),
+            container['name'].upper().replace("-", "_")
+        )
+        hiddenServices += getContainerHiddenService(app["metadata"]["name"], app["metadata"]["id"], container, dotEnv[env_var], container["name"] == mainContainer["name"])
 
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
