@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from lib.composegenerator.v1.networking import configureIps, configureMainPort
+from lib.composegenerator.v1.networking import configureHiddenServices, configureIps, configureMainPort
 from lib.composegenerator.shared.main import convertDataDirToVolume, convertContainerPermissions, addStopConfig, convertContainersToServices
 from lib.composegenerator.shared.env import validateEnv
 import os
@@ -20,6 +20,7 @@ def createComposeConfigFromV1(app: dict, nodeRoot: str):
     app = convertDataDirToVolume(app)
     app = configureIps(app, networkingFile, envFile)
     app = configureMainPort(app, nodeRoot)
+    app = configureHiddenServices(app, nodeRoot)
     app = addStopConfig(app)
     app = convertContainersToServices(app)
     del app['metadata']

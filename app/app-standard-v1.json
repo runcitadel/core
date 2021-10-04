@@ -113,7 +113,7 @@
           "ports": {
             "type": "array",
             "items": {
-              "type": [ "string", "number" ]
+              "type": ["string", "number"]
             }
           },
           "port": {
@@ -121,7 +121,7 @@
             "description": "If this is the main container, the port inside the container which will be exposed to the outside as the port specified in metadata."
           },
           "environment": {
-            "type": [ "object", "array" ]
+            "type": ["object", "array"]
           },
           "data": {
             "type": "array",
@@ -165,6 +165,19 @@
           "needsHiddenService": {
             "type": "boolean",
             "description": "Set this to true if the container should be assigned a hidden service even if it's not the main container."
+          },
+          "hiddenServicePort": {
+            "type": "number",
+            "description": "Set this to a port if your container exposes multiple ports, but only one should be a hidden service."
+          },
+          "hiddenServicePorts": {
+            "type": "object",
+            "description": "Set this to a map of service names to hidden service ports if your container exposes multiple ports, and all of them should be hidden services.",
+            "patternProperties": {
+              "^[a-zA-Z0-9_]+$": {
+                "type": "number"
+              }
+            }
           }
         },
         "additionalProperties": false

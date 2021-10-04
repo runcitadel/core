@@ -6,10 +6,11 @@ import json
 import os
 import random
 
+
 def getFreePort(networkingFile: str, appId: str):
     # Ports used currently in Umbrel
     usedPorts = [80, 8333, 8332, 28332, 28333, 28334, 10009, 8080, 50001, 9050, 3002, 3000, 3300, 3001, 3004, 25441,
-               3003, 3007, 3006, 3009, 3005, 8898, 3008, 8081, 8082, 8083, 8085, 2222, 8086, 8087, 8008, 8088, 8089, 8091]
+                 3003, 3007, 3006, 3009, 3005, 8898, 3008, 8081, 8082, 8083, 8085, 2222, 8086, 8087, 8008, 8088, 8089, 8091]
     networkingData = {}
     if(os.path.isfile(networkingFile)):
         with open(networkingFile, 'r') as f:
@@ -18,7 +19,7 @@ def getFreePort(networkingFile: str, appId: str):
         usedPorts += list(networkingData['ports'].values())
     else:
         networkingData['ports'] = {}
-    
+
     if(appId in networkingData['ports']):
         return networkingData['ports'][appId]
 
@@ -35,19 +36,40 @@ def getFreePort(networkingFile: str, appId: str):
 
     return port
 
-def getHiddenService(appName: str, appId: str, appIp: str, appPort: str) -> str:
-                return '''
+
+def getHiddenServiceString(name: str, id: str, internalPort, internalIp: str, publicPort) -> str:
+    return '''
 # {} Hidden Service
 HiddenServiceDir /var/lib/tor/app-{}
-HiddenServicePort 80 {}:{}
-
-            '''.format(appName, appId, appIp, appPort)
-
-
-def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str) -> str:
-                return '''
-# {} {} Hidden Service
-HiddenServiceDir /var/lib/tor/app-{}-{}
 HiddenServicePort {} {}:{}
 
-            '''.format(appName, container["name"], appId, container["name"], container["port"], containerIp, container["port"])
+'''.format(name, id, publicPort, internalIp, internalPort)
+
+
+def getHiddenService(appName: str, appId: str, appIp: str, appPort: str) -> str:
+    return getHiddenServiceString(appName, appId, appPort, appIp, appPort)
+
+
+def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str, isMainContainer: bool = False) -> str:
+    if not "needsHiddenService" in container and not isMainContainer:
+        return ""
+    if (("ports" in container and not "hiddenServicePort" in container) or not "port" in container) and not isMainContainer:
+        print("Container {} for app {} isn't compatible with hidden service assignment".format(
+            container["name"], appName))
+        return ""
+    
+    if  isMainContainer:
+        if not "hiddenServicePorts" in container:
+            print("Container {} for app {} isn't compatible with hidden service assignment".format(
+                container["name"], appName))
+            return ""
+        # hiddenServicePorts is a map of hidden service name to port
+        # We need to generate a hidden service for each one
+        hiddenServices = ""
+        for name, port in container["hiddenServicePorts"].items():
+            hiddenServices += getHiddenServiceString(name, appId, port, containerIp, port)
+        return hiddenServices
+
+    return getHiddenServiceString(appName + container["name"], "{}-{}".format(
+        appId, container["name"]), container["port"], containerIp, container["port"])
+

@@ -6,7 +6,7 @@ from lib.citadelutils import parse_dotenv
 import json
 from os import path
 import random
-from lib.composegenerator.v1.utils.networking import getFreePort, getHiddenService
+from lib.composegenerator.v1.utils.networking import getContainerHiddenService, getFreePort, getHiddenService
 
 
 def assignIp(container: dict, appId: str, networkingFile: str, envFile: str):
@@ -175,5 +175,31 @@ def configureIps(app: dict, networkingFile: str, envFile: str):
             continue
         
         container = assignIp(container, app['metadata']['id'], networkingFile, envFile)
+
+    return app
+
+def configureHiddenServices(app: dict, nodeRoot: str):
+    hiddenServices = ""
+
+    if len(app['containers']) == 1:
+        mainContainer = app['containers'][0]
+    else:
+        mainContainer = None
+        if not 'mainContainer' in app['metadata']:
+            app['metadata']['mainContainer'] = 'main'
+        for container in app['containers']:
+            if container['name'] == app['metadata']['mainContainer']:
+                mainContainer = container
+                break
+        if mainContainer is None:
+            raise Exception("No main container found")
+    
+    for container in app['containers']:
+        hiddenServices += getContainerHiddenService(app["metadata"]["name"], app["metadata"]["id"], container, container["name"] == mainContainer["name"])
+
+    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    with open(path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+        f.write(hiddenServices)
 
     return app
