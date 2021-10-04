@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from lib.manage import deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy
+from lib.manage import createDataDir, deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -89,7 +89,7 @@ elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
-    os.system(legacyScript + " install " + args.app)
+    createDataDir(args.app)
     runCompose(args.app, "pull")
     runCompose(args.app, "up --detach")
     setInstalled(args.app)

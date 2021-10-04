@@ -211,6 +211,16 @@ def deleteData(app: str):
     except FileNotFoundError:
         pass
 
+def createDataDir(app: str):
+    dataDir = os.path.join(appDataDir, app)
+    appDir = os.path.join(appsDir, app)
+    if os.path.isdir(dataDir):
+        deleteData(app)
+    # Recursively copy everything from appDir to dataDir while excluding .gitignore
+    shutil.copytree(appDir, dataDir, symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))
+    # Chown and chmod dataDir to have the same owner and permissions as appDir
+    os.chown(dataDir, os.stat(appDir).st_uid, os.stat(appDir).st_gid)
+    os.chmod(dataDir, os.stat(appDir).st_mode)
 
 def setInstalled(app: str):
     userData = getUserData()
