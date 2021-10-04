@@ -39,6 +39,9 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 
 def runCompose(app: str, args: str):
+    # If the app is neither squeaknode nor samourai-server, run compose(app, args) instead
+    if app != "squeaknode" and app != "samourai-server":
+        compose(app, args)
     os.system("{script} compose {app} {args}".format(
         script=legacyScript, app=app, args=args))
 
@@ -188,15 +191,19 @@ def compose(app, arguments):
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+    commonComposeFile = os.path.join(appsDir, "docker-compose.common.yml")
+    os.environ["APP_DOMAIN"] = subprocess.check_output("hostname -s 2>/dev/null || echo 'umbrel'", shell=True).decode("utf-8") + ".local"
+    os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(os.path.join(nodeRoot, "app-{}/hostname".format(app))), shell=True).decode("utf-8")
+    os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
+    os.environ["APP_DATA_DIR"] = os.path.join(appsDir, app, "data")
+    os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
+    os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
     if not os.path.isfile(composeFile):
         print("Error: Could not find docker-compose.yml in " + app)
         exit(1)
-    # Save the previous working directory and return to it later
-    oldDir = os.getcwd()
-    os.chdir(os.path.join(nodeRoot, "apps", app))
     os.system(
-        "docker compose --env-file '{}' {}".format(os.path.join(nodeRoot, ".env"), arguments))
-    os.chdir(oldDir)
+        "docker compose --env-file '{}' --project-name '{}' --file '{}' --file '{}' {}".format(
+            os.path.join(nodeRoot, ".env"), app, commonComposeFile, composeFile, arguments))
 
 
 def remove_readonly(func, path, _):
@@ -211,16 +218,19 @@ def deleteData(app: str):
     except FileNotFoundError:
         pass
 
+
 def createDataDir(app: str):
     dataDir = os.path.join(appDataDir, app)
     appDir = os.path.join(appsDir, app)
     if os.path.isdir(dataDir):
         deleteData(app)
     # Recursively copy everything from appDir to dataDir while excluding .gitignore
-    shutil.copytree(appDir, dataDir, symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))
+    shutil.copytree(appDir, dataDir, symlinks=False,
+                    ignore=shutil.ignore_patterns(".gitignore"))
     # Chown and chmod dataDir to have the same owner and permissions as appDir
     os.chown(dataDir, os.stat(appDir).st_uid, os.stat(appDir).st_gid)
     os.chmod(dataDir, os.stat(appDir).st_mode)
+
 
 def setInstalled(app: str):
     userData = getUserData()

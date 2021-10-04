@@ -13,29 +13,10 @@ derive_entropy () {
   "${UMBREL_ROOT}/app/app-manager.py" entropy ${1}
 }
 
-if [ -z ${1+x} ]; then
-  command=""
-else
-  command="$1"
-fi
-
-if [ -z ${2+x} ]; then
-  exit 1
-else
-  app="$2"
-  app_dir="${UMBREL_ROOT}/apps/${app}"
-  app_data_dir="${UMBREL_ROOT}/app-data/${app}"
-  if [[ -z "${app}" ]] || [[ ! -d "${app_dir}" ]]; then
-    echo "Error: \"${app}\" is not a valid app"
-    exit 1
-  fi
-fi
-
-if [ -z ${3+x} ]; then
-  args=""
-else
-  args="${@:3}"
-fi
+app="$2"
+args="${@:3}"
+app_dir="${UMBREL_ROOT}/apps/${app}"
+app_data_dir="${UMBREL_ROOT}/app-data/${app}"
 
 compose() {
   local app="${1}"
@@ -76,18 +57,4 @@ compose() {
     "${@}"
 }
 
-# Sets up the directory for an app
-if [[ "$command" = "install" ]]; then
-  mkdir -p "${app_data_dir}"
-  rsync --archive --verbose --exclude ".gitkeep" "${app_dir}/." "${app_data_dir}"
-  exit
-fi
-
-# Passes all arguments to docker compose
-if [[ "$command" = "compose" ]]; then
-  compose "${app}" ${args}
-  exit
-fi
-
-# If we get here it means no valid command was supplied
-exit 1
+compose "${app}" ${args}
