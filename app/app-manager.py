@@ -157,6 +157,9 @@ elif args.action == 'compose':
     runCompose(args.app, " ".join(args.other))
 
 elif args.action == "entropy":
+    if(args.app == ""):
+        print("Missing identifier for entropy")
+        exit(1)
     print(deriveEntropy(args.app))
 
 else:

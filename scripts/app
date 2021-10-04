@@ -9,25 +9,8 @@ set -euo pipefail
 UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 USER_FILE="${UMBREL_ROOT}/db/user.json"
 
-# Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
-  # Make sure we use the seed from the real installation if this is
-  # an OTA update.
-  SEED_FILE="${UMBREL_ROOT}/db/umbrel-seed/seed"
-  if [[ ! -f "${SEED_FILE}" ]] && [[ -f "${UMBREL_ROOT}/../.umbrel" ]]; then
-    SEED_FILE="${UMBREL_ROOT}/../db/umbrel-seed/seed"
-  fi
-
-  identifier="${1}"
-  umbrel_seed=$(cat "${SEED_FILE}") || true
-
-  if [[ -z "$umbrel_seed" ]] || [[ -z "$identifier" ]]; then
-    >&2 echo "Missing derivation parameter, this is unsafe, exiting."
-    exit 1
-  fi
-
-  # We output as binary, then convert to hex so we don't have to deal with openssl adding a prefix, and remove newlines openSSL adds after a character limit
-  echo $(printf "%s" "${identifier}" | openssl dgst -sha256 -binary -hmac "${umbrel-seed}" | xxd -p | tr --delete "\n")
+  "${UMBREL_ROOT}/app/app-manager.py" entropy ${1}
 }
 
 if [ -z ${1+x} ]; then
@@ -93,7 +76,7 @@ compose() {
     "${@}"
 }
 
-# Pulls down images for an app and starts it
+# Sets up the directory for an app
 if [[ "$command" = "install" ]]; then
   mkdir -p "${app_data_dir}"
   rsync --archive --verbose --exclude ".gitkeep" "${app_dir}/." "${app_data_dir}"

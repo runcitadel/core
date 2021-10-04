@@ -22,9 +22,12 @@ from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry, getSimpleAppRegistry
 
 # For an array of threads, join them and wait for them to finish
+
+
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
+
 
 # The directory with this script
 scriptDir = os.path.dirname(os.path.realpath(__file__))
@@ -40,6 +43,8 @@ def runCompose(app: str, args: str):
         script=legacyScript, app=app, args=args))
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
+
+
 def getArguments():
     arguments = ""
     for i in range(3, len(argv)):
@@ -226,6 +231,7 @@ def setRemoved(app: str):
     with open(userFile, "w") as f:
         json.dump(userData, f)
 
+
 def deriveEntropy(identifier: str):
     seedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
     alternativeSeedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
@@ -236,6 +242,7 @@ def deriveEntropy(identifier: str):
             print("No seed file found, exiting...")
             exit(1)
     with open(seedFile, "r") as f:
-        data = f.read().strip()
-    entropy = subprocess.check_output('printf "%s" "{}" | openssl dgst -sha256 -binary -hmac "{}" | xxd -p | tr --delete "\n"'.format(data, identifier), shell=True)
+        umbrel_seed = f.read().strip()
+    entropy = subprocess.check_output(
+        'printf "%s" "{}" | openssl dgst -sha256 -binary -hmac "{}" | xxd -p | tr --delete "\n"'.format(identifier, umbrel_seed), shell=True)
     return entropy.decode("utf-8")
