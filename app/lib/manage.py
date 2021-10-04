@@ -231,3 +231,6 @@ def deriveEntropy():
     if not os.path.isfile(seedFile):
         if(os.path.isfile(alternativeSeedFile)):
             seedFile = alternativeSeedFile
+        else:
+            print("No seed file found, exiting...")
+            exit(1)
