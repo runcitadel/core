@@ -77,7 +77,7 @@ def getContainerHiddenService(appName: str, appId: str, container: dict, contain
         # We need to generate a hidden service for each one
         hiddenServices = ""
         for name, port in container["hiddenServicePorts"].items():
-            if name.contains(".."):
+            if ".." in name:
                 print(".. Not allowed in service names, this app ({}) isn't getting a hidden service.".format(appName))
             
             # If port is a list, use getHiddenServiceMultiPort
