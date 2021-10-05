@@ -4,10 +4,6 @@ SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
 SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 -->
 
-
-[![Version](https://img.shields.io/github/v/release/rubcitadel/dashboard?color=%235351FB&label=version)](https://github.com/runcitadel/dashboard/releases)
-[![Docker Build](https://img.shields.io/github/workflow/status/runcitadel/umbrel-dashboard/Docker%20build%20on%20push?color=%235351FB)](https://github.com/runcitadel/dashboard/actions?query=workflow%3A"Docker+build+on+push")
-[![Docker Pulls](https://img.shields.io/docker/pulls/runcitadel/dashboard?color=%235351FB)](https://hub.docker.com/repository/registry-1.docker.io/runcitadel/dashboard/tags?page=1)
 [![Discord Server](https://img.shields.io/badge/Community%20Chat-Discord-%235351FB)](https://discord.gg/6U3kM2cjdB)
 [![Twitter](https://img.shields.io/twitter/follow/runcitadel?style=social)](https://twitter.com/runcitadel)
 
@@ -32,23 +28,22 @@ TBD
 - 4GB RAM and 600GB+ free space (for mainnet)
 - [Docker](https://docs.docker.com/engine/install)
 - [Python 3.0+](https://www.python.org/downloads)
-- [Docker Compose](https://docs.docker.com/compose/install)
 - [fswatch](https://emcrisostomo.github.io/fswatch/), [jq](https://stedolan.github.io/jq/), [rsync](https://linuxize.com/post/how-to-use-rsync-for-local-and-remote-data-transfer-and-synchronization/#installing-rsync), [curl](https://curl.haxx.se/docs/install.html) (`sudo apt-get install fswatch jq rsync curl`)
 
 Make sure your User ID is `1000` (verify it by running `id -u`) and ensure that your account is [correctly permissioned to use docker](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user).
 
-### Step 1. Download Umbrel
+### Step 1. Download Citadel
 
-> Run this in an empty directory where you want to install Umbrel. If using an external storage such as an SSD or HDD, run this inside an empty directory on that drive.
+> Run this in an empty directory where you want to install Citadel. If using an external storage such as an SSD or HDD, run this inside an empty directory on that drive.
 
 ```bash
-curl -L https://github.com/getumbrel/umbrel/archive/v0.4.2.tar.gz | tar -xz --strip-components=1
+curl -L https://github.com/runcitadel/compose-nonfree/archive/v0.4.10.tar.gz | tar -xz --strip-components=1
 ```
 
-### Step 2. Run Umbrel
+### Step 2. Run Citadel
 
 ```bash
-# To use Umbrel on mainnet, run:
+# To use Citadel on mainnet, run:
 sudo ./scripts/start
 
 # The following environment settings can only be set
@@ -61,11 +56,11 @@ sudo NETWORK=testnet ./scripts/start
 # For regtest, run:
 sudo NETWORK=regtest ./scripts/start
 
-# For umbrel to listen on port 12345 instead of 80, run:
+# For Citadel to listen on port 12345 instead of 80, run:
 sudo NGINX_PORT=12345 ./scripts/start
 ```
 
-To stop Umbrel, run:
+To stop Citadel, run:
 
 ```bash
 sudo ./scripts/stop
@@ -79,7 +74,7 @@ TBD
 
 ```
                           + -------------------- +
-                          |   umbrel-dashboard   |
+                          |       dashboard      |
                           + -------------------- +
                                       |
                                       |
@@ -92,7 +87,7 @@ TBD
               |                                               |
               |                                               |
    + ------------------ +                         + --------------------- +
-   |   umbrel-manager   | < - - - jwt auth - - -  |   umbrel-middleware   |
+   |       manager      | < - - - jwt auth - - -  |       middleware      |
    + ------------------ +                         + --------------------- +
                                                               |
                                                               |
@@ -100,7 +95,7 @@ TBD
                                             |                                   |
                                             |                                   |
                                     + ------------- +                   + ------------- +
-                                    |    bitcoind   | < - - - - - - - - |      lnd      |
+                                    |   bitcoind    | < - - - - - - - - |      lnd      |
                                     + ------------- +                   + ------------- +
 ```
 
@@ -108,11 +103,11 @@ TBD
 
 ## ⚡️ Don't be too reckless
 
-Umbrel is still in beta development and should not be considered secure. [Read our writeup of security tradeoffs](https://github.com/getumbrel/umbrel/blob/master/SECURITY.md) that exist today.
+Citadel is still in beta development and should not be considered secure. [Read our writeup of security tradeoffs](https://github.com/runcitadel/compose-nonfree/blob/master/SECURITY.md) that exist today.
 
-It's recommended that you note down your 24 secret words (seed phrase) with a pen and paper, and secure it safely. If you forget your dashboard's password, or in case something goes wrong with your Umbrel, you will need these 24 words to recover your funds in the Bitcoin wallet of your Umbrel.
+It's recommended that you note down your 24 secret words (seed phrase) with a pen and paper, and secure it safely. If you forget your dashboard's password, or in case something goes wrong with your Citadel, you will need these 24 words to recover your funds in the Bitcoin wallet of your Citadel.
 
-You're also recommended to download a backup of your payment channels regularly as it'll be required to recover your funds in the Lightning wallet of your Umbrel in case something goes wrong. You should also always download the latest backup file before installing an update.
+You're also recommended to download a backup of your payment channels regularly as it'll be required to recover your funds in the Lightning wallet of your Citadel in case something goes wrong. You should also always download the latest backup file before installing an update.
 
 ## ❤️ Contributing
 
