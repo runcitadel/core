@@ -40,7 +40,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 def runCompose(app: str, args: str):
     # If the app is neither squeaknode nor samourai-server, run compose(app, args) instead
-    if app != "squeaknode" and app != "samourai-server":
+    if app != "samourai-server":
         compose(app, args)
     os.system("{script} compose {app} {args}".format(
         script=legacyScript, app=app, args=args))
@@ -192,12 +192,22 @@ def compose(app, arguments):
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     commonComposeFile = os.path.join(appsDir, "docker-compose.common.yml")
-    os.environ["APP_DOMAIN"] = subprocess.check_output("hostname -s 2>/dev/null || echo 'umbrel'", shell=True).decode("utf-8") + ".local"
-    os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(os.path.join(nodeRoot, "app-{}/hostname".format(app))), shell=True).decode("utf-8")
+    os.environ["APP_DOMAIN"] = subprocess.check_output(
+        "hostname -s 2>/dev/null || echo 'umbrel'", shell=True).decode("utf-8") + ".local"
+    os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
+        os.path.join(nodeRoot, "tor", "data", "app-{}/hostname".format(app))), shell=True).decode("utf-8")
     os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
     os.environ["APP_DATA_DIR"] = os.path.join(appsDir, app, "data")
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
+    # List all hidden services for an app and put their hostname in the environment
+    hiddenServices: List[str] = getAppHiddenServices(app)
+    for service in hiddenServices:
+        appHiddenServiceFile = os.path.join(
+            nodeRoot, "tor", "data", "app-{}-{}/hostname".format(app, service))
+        os.environ["APP_HIDDEN_SERVICE_{}".format(service.upper().replace("-", "_"))] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
+            appHiddenServiceFile), shell=True).decode("utf-8")
+
     if not os.path.isfile(composeFile):
         print("Error: Could not find docker-compose.yml in " + app)
         exit(1)
@@ -250,6 +260,17 @@ def setRemoved(app: str):
     userData["installedApps"].remove(app)
     with open(userFile, "w") as f:
         json.dump(userData, f)
+
+
+def getAppHiddenServices(app: str):
+    torDir = os.path.join(nodeRoot, "tor", "data")
+    # List all subdirectories of torDir which start with app-${APP}-
+    # but return them without the app-${APP}- prefix
+    results = []
+    for subdir in os.listdir(torDir):
+        if subdir.startswith("app-{}-".format(app)):
+            results.append(subdir[len("app-{}-".format(app)):])
+    return results
 
 
 def deriveEntropy(identifier: str):

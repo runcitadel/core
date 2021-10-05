@@ -16,7 +16,7 @@ def validateEnvByValue(env: list, allowed: list, app_name: str):
             app_name.upper().replace("-", "_"))
         for key in env:
             # If the key is neither in all_allowed nor is a full match against the validation regex, print a warning and return false
-            if(key not in all_allowed and re.fullmatch(validation_regex, key) is None):
+            if key not in all_allowed and re.fullmatch(validation_regex, key) is None and not key.startswith("APP_HIDDEN_SERVICE_"):
                 print("Invalid environment variable {} in app {}".format(
                     key, app_name))
                 return False
