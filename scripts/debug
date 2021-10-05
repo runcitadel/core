@@ -245,13 +245,13 @@ else
             fi
             exit 0
             elif [[ $no_of_block_devices -gt 1 ]]; then
-            echo "You have multiple external drives connected to your Raspberry Pi. Please remove the drive(s) you don't want to use for Node,"
+            echo "You have multiple external drives connected to your Raspberry Pi. Please remove the drive(s) you don't want to use for Citadel,"
             echo "then reboot your Raspberry Pi by running 'sudo reboot'."
             exit 0
         fi
     fi
     
-    echo "The debug script did not automatically detect any issues with your Node."
+    echo "The debug script did not automatically detect any issues with your Citadel."
     if [[ $upload = true ]]; then
         echo "Please copy the following link and share it with us on Telegram so we can help you with your problem."
         if [[ $tor = true ]]; then
