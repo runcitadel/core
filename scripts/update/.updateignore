@@ -8,4 +8,3 @@ electrs/*
 events/signals
 logs/*
 app-data/*
-apps/*
