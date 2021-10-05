@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 # Warning: it's not recommended to modify these files directly. Any
-# modifications you make can break the functionality of your umbrel. These files
-# are automatically reset with every Umbrel update.
+# modifications you make can break the functionality of your node. These files
+# are automatically reset with every update.
 
 verbose = 2
 network = "bitcoin"
