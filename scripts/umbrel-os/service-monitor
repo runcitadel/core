@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
-STATUS_FILE_PATH="/umbrel-status"
+STATUS_FILE_PATH="/citadel-status"
 
 set_status="/status-server/set-status"
 
@@ -19,7 +19,7 @@ check_root () {
 check_umbrel_os () {
   [[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
   if [[ -z "${UMBREL_OS:-}" ]]; then
-    echo "This script must only be run on Umbrel OS"
+    echo "This script must only be run on Citadel OS"
     exit 1
   fi
 }
@@ -28,7 +28,7 @@ has_service_failed () {
   systemctl is-failed --quiet '*'
 }
 
-has_umbrel_started () {
+has_citadel_started () {
   cat "${STATUS_FILE_PATH}" | grep --silent '^umbrel:completed$'
 }
 
@@ -44,9 +44,9 @@ echo "Starting service monitor..."
 
 while true
 do
-  if has_umbrel_started
+  if has_citadel_started
   then
-    echo "Umbrel successfully started, exiting service monitor!"
+    echo "Citadel successfully started, exiting service monitor!"
     exit 0
   fi
   if has_service_failed

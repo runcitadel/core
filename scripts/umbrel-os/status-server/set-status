@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-STATUS_FILE_PATH="/umbrel-status"
+STATUS_FILE_PATH="/citadel-status"
 
 service_id="${1}"
 status="${2}"

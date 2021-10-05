@@ -6,7 +6,7 @@
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 BIND_MOUNT_PATH="/status-server"
-STATUS_FILE_PATH="/umbrel-status"
+STATUS_FILE_PATH="/citadel-status"
 
 # Bind mount status server to new location so we always run on the SD card
 echo "Bind mounting status server to ${BIND_MOUNT_PATH}..."

@@ -11,7 +11,7 @@ from util.server import Server
 from util.csrf import get_csrf_token, verify_csrf_token
 import util.status_file as status_file
 
-STATUS_FILE_PATH='/umbrel-status'
+STATUS_FILE_PATH='/citadel-status'
 
 def csrf(request):
     if not verify_csrf_token(request['post_data']['token']):
