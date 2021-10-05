@@ -4,14 +4,14 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 BIND_MOUNT_PATH="/status-server"
 STATUS_FILE_PATH="/umbrel-status"
 
 # Bind mount status server to new location so we always run on the SD card
 echo "Bind mounting status server to ${BIND_MOUNT_PATH}..."
 [[ ! -d "${BIND_MOUNT_PATH}" ]] && mkdir -p "${BIND_MOUNT_PATH}"
-mount --bind "${UMBREL_ROOT}/scripts/umbrel-os/status-server/" "${BIND_MOUNT_PATH}"
+mount --bind "${CITADEL_ROOT}/scripts/umbrel-os/status-server/" "${BIND_MOUNT_PATH}"
 sync
 sleep 1
 

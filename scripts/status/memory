@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
 memory_total_bytes() {
   free --bytes | awk 'NR==2 {print $2}'
@@ -35,7 +35,7 @@ get_app_memory_use() {
 
   local app_memory=0
 
-  local app_containers=$("${UMBREL_ROOT}/app/app-manager.py" compose "${app}" ps | awk '{print $1}' | grep -v 'Name\|-----')
+  local app_containers=$("${CITADEL_ROOT}/app/app-manager.py" compose "${app}" ps | awk '{print $1}' | grep -v 'Name\|-----')
   for container in $app_containers; do
     local container_memory=$(get_container_memory_use "${container}")
     app_memory=$(awk "BEGIN {print ${app_memory}+${container_memory}}")
@@ -55,7 +55,7 @@ used=$(memory_used_bytes)
 json=$(echo $json | jq --arg used "${used}" '. + {used: $used|tonumber}')
 
 cumulative_app_memory="0"
-for app in $( "${UMBREL_ROOT}/app/app-manager.py" ls-installed)
+for app in $( "${CITADEL_ROOT}/app/app-manager.py" ls-installed)
 do
   app_memory=$(get_app_memory_use "${app}")
   cumulative_app_memory=$(($cumulative_app_memory+$app_memory))

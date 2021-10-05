@@ -15,14 +15,14 @@ if [[ $UID != 0 ]]; then
     exit 1
 fi
 
-UMBREL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 
-if [[ ! -d "$UMBREL_ROOT" ]]; then
-  echo "Root dir does not exist '$UMBREL_ROOT'"
+if [[ ! -d "$CITADEL_ROOT" ]]; then
+  echo "Root dir does not exist '$CITADEL_ROOT'"
   exit 1
 fi
 
-cd "$UMBREL_ROOT"
+cd "$CITADEL_ROOT"
 
 # Increase default Docker and Compose timeouts to 240s
 # As bitcoin can take a long while to respond
@@ -31,7 +31,7 @@ export COMPOSE_HTTP_TIMEOUT=240
 
 echo "Stopping installed apps..."
 echo
-"${UMBREL_ROOT}/app/app-manager.py" stop installed
+"${CITADEL_ROOT}/app/app-manager.py" stop installed
 echo
 
 echo "Stopping Docker services..."

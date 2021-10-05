@@ -72,13 +72,13 @@ except:
     exit(1)
 
 # Switch to UMBREL root directory.
-UMBREL_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-os.chdir(UMBREL_ROOT)
+CITADEL_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(CITADEL_ROOT)
 
-status_dir = os.path.join(UMBREL_ROOT, 'statuses')
+status_dir = os.path.join(CITADEL_ROOT, 'statuses')
 # Make sure to use the main status dir for updates
 if os.path.isfile('../.umbrel'):
-    status_dir = os.path.join(UMBREL_ROOT, '..', 'statuses')
+    status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
 
 # Configure for mainnet or testnet or regtest depending
 # upon the user-supplied value of $NETWORK
@@ -90,7 +90,7 @@ if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
     print('Error: Network must be either mainnet, testnet, or regtest!')
     exit(1)
 
-with open(os.path.join(UMBREL_ROOT, "info.json"), 'r') as file:
+with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
   UMBREL_VERSION=json.load(file)['version']
 
 print()
@@ -368,7 +368,7 @@ print()
 os.system('./app/app-manager.py --invoked-by-configure update-online')
 print("Configuring permissions")
 print()
-os.system('chown -R 1000:1000 {}'.format(UMBREL_ROOT))
+os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')

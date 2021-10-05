@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 block_device="${1}"
 mount_point="${2}"
 
@@ -38,7 +38,7 @@ main () {
       break
     fi
 
-    if ! df -h "${UMBREL_ROOT}" | grep --quiet "/dev/${block_device}"; then
+    if ! df -h "${CITADEL_ROOT}" | grep --quiet "/dev/${block_device}"; then
       echo "Umbrel root is no longer bind mounted to external storage!"
       break
     fi

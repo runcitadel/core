@@ -8,16 +8,16 @@
 set -euo pipefail
 
 RELEASE=$1
-UMBREL_ROOT=$2
+CITADEL_ROOT=$2
 
-# Check if $UMBREL_ROOT/.umbrel-$RELEASE exists, if it does, rename it to $UMBREL_ROOT/.citadel-$RELEASE
-if [ -d "$UMBREL_ROOT/.umbrel-$RELEASE" ]; then
+# Check if $CITADEL_ROOT/.umbrel-$RELEASE exists, if it does, rename it to $CITADEL_ROOT/.citadel-$RELEASE
+if [ -d "$CITADEL_ROOT/.umbrel-$RELEASE" ]; then
     echo "Migrating from Umbrel..."
     echo "Your Umbrel will now be turned into a Citadel"
     echo "Please contact the Citadel team if anything goes wrong during the update"
     echo "Waiting 5 seconds, then the migration will start"
     sleep 5
-    mv "$UMBREL_ROOT/.umbrel-$RELEASE" "$UMBREL_ROOT/.citadel-$RELEASE"
+    mv "$CITADEL_ROOT/.umbrel-$RELEASE" "$CITADEL_ROOT/.citadel-$RELEASE"
 fi
 
 # Functions which work like echo, but color the text red, green, and yellow
@@ -53,16 +53,16 @@ echo
 pkill -f "\./karen" || true
 
 # Make sure any previous backup doesn't exist
-if [[ -d "$UMBREL_ROOT"/.citadel-backup ]]; then
-    echo "Cannot install update. A previous backup already exists at $UMBREL_ROOT/.citadel-backup"
+if [[ -d "$CITADEL_ROOT"/.citadel-backup ]]; then
+    echo "Cannot install update. A previous backup already exists at $CITADEL_ROOT/.citadel-backup"
     echo "This can only happen if the previous update installation wasn't successful"
     exit 1
 fi
 
-echo "Installing Citadel $RELEASE at $UMBREL_ROOT"
+echo "Installing Citadel $RELEASE at $CITADEL_ROOT"
 
 # Update status file
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 20, "description": "Backing up", "updateTo": "$RELEASE"}
 EOF
 
@@ -71,9 +71,9 @@ EOF
 echo "Backing up existing directory tree"
 
 rsync -av \
-    --include-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
-    --exclude-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
-    "$UMBREL_ROOT"/ \
-    "$UMBREL_ROOT"/.citadel-backup/
+    --include-from="$CITADEL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
+    --exclude-from="$CITADEL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
+    "$CITADEL_ROOT"/ \
+    "$CITADEL_ROOT"/.citadel-backup/
 
-echo "Successfully backed up to $UMBREL_ROOT/.citadel-backup"
+echo "Successfully backed up to $CITADEL_ROOT/.citadel-backup"

@@ -6,12 +6,12 @@
 
 set -euo pipefail
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
-BACKUP_ROOT="${UMBREL_ROOT}/.backup/$RANDOM"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+BACKUP_ROOT="${CITADEL_ROOT}/.backup/$RANDOM"
 BACKUP_FOLDER_NAME="backup"
 BACKUP_FOLDER_PATH="${BACKUP_ROOT}/${BACKUP_FOLDER_NAME}"
 BACKUP_FILE="${BACKUP_ROOT}/backup.tar.gz.pgp"
-BACKUP_STATUS_FILE="${UMBREL_ROOT}/statuses/backup-status.json"
+BACKUP_STATUS_FILE="${CITADEL_ROOT}/statuses/backup-status.json"
 
 check_dependencies () {
   for cmd in "$@"; do
@@ -27,7 +27,7 @@ check_dependencies openssl tar gpg shuf curl
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   identifier="${1}"
-  umbrel_seed=$(cat "${UMBREL_ROOT}/db/umbrel-seed/seed") || true
+  umbrel_seed=$(cat "${CITADEL_ROOT}/db/umbrel-seed/seed") || true
 
   if [[ -z "$umbrel_seed" ]] || [[ -z "$identifier" ]]; then
     >&2 echo "Missing derivation parameter, this is unsafe, exiting."
@@ -38,7 +38,7 @@ derive_entropy () {
   printf "%s" "${identifier}" | openssl dgst -sha256 -hmac "${umbrel_seed}" | sed 's/^.* //'
 }
 
-[[ -f "${UMBREL_ROOT}/.env" ]] && source "${UMBREL_ROOT}/.env"
+[[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
 BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
 
 echo "Deriving keys..."
@@ -48,20 +48,20 @@ encryption_key=$(derive_entropy "umbrel_backup_encryption_key")
 
 echo "Creating backup..."
 
-if [[ ! -f "${UMBREL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" ]]; then
+if [[ ! -f "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" ]]; then
     echo "No channel.backup file found, skipping backup..."
     exit 1
 fi
 
 mkdir -p "${BACKUP_FOLDER_PATH}"
 
-cp --archive "${UMBREL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/channel.backup"
+cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/channel.backup"
 
 # We want to back up user settings too, however we currently store the encrypted
 # mnemonic in this file which is not safe to backup remotely.
 # Uncomment this in the future once we've ensured there's no critical data in
 # this file.
-# cp --archive "${UMBREL_ROOT}/db/user.json" "${BACKUP_FOLDER_PATH}/user.json"
+# cp --archive "${CITADEL_ROOT}/db/user.json" "${BACKUP_FOLDER_PATH}/user.json"
 
 echo "Adding random padding..."
 

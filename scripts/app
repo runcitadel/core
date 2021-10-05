@@ -6,30 +6,30 @@
 
 set -euo pipefail
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 derive_entropy () {
-  "${UMBREL_ROOT}/app/app-manager.py" entropy ${1}
+  "${CITADEL_ROOT}/app/app-manager.py" entropy ${1}
 }
 
 app="$2"
 args="${@:3}"
-app_dir="${UMBREL_ROOT}/apps/${app}"
-app_data_dir="${UMBREL_ROOT}/app-data/${app}"
+app_dir="${CITADEL_ROOT}/apps/${app}"
+app_data_dir="${CITADEL_ROOT}/app-data/${app}"
 
 compose() {
   local app="${1}"
   shift
-  local env_file="${UMBREL_ROOT}/.env"
-  local app_base_compose_file="${UMBREL_ROOT}/apps/docker-compose.common.yml"
+  local env_file="${CITADEL_ROOT}/.env"
+  local app_base_compose_file="${CITADEL_ROOT}/apps/docker-compose.common.yml"
   local app_compose_file="${app_dir}/docker-compose.yml"
   local app_entropy_identifier="app-${app}-seed"
 
-  export BITCOIN_DATA_DIR="${UMBREL_ROOT}/bitcoin"
+  export BITCOIN_DATA_DIR="${CITADEL_ROOT}/bitcoin"
   export APP_DATA_DIR="${app_data_dir}"
 
-  local dojo_hidden_service_file="${UMBREL_ROOT}/tor/data/app-${app}-dojo/hostname"
-  local whirlpool_hidden_service_file="${UMBREL_ROOT}/tor/data/app-${app}-whirlpool/hostname"
+  local dojo_hidden_service_file="${CITADEL_ROOT}/tor/data/app-${app}-dojo/hostname"
+  local whirlpool_hidden_service_file="${CITADEL_ROOT}/tor/data/app-${app}-whirlpool/hostname"
   export APP_SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE="$(cat "${dojo_hidden_service_file}" 2>/dev/null || echo "notyetset.onion")"
   export APP_SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE="$(cat "${whirlpool_hidden_service_file}" 2>/dev/null || echo "notyetset.onion")"
   export APP_SAMOURAI_SERVER_NODE_API_KEY=$(derive_entropy "env-${app_entropy_identifier}-NODE_API_KEY")

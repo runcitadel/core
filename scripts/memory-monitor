@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 PERCENT_MEMORY_THRESHOLD=90
 
@@ -27,8 +27,8 @@ while true; do
   percent_memory_used=$(free | awk 'NR==2{print int($3*100/$2) }')
   if (( $percent_memory_used > $PERCENT_MEMORY_THRESHOLD )); then
     log "Warning memory usage at ${percent_memory_used}%"
-    if [[ "$(jq -r '.installedApps | length > 0' ${UMBREL_ROOT}/db/user.json)" == "true" ]]; then
-      touch "${UMBREL_ROOT}/statuses/memory-warning"
+    if [[ "$(jq -r '.installedApps | length > 0' ${CITADEL_ROOT}/db/user.json)" == "true" ]]; then
+      touch "${CITADEL_ROOT}/statuses/memory-warning"
     fi
   fi
   sleep 60

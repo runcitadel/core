@@ -34,7 +34,7 @@ check_if_not_already_running
 
 check_dependencies fswatch readlink dirname
 
-UMBREL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/../.."
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/../.."
 
 monitor_file () {
   local file_path="${1}"
@@ -48,26 +48,26 @@ monitor_file () {
       sleep 1
     done
     echo "$file_path created! Triggering backup..."
-    touch "${UMBREL_ROOT}/events/signals/backup"
+    touch "${CITADEL_ROOT}/events/signals/backup"
   fi
 
-  fswatch -0 --event Updated $file_path | xargs -0 -n 1 -I {} touch "${UMBREL_ROOT}/events/signals/backup"
+  fswatch -0 --event Updated $file_path | xargs -0 -n 1 -I {} touch "${CITADEL_ROOT}/events/signals/backup"
 }
 
-if [[ ! -d "${UMBREL_ROOT}" ]]; then
-  echo "Root dir does not exist '$UMBREL_ROOT'"
+if [[ ! -d "${CITADEL_ROOT}" ]]; then
+  echo "Root dir does not exist '$CITADEL_ROOT'"
   exit 1
 fi
 
-[[ -f "${UMBREL_ROOT}/.env" ]] && source "${UMBREL_ROOT}/.env"
+[[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
 BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
 
 # Monitor LND channel.backup
-monitor_file "${UMBREL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" &
+monitor_file "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" &
 
 # Monitor db/user.json
 # We want to back up user settings too, however we currently store the encrypted
 # mnemonic in this file which is not safe to backup remotely.
 # Uncomment this in the future once we've ensured there's no critical data in
 # this file.
-# monitor_file "${UMBREL_ROOT}/db/user.json" &
+# monitor_file "${CITADEL_ROOT}/db/user.json" &

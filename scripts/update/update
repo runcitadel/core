@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
 # SPDX-FileCopyrightText: 2021 Citadel and contributors
 #
 # SPDX-License-Identifier: MIT
@@ -21,7 +21,7 @@ check_dependencies () {
 
 check_dependencies jq curl rsync
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
 update_type=""
 if [[ "${1}" == "--ota" ]]; then
@@ -59,7 +59,7 @@ if [[ "${update_type}" == "path" ]] && [[ ! -f "${update_path}/.umbrel" ]] && [[
 fi
 
 if [[ "${update_type}" == "ota" ]]; then
-  RELEASE=$(cat "$UMBREL_ROOT"/statuses/update-status.json | jq .updateTo -r)
+  RELEASE=$(cat "$CITADEL_ROOT"/statuses/update-status.json | jq .updateTo -r)
 elif [[ "${update_type}" == "path" ]]; then
   RELEASE=$(cat "$update_path"/info.json | jq .version -r)
 fi
@@ -73,40 +73,40 @@ echo "======================================="
 echo
 
 # Make sure an update is not in progres
-if [[ -f "$UMBREL_ROOT/statuses/update-in-progress" ]]; then
+if [[ -f "$CITADEL_ROOT/statuses/update-in-progress" ]]; then
     echo "An update is already in progress. Exiting now."
     exit 2
 fi
 
 echo "Creating lock"
-touch "$UMBREL_ROOT"/statuses/update-in-progress
+touch "$CITADEL_ROOT"/statuses/update-in-progress
 
 # Cleanup just in case there's temp stuff lying around from previous update
 echo "Cleaning up any previous mess"
-[[ -d "$UMBREL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$UMBREL_ROOT"/.citadel-"$RELEASE"
+[[ -d "$CITADEL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$CITADEL_ROOT"/.citadel-"$RELEASE"
 
 # Update status file
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 10, "description": "Downloading Citadel $RELEASE", "updateTo": "$RELEASE"}
 EOF
 
 # Download new release
 if [[ "${update_type}" == "ota" ]]; then
   echo "Downloading Citadel ${RELEASE}"
-  mkdir -p "${UMBREL_ROOT}/.citadel-${RELEASE}"
-  cd "${UMBREL_ROOT}/.citadel-${RELEASE}"
+  mkdir -p "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  cd "${CITADEL_ROOT}/.citadel-${RELEASE}"
   curl -L "https://github.com/runcitadel/compose-nonfree/archive/$RELEASE.tar.gz" | tar -xz --strip-components=1
 fi
 
 # Copy over new release from path
 if [[ "${update_type}" == "path" ]]; then
   echo "Copying Citadel ${RELEASE} from ${update_path}"
-  mkdir -p "${UMBREL_ROOT}/.citadel-${RELEASE}"
+  mkdir -p "${CITADEL_ROOT}/.citadel-${RELEASE}"
   cp --recursive \
     --archive \
     --no-target-directory \
-    "${update_path}" "${UMBREL_ROOT}/.citadel-${RELEASE}"
-  cd "${UMBREL_ROOT}/.citadel-${RELEASE}"
+    "${update_path}" "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  cd "${CITADEL_ROOT}/.citadel-${RELEASE}"
 fi
 
 # Run update scripts
@@ -117,7 +117,7 @@ for script in $UPDATE_INSTALL_SCRIPTS; do
     if [[ -x $script ]]; then
         echo
         echo "== Begin Update Script $script =="
-        ./"$script" "$RELEASE" "$UMBREL_ROOT"
+        ./"$script" "$RELEASE" "$CITADEL_ROOT"
         echo "== End Update Script $script =="
         echo
     fi
@@ -125,9 +125,9 @@ done
 
 # Delete cloned repo
 echo "Deleting cloned repository"
-[[ -d "$UMBREL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$UMBREL_ROOT"/.citadel-"$RELEASE"
+[[ -d "$CITADEL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$CITADEL_ROOT"/.citadel-"$RELEASE"
 
 echo "Removing lock"
-rm -f "$UMBREL_ROOT"/statuses/update-in-progress
+rm -f "$CITADEL_ROOT"/statuses/update-in-progress
 
 exit 0

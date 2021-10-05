@@ -32,7 +32,7 @@ How over-the-air updates work on Citadel.
 
 6. When the user opens his [`dashboard`](https://github.com/runcitadel/dashboard-old), it periodically polls [`manager`](https://github.com/runcitadel/manager) to check for new updates.
 
-7. `manager` fetches the latest `info.json` from umbrel's main repo's main branch using `GET https://raw.githubusercontent.com/runcitadel/compose-nonfree/main/info.json`, compares it's `version` with the `version` of the local `$UMBREL_ROOT/info.json` file, and exits if both the versions are same.
+7. `manager` fetches the latest `info.json` from umbrel's main repo's main branch using `GET https://raw.githubusercontent.com/runcitadel/compose-nonfree/main/info.json`, compares it's `version` with the `version` of the local `$CITADEL_ROOT/info.json` file, and exits if both the versions are same.
 
 8. If fetched `version` > local `version`, `manager` checks if local `version` satisfies the `requires` condition in the fetched `info.json`.
 
@@ -42,7 +42,7 @@ How over-the-air updates work on Citadel.
 
 11. `umbrel-dashboard` then alerts the user regarding the available update, and after the user consents, it makes a `POST` request to `manager` to start the update process.
 
-12. `manager` adds the `updateTo` key to `$UMBREL_ROOT/statuses/update-status.json` (a file used to continuosly update the user with the update status and progress) with the update release tag.
+12. `manager` adds the `updateTo` key to `$CITADEL_ROOT/statuses/update-status.json` (a file used to continuosly update the user with the update status and progress) with the update release tag.
 
 ```json
 {
@@ -52,20 +52,20 @@ How over-the-air updates work on Citadel.
 }
 ```
 
-13. `manager` then creates an update signal file on the mounted host OS volume (`$UMBREL_ROOT/events/signals/update`) and returns `OK` to the `umbrel-dashboard`.
+13. `manager` then creates an update signal file on the mounted host OS volume (`$CITADEL_ROOT/events/signals/update`) and returns `OK` to the `umbrel-dashboard`.
 
-14. [`karen`](https://github.com/runcitadel/compose-nonfree/blob/main/karen) is triggered (obviously) as soon as `$UMBREL_ROOT/events/signals/update` is touched/updated, and immediately runs the `update` trigger script [`$UMBREL_ROOT/events/triggers/update`](https://github.com/runcitadel/compose-nonfree/blob/main/events/triggers/update) as root.
+14. [`karen`](https://github.com/runcitadel/compose-nonfree/blob/main/karen) is triggered (obviously) as soon as `$CITADEL_ROOT/events/signals/update` is touched/updated, and immediately runs the `update` trigger script [`$CITADEL_ROOT/events/triggers/update`](https://github.com/runcitadel/compose-nonfree/blob/main/events/triggers/update) as root.
 
-15. `$UMBREL_ROOT/events/triggers/update` clones release `vX.Y.Z` from github in `$UMBREL_ROOT/.umbrel-vX.Y.Z`.
+15. `$CITADEL_ROOT/events/triggers/update` clones release `vX.Y.Z` from github in `$CITADEL_ROOT/.umbrel-vX.Y.Z`.
 
-16. `$UMBREL_ROOT/events/triggers/update` then executes all of the following update scripts from the new release `$UMBREL_ROOT/.umbrel-vX.Y.Z` one-by-one:
+16. `$CITADEL_ROOT/events/triggers/update` then executes all of the following update scripts from the new release `$CITADEL_ROOT/.umbrel-vX.Y.Z` one-by-one:
 
-- [`$UMBREL_ROOT/.umbrel-vX.Y.Z/scripts/update/00-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/00-run.sh): Pre-update preparation script (does things like making a backup)
-- [`$UMBREL_ROOT/.umbrel-vX.Y.Z/scripts/update/01-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/01-run.sh): Install update script (installs the update)
-- [`$UMBREL_ROOT/.umbrel-vX.Y.Z/scripts/update/02-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/02-run.sh): Post-update script (used to run unit-tests to make sure the update was successfully installed)
-- [`$UMBREL_ROOT/.umbrel-vX.Y.Z/scripts/update/03-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/03-run.sh): Success script (runs after the updated has been successfully downloaded and installed)
+- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/00-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/00-run.sh): Pre-update preparation script (does things like making a backup)
+- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/01-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/01-run.sh): Install update script (installs the update)
+- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/02-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/02-run.sh): Post-update script (used to run unit-tests to make sure the update was successfully installed)
+- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/03-run.sh`](https://github.com/runcitadel/compose-nonfree/blob/main/scripts/update/03-run.sh): Success script (runs after the updated has been successfully downloaded and installed)
 
-All of the above scripts continuously update `$UMBREL_ROOT/statuses/update-status.json` with the progress of update, which the dashboard periodically fetches every 2s via `manager` to keep the user updated.
+All of the above scripts continuously update `$CITADEL_ROOT/statuses/update-status.json` with the progress of update, which the dashboard periodically fetches every 2s via `manager` to keep the user updated.
 
 ### Further improvements
 

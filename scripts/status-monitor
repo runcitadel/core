@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 resource="${1}"
 interval="${2}"
@@ -15,8 +15,8 @@ log () {
 
 log "Status monitor for \"${resource}\" running every ${interval} seconds!"
 
-status_script="${UMBREL_ROOT}/scripts/status/${resource}"
-json_path="${UMBREL_ROOT}/statuses/${resource}-status.json"
+status_script="${CITADEL_ROOT}/scripts/status/${resource}"
+json_path="${CITADEL_ROOT}/statuses/${resource}-status.json"
 while true; do
   result=$("${status_script}")
   echo "$result" > "${json_path}"

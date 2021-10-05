@@ -6,11 +6,11 @@
 
 set -euo pipefail
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 result=$(docker compose \
-  --file "${UMBREL_ROOT}/docker-compose.yml" \
-  --env-file "${UMBREL_ROOT}/.env" \
+  --file "${CITADEL_ROOT}/docker-compose.yml" \
+  --env-file "${CITADEL_ROOT}/.env" \
   exec bitcoin bitcoin-cli "$@")
 
 # We need to echo with quotes to preserve output formatting

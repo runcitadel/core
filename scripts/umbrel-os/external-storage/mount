@@ -17,9 +17,9 @@ set -euo pipefail
 # - - Install Umbrel on it
 # - Bind mount the external installation on top of the local installation
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 MOUNT_POINT="/mnt/data"
-EXTERNAL_UMBREL_ROOT="${MOUNT_POINT}/umbrel"
+EXTERNAL_CITADEL_ROOT="${MOUNT_POINT}/umbrel"
 DOCKER_DIR="/var/lib/docker"
 EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
 SWAP_DIR="/swap"
@@ -132,11 +132,11 @@ setup_new_device () {
   mount_partition "${partition_path}"
 
   echo "Copying Umbrel install to external storage..."
-  mkdir -p "${EXTERNAL_UMBREL_ROOT}"
+  mkdir -p "${EXTERNAL_CITADEL_ROOT}"
   cp  --recursive \
       --archive \
       --no-target-directory \
-      "${UMBREL_ROOT}" "${EXTERNAL_UMBREL_ROOT}"
+      "${CITADEL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
 }
 
 # Copy Docker data dir to external storage
@@ -217,7 +217,7 @@ main () {
 
     echo "Checking if device contains an Umbrel install..."
 
-    if [[ -f "${EXTERNAL_UMBREL_ROOT}"/.umbrel ]]; then
+    if [[ -f "${EXTERNAL_CITADEL_ROOT}"/.umbrel ]]; then
       echo "Yes, it contains an Umbrel install"
     else
       echo "No, it doesn't contain an Umbrel install"
@@ -237,7 +237,7 @@ main () {
   fi
 
   echo "Bind mounting external storage over local Umbrel installation..."
-  mount --bind "${EXTERNAL_UMBREL_ROOT}" "${UMBREL_ROOT}"
+  mount --bind "${EXTERNAL_CITADEL_ROOT}" "${CITADEL_ROOT}"
 
   echo "Bind mounting external storage over local Docker data dir..."
   mount --bind "${EXTERNAL_DOCKER_DIR}" "${DOCKER_DIR}"
@@ -253,7 +253,7 @@ main () {
   echo "Checking Umbrel root is now on external storage..."
   sync
   sleep 1
-  df -h "${UMBREL_ROOT}" | grep --quiet '/dev/sd'
+  df -h "${CITADEL_ROOT}" | grep --quiet '/dev/sd'
 
   echo "Checking ${DOCKER_DIR} is now on external storage..."
   df -h "${DOCKER_DIR}" | grep --quiet '/dev/sd'
@@ -269,11 +269,11 @@ main () {
   swapon "${SWAP_FILE}"
 
   echo "Checking SD Card root is bind mounted at /sd-root..."
-  df -h "/sd-root${UMBREL_ROOT}" | grep --quiet "/dev/root"
+  df -h "/sd-root${CITADEL_ROOT}" | grep --quiet "/dev/root"
 
   echo "Starting external drive mount monitor..."
   echo
-  ${UMBREL_ROOT}/scripts/umbrel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &
+  ${CITADEL_ROOT}/scripts/umbrel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &
 
   echo "Mount script completed successfully!"
   $set_status mount completed

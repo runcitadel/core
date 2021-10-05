@@ -33,22 +33,22 @@ check_dependencies fswatch
 # Check OTA update scripts' dependencies
 check_dependencies rsync jq curl
 
-UMBREL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
-UMBREL_LOGS="${UMBREL_ROOT}/logs"
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+UMBREL_LOGS="${CITADEL_ROOT}/logs"
 
-set_status="${UMBREL_ROOT}/scripts/umbrel-os/status-server/set-status"
+set_status="${CITADEL_ROOT}/scripts/umbrel-os/status-server/set-status"
 
 $set_status umbrel started
 
-if [[ ! -d "$UMBREL_ROOT" ]]; then
-  echo "Root dir does not exist '$UMBREL_ROOT'"
+if [[ ! -d "$CITADEL_ROOT" ]]; then
+  echo "Root dir does not exist '$CITADEL_ROOT'"
   $set_status umbrel errored umbrel-root-missing
   exit 1
 fi
 
 # Configure Umbrel if it isn't already configured
-if [[ ! -f "${UMBREL_ROOT}/statuses/configured" ]]; then
-  NGINX_PORT=${NGINX_PORT:-80} NETWORK="${NETWORK:-mainnet}" "${UMBREL_ROOT}/scripts/configure"
+if [[ ! -f "${CITADEL_ROOT}/statuses/configured" ]]; then
+  NGINX_PORT=${NGINX_PORT:-80} NETWORK="${NETWORK:-mainnet}" "${CITADEL_ROOT}/scripts/configure"
 fi
 
 echo
@@ -73,8 +73,8 @@ fi
 DEVICE_IP="$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')"
 DEVICE_HOSTNAME="$(hostname)"
 DEVICE_HOSTS="http://${DEVICE_IP},http://${DEVICE_HOSTNAME}.local,https://${DEVICE_HOSTNAME}.local,http://${DEVICE_HOSTNAME},https://${DEVICE_HOSTNAME}"
-if [[ -f "${UMBREL_ROOT}/tor/data/web/hostname" ]]; then
-    hidden_service_url=$(cat "${UMBREL_ROOT}/tor/data/web/hostname")
+if [[ -f "${CITADEL_ROOT}/tor/data/web/hostname" ]]; then
+    hidden_service_url=$(cat "${CITADEL_ROOT}/tor/data/web/hostname")
     DEVICE_HOSTS="${DEVICE_HOSTS},http://${hidden_service_url}"
 fi
 export DEVICE_HOSTS=$DEVICE_HOSTS
@@ -85,7 +85,7 @@ export DEVICE_HOSTNAME="${DEVICE_HOSTNAME}.local"
 export DOCKER_CLIENT_TIMEOUT=240
 export COMPOSE_HTTP_TIMEOUT=240
 
-cd "$UMBREL_ROOT"
+cd "$CITADEL_ROOT"
 
 echo "Starting karen..."
 echo
@@ -126,13 +126,13 @@ docker compose up --detach --build --remove-orphans || {
 echo
 
 echo "Removing status server iptables entry..."
-"${UMBREL_ROOT}/scripts/umbrel-os/status-server/setup-iptables" --delete
+"${CITADEL_ROOT}/scripts/umbrel-os/status-server/setup-iptables" --delete
 
 # Unlock the user file on each start of Umbrel to avoid issues
 # Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
-if [[ -f "${UMBREL_ROOT}/db/user.json.lock" ]]; then
+if [[ -f "${CITADEL_ROOT}/db/user.json.lock" ]]; then
   echo "WARNING: The user file was locked, Umbrel probably wasn't shut down properly"
-  rm "${UMBREL_ROOT}/db/user.json.lock"
+  rm "${CITADEL_ROOT}/db/user.json.lock"
 fi
 
 echo

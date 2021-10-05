@@ -8,7 +8,7 @@
 set -euo pipefail
 
 RELEASE=$1
-UMBREL_ROOT=$2
+CITADEL_ROOT=$2
 
 echo
 echo "======================================="

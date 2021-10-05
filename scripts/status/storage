@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
 filesystem_total_storage_bytes() {
   local directory="${1}"
@@ -23,16 +23,16 @@ directory_size_bytes() {
 
 json="{}"
 
-total=$(filesystem_total_storage_bytes "${UMBREL_ROOT}")
+total=$(filesystem_total_storage_bytes "${CITADEL_ROOT}")
 json=$(echo $json | jq --arg total "${total}" '. + {total: $total|tonumber}')
 
-used=$(filesystem_used_storage_bytes "${UMBREL_ROOT}")
+used=$(filesystem_used_storage_bytes "${CITADEL_ROOT}")
 json=$(echo $json | jq --arg used "${used}" '. + {used: $used|tonumber}')
 
 cumulative_app_size="0"
-for app in $( "${UMBREL_ROOT}/app/app-manager.py" ls-installed)
+for app in $( "${CITADEL_ROOT}/app/app-manager.py" ls-installed)
 do
-  app_size=$(directory_size_bytes "${UMBREL_ROOT}/app-data/${app}")
+  app_size=$(directory_size_bytes "${CITADEL_ROOT}/app-data/${app}")
   cumulative_app_size=$(($cumulative_app_size+$app_size))
   json=$(echo $json | jq --arg app "${app}" --arg app_size "${app_size}" '.breakdown |= .+ [{id: $app, used: $app_size|tonumber}]')
 done

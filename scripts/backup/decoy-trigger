@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 MAX_BACKUP_INTERVAL_IN_HOURS="12"
 
 check_if_not_already_running() {
@@ -39,7 +39,7 @@ main () {
     echo "Sleeping for ${delay} seconds..."
     sleep $delay
     echo "Triggering decoy backup..."
-    touch "${UMBREL_ROOT}/events/signals/backup"
+    touch "${CITADEL_ROOT}/events/signals/backup"
   done
 }
 

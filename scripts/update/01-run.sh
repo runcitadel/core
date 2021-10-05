@@ -7,12 +7,12 @@
 set -euo pipefail
 
 RELEASE=$1
-UMBREL_ROOT=$2
+CITADEL_ROOT=$2
 
-./check-memory "${RELEASE}" "${UMBREL_ROOT}" "notfirstrun"
+./check-memory "${RELEASE}" "${CITADEL_ROOT}" "notfirstrun"
 
 # Only used on Umbrel OS and Citadel OS
-SD_CARD_UMBREL_ROOT="/sd-root${UMBREL_ROOT}"
+SD_CARD_CITADEL_ROOT="/sd-root${CITADEL_ROOT}"
 
 echo
 echo "======================================="
@@ -33,7 +33,7 @@ if [[ -z "${UMBREL_OS:-}" ]] && [[ -n "${CITADEL_OS:-}" ]]; then
     echo "export CITADEL_OS='0.0.1'" > /etc/default/citadel
     IS_MIGRATING=1
     CITADEL_OS='0.0.1'
-    rm -rf "${UMBREL_ROOT}/electrs/db"
+    rm -rf "${CITADEL_ROOT}/electrs/db"
 fi
 
 # Make Umbrel OS specific updates
@@ -45,25 +45,25 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
     
     # Update SD card installation
-    if  [[ -f "${SD_CARD_UMBREL_ROOT}/.umbrel" ]] || [[ -f "${SD_CARD_UMBREL_ROOT}/.citadel" ]]; then
-        echo "Replacing ${SD_CARD_UMBREL_ROOT} on SD card with the new release"
+    if  [[ -f "${SD_CARD_CITADEL_ROOT}/.umbrel" ]] || [[ -f "${SD_CARD_CITADEL_ROOT}/.citadel" ]]; then
+        echo "Replacing ${SD_CARD_CITADEL_ROOT} on SD card with the new release"
         rsync --archive \
             --verbose \
-            --include-from="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateinclude" \
-            --exclude-from="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateignore" \
+            --include-from="${CITADEL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateinclude" \
+            --exclude-from="${CITADEL_ROOT}/.citadel-${RELEASE}/scripts/update/.updateignore" \
             --delete \
-            "${UMBREL_ROOT}/.citadel-${RELEASE}/" \
-            "${SD_CARD_UMBREL_ROOT}/"
+            "${CITADEL_ROOT}/.citadel-${RELEASE}/" \
+            "${SD_CARD_CITADEL_ROOT}/"
 
         echo "Fixing permissions"
-        chown -R 1000:1000 "${SD_CARD_UMBREL_ROOT}/"
+        chown -R 1000:1000 "${SD_CARD_CITADEL_ROOT}/"
     else
-        echo "ERROR: No Umbrel or Citadel installation found at SD root ${SD_CARD_UMBREL_ROOT}"
+        echo "ERROR: No Umbrel or Citadel installation found at SD root ${SD_CARD_CITADEL_ROOT}"
         echo "Skipping updating on SD Card..."
     fi
 
     # This makes sure systemd services are always updated (and new ones are enabled).
-    UMBREL_SYSTEMD_SERVICES="${UMBREL_ROOT}/.citadel-${RELEASE}/scripts/umbrel-os/services/*.service"
+    UMBREL_SYSTEMD_SERVICES="${CITADEL_ROOT}/.citadel-${RELEASE}/scripts/umbrel-os/services/*.service"
     for service_path in $UMBREL_SYSTEMD_SERVICES; do
       service_name=$(basename "${service_path}")
       install -m 644 "${service_path}" "/etc/systemd/system/${service_name}"
@@ -71,41 +71,41 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     done
 fi
 
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 33, "description": "Configuring settings", "updateTo": "$RELEASE"}
 EOF
 
 # Checkout to the new release
-cd "$UMBREL_ROOT"/.citadel-"$RELEASE"
+cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
 
 # Configure new install
 echo "Configuring new release"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 40, "description": "Configuring new release", "updateTo": "$RELEASE"}
 EOF
 
-PREV_ENV_FILE="$UMBREL_ROOT/.env"
+PREV_ENV_FILE="$CITADEL_ROOT/.env"
 BITCOIN_NETWORK="mainnet"
 [[ -f "${PREV_ENV_FILE}" ]] && source "${PREV_ENV_FILE}"
 PREV_ENV_FILE="${PREV_ENV_FILE}" NETWORK=$BITCOIN_NETWORK ./scripts/configure
 
 # Pulling new containers
 echo "Pulling new containers"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 50, "description": "Pulling new containers", "updateTo": "$RELEASE"}
 EOF
 docker compose pull
 
 # Stop existing containers
 echo "Stopping existing containers"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 60, "description": "Removing old containers", "updateTo": "$RELEASE"}
 EOF
-cd "$UMBREL_ROOT"
+cd "$CITADEL_ROOT"
 ./scripts/stop
 
 echo "Installing dependencies"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 61, "description": "Installing dependencies", "updateTo": "$RELEASE"}
 EOF
 
@@ -126,7 +126,7 @@ MOUNT_POINT="/mnt/data"
 EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
 if [[ ! -z "${UMBREL_OS:-}" ]] && [[ ! -d "${EXTERNAL_DOCKER_DIR}" ]]; then
   echo "Attempting to move Docker to external storage..."
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 62, "description": "Migrating Docker install to external storage", "updateTo": "$RELEASE"}
 EOF
 
@@ -158,24 +158,24 @@ fi
 
 # Stopping karen
 echo "Stopping background daemon"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 65, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
 EOF
 pkill -f "\./karen" || true
 
 # Overlay home dir structure with new dir tree
-echo "Overlaying $UMBREL_ROOT/ with new directory tree"
+echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
     --verbose \
-    --include-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
-    --exclude-from="$UMBREL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
+    --include-from="$CITADEL_ROOT/.citadel-$RELEASE/scripts/update/.updateinclude" \
+    --exclude-from="$CITADEL_ROOT/.citadel-$RELEASE/scripts/update/.updateignore" \
     --delete \
-    "$UMBREL_ROOT"/.citadel-"$RELEASE"/ \
-    "$UMBREL_ROOT"/
+    "$CITADEL_ROOT"/.citadel-"$RELEASE"/ \
+    "$CITADEL_ROOT"/
 
 # Handle updating mysql conf for samourai-server app
-samourai_app_mysql_conf="${UMBREL_ROOT}/apps/samourai-server/mysql/mysql-dojo.cnf"
-samourai_data_mysql_conf="${UMBREL_ROOT}/app-data/samourai-server/mysql/mysql-dojo.cnf"
+samourai_app_mysql_conf="${CITADEL_ROOT}/apps/samourai-server/mysql/mysql-dojo.cnf"
+samourai_data_mysql_conf="${CITADEL_ROOT}/app-data/samourai-server/mysql/mysql-dojo.cnf"
 if [[ -f "${samourai_app_mysql_conf}" ]] && [[ -f "${samourai_data_mysql_conf}" ]]; then
   echo "Found samourai-server install, attempting to update DB configuration..."
   cp "${samourai_app_mysql_conf}" "${samourai_data_mysql_conf}"
@@ -183,16 +183,16 @@ fi
 
 # Fix permissions
 echo "Fixing permissions"
-find "$UMBREL_ROOT" -path "$UMBREL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
-chmod -R 700 "$UMBREL_ROOT"/tor/data/*
+find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
+chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
 
 echo "Updating installed apps"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 70, "description": "Updating installed apps", "updateTo": "$RELEASE"}
 EOF
-"${UMBREL_ROOT}/app/app-manager.py" update
-for app in $("$UMBREL_ROOT/app/app-manager.py" ls-installed); do
+"${CITADEL_ROOT}/app/app-manager.py" update
+for app in $("$CITADEL_ROOT/app/app-manager.py" ls-installed); do
   if [[ "${app}" != "" ]]; then
     echo "${app}..."
     app/app-manager.py compose "${app}" pull
@@ -203,10 +203,10 @@ wait
 docker network rm umbrel_main_network || true
 # Start updated containers
 echo "Starting new containers"
-cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
-cd "$UMBREL_ROOT"
+cd "$CITADEL_ROOT"
 ./scripts/start
 
 # Make Citadel OS specific post-update changes
@@ -214,7 +214,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
 
   # Delete unused Docker images on Citadel OS
   echo "Deleting previous images"
-  cat <<EOF > "$UMBREL_ROOT"/statuses/update-status.json
+  cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 90, "description": "Deleting previous images", "updateTo": "$RELEASE"}
 EOF
   docker image prune --all --force
