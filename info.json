@@ -1,6 +1,6 @@
 {
-    "version": "0.4.9",
+    "version": "0.4.10",
     "name": "Citadel update",
     "requires": ">=0.2.1",
-    "notes": "This update resolves an important security issue, and we recommend updating as soon as possible. If your update gets stuck on starting while updating, please install it via SSH like you did when first upgrading to Citadel."
+    "notes": "This update updates a few apps and fixes a few bugs we've been experiencing. We've also replaced more non-free code with fully FOSS alternatives. If your update gets stuck on starting or while updating, please contact us on Discord, Matrix or GitHub: https://github.com/runcitadel/citadel"
 }
