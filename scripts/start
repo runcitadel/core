@@ -34,7 +34,7 @@ check_dependencies fswatch
 check_dependencies rsync jq curl
 
 CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
-UMBREL_LOGS="${CITADEL_ROOT}/logs"
+CITADEL_LOGS="${CITADEL_ROOT}/logs"
 
 set_status="${CITADEL_ROOT}/scripts/umbrel-os/status-server/set-status"
 
@@ -89,26 +89,26 @@ cd "$CITADEL_ROOT"
 
 echo "Starting karen..."
 echo
-./karen &>> "${UMBREL_LOGS}/karen.log" &
+./karen &>> "${CITADEL_LOGS}/karen.log" &
 
 echo "Starting status monitors..."
 pkill -f ./scripts/status-monitor || true
-./scripts/status-monitor memory 60 &>> "${UMBREL_LOGS}/status-monitor.log" &
-./scripts/status-monitor storage 60 &>> "${UMBREL_LOGS}/status-monitor.log" &
-./scripts/status-monitor temperature 15 &>> "${UMBREL_LOGS}/status-monitor.log" &
-./scripts/status-monitor uptime 15 &>> "${UMBREL_LOGS}/status-monitor.log" &
+./scripts/status-monitor memory 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor storage 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor temperature 15 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor uptime 15 &>> "${CITADEL_LOGS}/status-monitor.log" &
 
 echo "Starting memory monitor..."
 echo
-./scripts/memory-monitor &>> "${UMBREL_LOGS}/memory-monitor.log" &
+./scripts/memory-monitor &>> "${CITADEL_LOGS}/memory-monitor.log" &
 
 echo "Starting backup monitor..."
 echo
-./scripts/backup/monitor &>> "${UMBREL_LOGS}/backup-monitor.log" &
+./scripts/backup/monitor &>> "${CITADEL_LOGS}/backup-monitor.log" &
 
 echo "Starting decoy backup trigger..."
 echo
-./scripts/backup/decoy-trigger &>> "${UMBREL_LOGS}/backup-decoy-trigger.log" &
+./scripts/backup/decoy-trigger &>> "${CITADEL_LOGS}/backup-decoy-trigger.log" &
 
 echo
 echo "Resetting config files"

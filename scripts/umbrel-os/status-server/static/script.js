@@ -18,7 +18,7 @@ const on = (selector, eventName, callback) => {
 const setState = (key, value) => document.body.dataset[key] = value;
 const getState = key => document.body.dataset[key];
 
-const isUmbrelUp = async () => {
+const isCitadelUp = async () => {
   const response = await fetch('/manager-api/ping');
   return response.status === 200 && response.redirected === false;
 };
@@ -59,7 +59,7 @@ const power = async action => {
 
 on('.shutdown', 'click', async () => {
   if (! await power('shutdown')) {
-    alert('Failed to shutdown Umbrel');
+    alert('Failed to shutdown Citadel');
     return;
   }
 
@@ -70,16 +70,16 @@ on('.shutdown', 'click', async () => {
 
 on('.restart', 'click', async () => {
   if (! await power('restart')) {
-    alert('Failed to restart Umbrel');
+    alert('Failed to restart Citadel');
     return;
   }
 
   setState('status', 'restarting');
   await delay(10000);
-  // Wait for Umbrel to come back up then reload the page.
+  // Wait for Citadel to come back up then reload the page.
   while (true) {
     try {
-      if (await isStatusServerUp() || await isUmbrelUp()) {
+      if (await isStatusServerUp() || await isCitadelUp()) {
         window.location.reload();
       }
     } catch (e) {}
@@ -90,7 +90,7 @@ on('.restart', 'click', async () => {
 const main = async () => {
   // Protect against clickjacking
   if (isIframe) {
-    document.body.innerText = 'For security reasons Umbrel doesn\'t work in an iframe.';
+    document.body.innerText = 'For security reasons Citadel doesn\'t work in an iframe.';
     return;
   }
 
@@ -100,8 +100,8 @@ const main = async () => {
   // Start loop
   while (getState('status') === 'starting') {
     try {
-      // If Umbrel is ready, reload
-      if (await isUmbrelUp()) {
+      // If Citadel is ready, reload
+      if (await isCitadelUp()) {
         window.location.reload();
       }
 
