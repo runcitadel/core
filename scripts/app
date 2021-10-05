@@ -7,7 +7,6 @@
 set -euo pipefail
 
 UMBREL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
-USER_FILE="${UMBREL_ROOT}/db/user.json"
 
 derive_entropy () {
   "${UMBREL_ROOT}/app/app-manager.py" entropy ${1}
@@ -24,19 +23,11 @@ compose() {
   local env_file="${UMBREL_ROOT}/.env"
   local app_base_compose_file="${UMBREL_ROOT}/apps/docker-compose.common.yml"
   local app_compose_file="${app_dir}/docker-compose.yml"
-  local app_domain="$(hostname -s 2>/dev/null || echo "umbrel").local"
-  local app_hidden_servive_file="${UMBREL_ROOT}/tor/data/app-${app}/hostname"
   local app_entropy_identifier="app-${app}-seed"
 
   export BITCOIN_DATA_DIR="${UMBREL_ROOT}/bitcoin"
-  export LND_DATA_DIR="${UMBREL_ROOT}/lnd"
   export APP_DATA_DIR="${app_data_dir}"
-  export APP_DOMAIN="${app_domain}"
-  export APP_HIDDEN_SERVICE="$(cat "${app_hidden_servive_file}" 2>/dev/null || echo "notyetset.onion")"
 
-  # App specific env vars
-  # Note: Hardcoding app specific env vars is a short term solution. Long term
-  # these values will be registered in an apps manifest and generated dynamically.
   local dojo_hidden_service_file="${UMBREL_ROOT}/tor/data/app-${app}-dojo/hostname"
   local whirlpool_hidden_service_file="${UMBREL_ROOT}/tor/data/app-${app}-whirlpool/hostname"
   export APP_SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE="$(cat "${dojo_hidden_service_file}" 2>/dev/null || echo "notyetset.onion")"
