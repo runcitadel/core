@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app/app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Wallet Servers
   name: Samourai Server
@@ -29,15 +33,16 @@ metadata:
   - bitcoind
   repo: https://github.com/louneskmt/umbrel-samourai-dojo/tree/v1.10.1-umbrel
   support: https://t.me/SamouraiWallet
-  port: 3005
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
   path: ''
   defaultPassword: ''
+
 containers:
-- image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
+- name: db
+  image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
   init: true
   stop_grace_period: 5m
   user: 1000:1000
@@ -46,14 +51,14 @@ containers:
     MYSQL_ROOT_PASSWORD: rootpassword
     MYSQL_USER: samourai
     MYSQL_PASSWORD: password
-  name: db
   data:
   - mysql/update-db.sh:/update-db.sh
   - mysql/mysql-dojo.cnf:/etc/mysql/conf.d/mysql-dojo.cnf
   - mysql/db-scripts:/docker-entrypoint-initdb.d
   - mysql/data:/var/lib/mysql
-  ip: $APP_SAMOURAI_SERVER_DB_IP
-- image: louneskmt/dojo-nodejs:1.10.1@sha256:d1460df18df091837718fcd0a6d3850e2f1a4a49da5914a697648c40d5477184
+
+- name: node
+  image: louneskmt/dojo-nodejs:1.10.1@sha256:d1460df18df091837718fcd0a6d3850e2f1a4a49da5914a697648c40d5477184
   init: true
   command: /home/node/app/wait-for-it.sh ${APP_SAMOURAI_SERVER_DB_IP}:3306 --timeout=720 --strict -- /home/node/app/restart.sh
   user: 1000:1000
@@ -83,9 +88,9 @@ containers:
     NODE_TRACKER_UNCONF_TXS_PERIOD: 300000
     NODE_ACTIVE_INDEXER: local_indexer
     NODE_FEE_TYPE: ECONOMICAL
-    NODE_API_KEY: $APP_SAMOURAI_SERVER_NODE_API_KEY
-    NODE_ADMIN_KEY: $APP_SAMOURAI_SERVER_NODE_ADMIN_KEY
-    NODE_JWT_SECRET: $APP_SAMOURAI_SERVER_NODE_JWT_SECRET
+    NODE_API_KEY: $APP_SEED_1
+    NODE_ADMIN_KEY: $APP_SEED_2
+    NODE_JWT_SECRET: $APP_SEED_3
     BITCOIND_IP: $BITCOIN_IP
     BITCOIND_RPC_PORT: $BITCOIN_RPC_PORT
     BITCOIND_RPC_USER: $BITCOIN_RPC_USER
@@ -98,19 +103,21 @@ containers:
     INDEXER_BATCH_SUPPORT: inactive
   depends_on:
   - db
-  name: node
   permissions:
   - electrum
   - bitcoind
-  ip: $APP_SAMOURAI_SERVER_NODE_IP
-- image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
+  needsHiddenService: true
+  hiddenServicePort: 3009
+
+- name: whirlpool
+  image: louneskmt/whirlpool:0.10.11@sha256:a7cfb9e287aa5f2e4137a5d2fdddbfd348624e24e7dd7bed7fa0f4e2e22734d5
   init: true
   user: 1000:1000
   command:
   - --listen
-  - --cli.apiKey=$APP_SAMOURAI_SERVER_WHIRLPOOL_API_KEY
+  - --cli.apiKey=$APP_SEED_4
   - --cli.api.http-enable=true
-  - --cli.api.http-port=$APP_SAMOURAI_SERVER_WHIRLPOOL_PORT
+  - --cli.api.http-port=8898
   - --cli.tor=true
   - --cli.torConfig.coordinator.enabled=true
   - --cli.torConfig.coordinator.onion=true
@@ -122,33 +129,33 @@ containers:
   environment:
     WHIRLPOOL_BITCOIN_NETWORK: $BITCOIN_NETWORK
     WHIRLPOOL_DOJO: 'on'
-    WHIRLPOOL_DOJO_IP: $APP_SAMOURAI_SERVER_IP
-  name: whirlpool
+    WHIRLPOOL_DOJO_IP: $APP_SAMOURAI_SERVER_MAIN_IP
   data:
   - whirlpool:/home/whirlpool/.whirlpool-cli
-  ip: $APP_SAMOURAI_SERVER_WHIRLPOOL_IP
+  needsHiddenService: true
+  hiddenServicePort: 8898
+
 - image: nginx:1.19-alpine@sha256:c2ce58e024275728b00a554ac25628af25c54782865b3487b11c21cafb7fabda
   init: true
   command: /bin/sh -c "envsubst < /var/www/connect/js/conf.template.js > /var/www/connect/js/conf.js
     && /wait-for node:8080 --timeout=720 -- nginx"
   environment:
     COMMON_BTC_NETWORK: $BITCOIN_NETWORK
-    DOJO_LOCAL_PORT: $APP_SAMOURAI_SERVER_DOJO_PORT
-    DOJO_HIDDEN_SERVICE: $APP_SAMOURAI_SERVER_DOJO_HIDDEN_SERVICE
-    WHIRLPOOL_HIDDEN_SERVICE: $APP_SAMOURAI_SERVER_WHIRLPOOL_HIDDEN_SERVICE
+    DOJO_LOCAL_PORT: 3009
+    DOJO_HIDDEN_SERVICE: $APP_HIDDEN_SERVICE_DOJO
+    WHIRLPOOL_HIDDEN_SERVICE: $APP_HIDDEN_SERVICE_WHIRLPOOL
     NODE_PREFIX_SUPPORT: support
-    NODE_ADMIN_KEY: $APP_SAMOURAI_SERVER_NODE_ADMIN_KEY
-    WHIRLPOOL_API_KEY: $APP_SAMOURAI_SERVER_WHIRLPOOL_API_KEY
+    NODE_ADMIN_KEY: $APP_SEED_2
+    WHIRLPOOL_API_KEY: $APP_SEED_4
   ports:
-  - $APP_SAMOURAI_SERVER_DOJO_PORT:80
-  - $APP_SAMOURAI_SERVER_CONNECT_PORT:8081
+  - 3009:80
+  port: 8081
   depends_on:
   - node
-  name: nginx
+  name: main
   data:
   - nginx/connect:/var/www/connect
   - nginx/connect.conf:/etc/nginx/sites-enabled/connect.conf
   - nginx/${BITCOIN_NETWORK}.conf:/etc/nginx/sites-enabled/dojo.conf
   - nginx/nginx.conf:/etc/nginx/nginx.conf
   - nginx/wait-for:/wait-for
-  ip: $APP_SAMOURAI_SERVER_IP

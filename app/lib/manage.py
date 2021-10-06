@@ -39,11 +39,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 
 def runCompose(app: str, args: str):
-    # If the app is neither squeaknode nor samourai-server, run compose(app, args) instead
-    if app != "samourai-server":
-        compose(app, args)
-    os.system("{script} compose {app} {args}".format(
-        script=legacyScript, app=app, args=args))
+    compose(app, args)
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
 
@@ -197,6 +193,9 @@ def compose(app, arguments):
     os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
         os.path.join(nodeRoot, "tor", "data", "app-{}/hostname".format(app))), shell=True).decode("utf-8")
     os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
+    # Allow more app seeds, with random numbers from 1-5 assigned in a loop
+    for i in range(1, 6):
+        os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
     os.environ["APP_DATA_DIR"] = os.path.join(appsDir, app, "data")
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")

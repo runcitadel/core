@@ -4,18 +4,6 @@
 
 # Apps 2
 
-# samourai-server dojo Hidden Service
-HiddenServiceDir /var/lib/tor/app-samourai-server-dojo
-HiddenServicePort 80 <app-samourai-server-ip>:80
-
-# samourai-server connect Hidden Service
-HiddenServiceDir /var/lib/tor/app-samourai-server
-HiddenServicePort 80 <app-samourai-server-ip>:8081
-
-# samourai-server whirlpool Hidden Service
-HiddenServiceDir /var/lib/tor/app-samourai-server-whirlpool
-HiddenServicePort 80 <app-samourai-server-whirlpool-ip>:<app-samourai-server-whirlpool-port>
-
 # pi-hole Hidden Service
 HiddenServiceDir /var/lib/tor/app-pi-hole
 HiddenServicePort 80 <app-pi-hole-ip>:80

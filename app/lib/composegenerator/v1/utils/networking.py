@@ -59,13 +59,13 @@ HiddenServicePort {} {}:{}
 
 
 def getHiddenService(appName: str, appId: str, appIp: str, appPort: str) -> str:
-    return getHiddenServiceString(appName, appId, appPort, appIp, appPort)
+    return getHiddenServiceString(appName, appId, appPort, appIp, "80")
 
 
 def getContainerHiddenService(appName: str, appId: str, container: dict, containerIp: str, isMainContainer: bool) -> str:
     if not "needsHiddenService" in container and not isMainContainer:
         return ""
-    if (("ports" in container and not "hiddenServicePort" in container) or not "port" in container) and not isMainContainer:
+    if ("ports" in container or not "port" in container) and not "hiddenServicePort" in container and not isMainContainer:
         print("Container {} for app {} isn't compatible with hidden service assignment".format(
             container["name"], appName))
         return ""
@@ -90,5 +90,12 @@ def getContainerHiddenService(appName: str, appId: str, container: dict, contain
         del container["hiddenServicePorts"]
         return hiddenServices
 
-    return getHiddenServiceString(appName + container["name"], "{}-{}".format(
-        appId, container["name"]), container["port"], containerIp, container["port"])
+    del container["needsHiddenService"]
+    if not "port" in container:
+        data = getHiddenServiceString(appName + container["name"], "{}-{}".format(
+            appId, container["name"]), container["hiddenServicePort"], containerIp, "80")
+        del container["hiddenServicePort"]
+        return data
+    else:
+        return getHiddenServiceString(appName + container["name"], "{}-{}".format(
+            appId, container["name"]), container["port"], containerIp, container["port"])
