@@ -44,7 +44,6 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  path: ''
   defaultPassword: moneyprintergobrrr
 containers:
 - image: shahanafarooqui/rtl:0.11.2@sha256:225b47abcca053e3ea831431742a08b3f3e70b12654df6fd703f617ad965f34e

@@ -11,7 +11,7 @@ metadata:
     Vaultwarden (formerly known as Bitwarden_RS) is an alternative implementation\
     of the Bitwarden® server API written in Rust, compatible with upstream BitwardenÂ®\
     clients*. Vaultwarden is perfect for self-hosting all of your passwords in an\
-    encrypted vault on your Umbrel. Vaultwarden is a full implementation of BitwardenÂ®\
+    encrypted vault on your Citadel. Vaultwarden is a full implementation of BitwardenÂ®\
     API that includes:
     
     - Organizations support
@@ -43,8 +43,6 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  path: ''
-  defaultPassword: ''
   torOnly: true
 containers:
 - image: vaultwarden/server:1.22.2@sha256:fe2a236b792fb2304ef50f86f1c25076ac5b2748e1b776fce260ad12ad29188d

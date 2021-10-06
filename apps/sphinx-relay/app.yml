@@ -32,7 +32,6 @@ metadata:
   - 2.jpg
   - 3.jpg
   path: /connect
-  defaultPassword: ''
 containers:
 - name: sphinx-relay
   image: sphinxlightning/sphinx-relay:v2.2.1@sha256:9cee7ae739283eb824790b3bd1ba1890e8633598eb2df2cfc4bd01f08e54c5a5

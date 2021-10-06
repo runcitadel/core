@@ -13,11 +13,11 @@ metadata:
   tagline: Connect BlueWallet to your Lightning node
   description: >-
     Run BlueWallet in the most private and secure way possible by removing
-    3rd parties and connecting it directly to your Umbrel's Lightning node.
+    3rd parties and connecting it directly to your Citadel's Lightning node.
 
 
     You can pair multiple BlueWallet accounts, so your friends and family can pair
-    their BlueWallet with your Umbrel for a trust-minimized setup.
+    their BlueWallet with your Citadel for a trust-minimized setup.
   developer: BlueWallet
   website: https://lndhub.io
   dependencies:

@@ -45,8 +45,6 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  path: ''
-  defaultPassword: ''
   torOnly: false
 containers:
 - image: getumbrel/element-web:v1.7.34@sha256:f7f6229d2dca55b08fc976088d5797d6348842bcb2317e72d40704c3c9b117c2

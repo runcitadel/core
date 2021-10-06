@@ -33,7 +33,6 @@ metadata:
   - 2.jpg
   - 3.jpg
   - 4.jpg
-  path: ''
   defaultPassword: moneyprintergobrrr
 containers:
 - image: lightninglabs/lightning-terminal:v0.5.1-alpha@sha256:6c71d4b5a5076187db75abaf2eceafdd763d7b7369c451a302600a64ae90fde5
