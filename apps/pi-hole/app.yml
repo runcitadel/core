@@ -34,7 +34,7 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  defaultPassword: moneyprintergobrrr
+  defaultPassword: $APP_SEED
   torOnly: false
 containers:
 - image: pihole/pihole:2021.09@sha256:42837bd859b91b5584e9df185a59b16fda2f04109d68f050889a58274ff27004
@@ -44,7 +44,7 @@ containers:
   - ${APP_PI_HOLE_PORT}:80
   environment:
     VIRTUAL_HOST: ${APP_DOMAIN}
-    WEBPASSWORD: moneyprintergobrrr
+    WEBPASSWORD: $APP_SEED
   name: server
   data:
   - data/dnsmasq:/etc/dnsmasq.d/

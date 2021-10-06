@@ -4,6 +4,9 @@
 
 import os
 import yaml
+
+from lib.entropy import deriveEntropy
+
 # For every app, parse the app.yml in ../apps/[name] and
 # check their metadata, and return a list of all app's metadata
 # Also check the path and defaultPassword and set them to an empty string if they don't exist
@@ -20,6 +23,8 @@ def getAppRegistry(apps, app_path):
             metadata['id'] = app
             metadata['path'] = metadata.get('path', '')
             metadata['defaultPassword'] = metadata.get('defaultPassword', '')
+            if metadata['defaultPassword'] == "$APP_SEED":
+                metadata['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
             if("mainContainer" in metadata):
                 metadata.pop("mainContainer")
             app_metadata.append(metadata)

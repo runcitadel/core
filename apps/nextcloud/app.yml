@@ -40,7 +40,7 @@ metadata:
   - 2.jpg
   - 3.jpg
   path: /login?user=umbrel
-  defaultPassword: moneyprintergobrrr
+  defaultPassword: $APP_SEED
   mainContainer: web
 
 containers:
@@ -72,7 +72,7 @@ containers:
     MYSQL_DATABASE: nextcloud
     MYSQL_USER: nextcloud
     NEXTCLOUD_ADMIN_USER: umbrel
-    NEXTCLOUD_ADMIN_PASSWORD: moneyprintergobrrr
+    NEXTCLOUD_ADMIN_PASSWORD: $APP_SEED
     NEXTCLOUD_TRUSTED_DOMAINS: ${APP_DOMAIN}:${APP_NEXTCLOUD_WEB_PORT} ${APP_HIDDEN_SERVICE}
   depends_on:
   - db

@@ -32,7 +32,7 @@ metadata:
   - 2.jpg
   - 3.jpg
   path: /login?user=umbrel
-  defaultPassword: moneyprintergobrrr
+  defaultPassword: $APP_SEED
 
 containers:
 
@@ -61,7 +61,7 @@ containers:
     # App specific environment variables
     SQUEAKNODE_WEBADMIN_ENABLED: "true"
     SQUEAKNODE_WEBADMIN_USERNAME: "umbrel"
-    SQUEAKNODE_WEBADMIN_PASSWORD: "moneyprintergobrrr"
+    SQUEAKNODE_WEBADMIN_PASSWORD: "${APP_SEED}"
 
     SQUEAKNODE_NODE_NETWORK: "$BITCOIN_NETWORK"
     SQUEAKNODE_NODE_SQK_DIR_PATH: "/sqk"

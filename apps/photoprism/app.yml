@@ -46,7 +46,7 @@ metadata:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  defaultPassword: moneyprintergobrrr
+  defaultPassword: $APP_SEED
   torOnly: false
 containers:
 - image: photoprism/photoprism:preview@sha256:e0fdf255dcb486ba212d94f39010ba3d06991ff468b05ddddbe9113f3988efd5
@@ -54,7 +54,7 @@ containers:
   ports:
   - ${APP_PHOTOPRISM_PORT}:${APP_PHOTOPRISM_PORT}
   environment:
-    PHOTOPRISM_ADMIN_PASSWORD: moneyprintergobrrr
+    PHOTOPRISM_ADMIN_PASSWORD: $APP_SEED
     PHOTOPRISM_ORIGINALS_LIMIT: 10000
     PHOTOPRISM_HTTP_COMPRESSION: gzip
     PHOTOPRISM_HTTP_PORT: ${APP_PHOTOPRISM_PORT}
