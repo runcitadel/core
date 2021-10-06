@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
+
+echo "Citadel root directory is ${CITADEL_ROOT}"
+alias update="${CITADEL_ROOT}/scripts/update/update"
+alias lncli="docker exec -it lnd lncli"
+alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
+alias docker-compose="sudo docker compose"
+alias docker="sudo docker"
+alias debug="${CITADEL_ROOT}/scripts/debug"
