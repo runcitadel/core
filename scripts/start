@@ -6,10 +6,10 @@
 
 set -euo pipefail
 
-# Start Umbrel
+# Start Citadel
 
 if [[ $UID != 0 ]]; then
-    echo "Umbrel must be started as root"
+    echo "Citadel must be started as root"
     echo "Please re-run this script as"
     echo "  sudo ./scripts/start"
     exit 1
@@ -54,7 +54,7 @@ fi
 echo
 echo "======================================"
 echo "============= STARTING ==============="
-echo "============== UMBREL ================"
+echo "============= CITADEL ================"
 echo "======================================"
 echo
 
@@ -131,7 +131,7 @@ echo "Removing status server iptables entry..."
 # Unlock the user file on each start of Umbrel to avoid issues
 # Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
 if [[ -f "${CITADEL_ROOT}/db/user.json.lock" ]]; then
-  echo "WARNING: The user file was locked, Umbrel probably wasn't shut down properly"
+  echo "WARNING: The user file was locked, Citadel probably wasn't shut down properly"
   rm "${CITADEL_ROOT}/db/user.json.lock"
 fi
 
@@ -141,7 +141,7 @@ echo
 ./app/app-manager.py start installed
 echo
 
-echo "Umbrel is now accessible at"
+echo "Citadel is now accessible at"
 echo "  http://${DEVICE_HOSTNAME}"
 echo "  http://${DEVICE_IP}"
 if [[ ! -z "${hidden_service_url:-}" ]]; then
