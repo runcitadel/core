@@ -1,6 +1,6 @@
 {
-    "version": "0.4.10",
+    "version": "0.4.11",
     "name": "Citadel update",
     "requires": ">=0.2.1",
-    "notes": "This update updates a few apps and fixes a few bugs we've been experiencing. We've also replaced more non-free code with fully FOSS alternatives. If your update gets stuck on starting or while updating, please contact us on Discord, Matrix or GitHub: https://github.com/runcitadel/citadel"
+    "notes": "This update updates fixes a few bugs we've been experiencing and prepares your node for the next big update. We've also replaced more non-free code with fully FOSS alternatives. If your update gets stuck on starting or while updating, please contact us on Discord, Matrix or GitHub: https://github.com/runcitadel/citadel"
 }
