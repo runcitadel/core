@@ -62,7 +62,7 @@ do
   json=$(echo $json | jq --arg app "${app}" --arg app_memory "${app_memory}" '.breakdown |= .+ [{id: $app, used: $app_memory|tonumber}]')
 done
 
-umbrel=$(($used-$cumulative_app_memory))
-json=$(echo $json | jq --arg umbrel "${umbrel}" '.breakdown |= .+ [{id: "umbrel", used: $umbrel|tonumber}]')
+citadel=$(($used-$cumulative_app_memory))
+json=$(echo $json | jq --arg umbrel "${citadel}" '.breakdown |= .+ [{id: "umbrel", used: $umbrel|tonumber}]')
 
 echo $json | jq '.breakdown |= sort_by(-.used)'

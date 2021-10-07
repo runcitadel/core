@@ -15,7 +15,7 @@ def deriveEntropy(identifier: str):
             print("No seed file found, exiting...")
             exit(1)
     with open(seedFile, "r") as f:
-        umbrel_seed = f.read().strip()
+        node_seed = f.read().strip()
     entropy = subprocess.check_output(
-        'printf "%s" "{}" | openssl dgst -sha256 -binary -hmac "{}" | xxd -p | tr --delete "\n"'.format(identifier, umbrel_seed), shell=True)
+        'printf "%s" "{}" | openssl dgst -sha256 -binary -hmac "{}" | xxd -p | tr --delete "\n"'.format(identifier, node_seed), shell=True)
     return entropy.decode("utf-8")

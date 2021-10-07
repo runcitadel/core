@@ -37,7 +37,7 @@ do
   json=$(echo $json | jq --arg app "${app}" --arg app_size "${app_size}" '.breakdown |= .+ [{id: $app, used: $app_size|tonumber}]')
 done
 
-umbrel=$(($used-$cumulative_app_size))
-json=$(echo $json | jq --arg umbrel "${umbrel}" '.breakdown |= .+ [{id: "umbrel", used: $umbrel|tonumber}]')
+citadel=$(($used-$cumulative_app_size))
+json=$(echo $json | jq --arg umbrel "${citadel}" '.breakdown |= .+ [{id: "umbrel", used: $umbrel|tonumber}]')
 
 echo $json | jq '.breakdown |= sort_by(-.used)'

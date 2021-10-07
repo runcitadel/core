@@ -15,7 +15,7 @@
 __pycache__
 *.py[cod]
 
-# umbrel-dev
+# dev environment
 docker-compose.override.yml
 
 # Files and data directories created by services

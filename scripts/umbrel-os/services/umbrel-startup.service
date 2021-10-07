@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-# Umbrel Startup Service
+# Citadel Startup Service
 # Installed at /etc/systemd/system/umbrel-startup.service
 
 [Unit]
-Description=Umbrel Startup Service
+Description=Citadel Startup Service
 Requires=umbrel-external-storage.service
 After=umbrel-external-storage.service
 Requires=umbrel-external-storage-sdcard-update.service
@@ -30,7 +30,7 @@ User=root
 Group=root
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=umbrel startup
+SyslogIdentifier=citadel startup
 RemainAfterExit=yes
 Restart=always
 RestartSec=10

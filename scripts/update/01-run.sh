@@ -200,7 +200,9 @@ for app in $("$CITADEL_ROOT/app/app-manager.py" ls-installed); do
 done
 wait
 
+# On Citadel, the main network is now called Citadel
 docker network rm umbrel_main_network || true
+
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json

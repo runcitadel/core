@@ -32,15 +32,15 @@ How over-the-air updates work on Citadel.
 
 6. When the user opens his [`dashboard`](https://github.com/runcitadel/dashboard-old), it periodically polls [`manager`](https://github.com/runcitadel/manager) to check for new updates.
 
-7. `manager` fetches the latest `info.json` from umbrel's main repo's main branch using `GET https://raw.githubusercontent.com/runcitadel/compose-nonfree/main/info.json`, compares it's `version` with the `version` of the local `$CITADEL_ROOT/info.json` file, and exits if both the versions are same.
+7. `manager` fetches the latest `info.json` from Citadel's main repo's main branch using `GET https://raw.githubusercontent.com/runcitadel/compose-nonfree/main/info.json`, compares it's `version` with the `version` of the local `$CITADEL_ROOT/info.json` file, and exits if both the versions are same.
 
 8. If fetched `version` > local `version`, `manager` checks if local `version` satisfies the `requires` condition in the fetched `info.json`.
 
 9. If not, `manager` computes the minimum satisfactory version, called `L.M.N`, required for update. Eg, for `"requires": ">=1.2.2"` the minimum satisfactory version would be `1.2.2`. `manager` then makes a `GET` request to `https://raw.githubusercontent.com/runcitadel/compose-nonfree/vL.M.N/info.json` and repeats step 8 and 9 until local `version` < fetched `version` **AND** local `version` fulfills the fetched `requires` condition.
 
-10. `manager` then returns the satisfying `info.json` to `umbrel-dashboard`.
+10. `manager` then returns the satisfying `info.json` to `dashboard`.
 
-11. `umbrel-dashboard` then alerts the user regarding the available update, and after the user consents, it makes a `POST` request to `manager` to start the update process.
+11. `dashboard` then alerts the user regarding the available update, and after the user consents, it makes a `POST` request to `manager` to start the update process.
 
 12. `manager` adds the `updateTo` key to `$CITADEL_ROOT/statuses/update-status.json` (a file used to continuosly update the user with the update status and progress) with the update release tag.
 
@@ -52,7 +52,7 @@ How over-the-air updates work on Citadel.
 }
 ```
 
-13. `manager` then creates an update signal file on the mounted host OS volume (`$CITADEL_ROOT/events/signals/update`) and returns `OK` to the `umbrel-dashboard`.
+13. `manager` then creates an update signal file on the mounted host OS volume (`$CITADEL_ROOT/events/signals/update`) and returns `OK` to the `dashboard`.
 
 14. [`karen`](https://github.com/runcitadel/compose-nonfree/blob/main/karen) is triggered (obviously) as soon as `$CITADEL_ROOT/events/signals/update` is touched/updated, and immediately runs the `update` trigger script [`$CITADEL_ROOT/events/triggers/update`](https://github.com/runcitadel/compose-nonfree/blob/main/events/triggers/update) as root.
 

@@ -105,7 +105,7 @@ format_block_device () {
   # We need to run sync here to make sure the filesystem is reflecting the
   # the latest changes in /dev/*
   sync
-  mkfs.ext4 -F -L umbrel "${partition_path}"
+  mkfs.ext4 -F -L citadel "${partition_path}"
 }
 
 # Mounts the device given in the first argument at $MOUNT_POINT
@@ -215,12 +215,12 @@ main () {
     echo "Yes, it is ext4"
     mount_partition "${partition_path}"
 
-    echo "Checking if device contains an Umbrel install..."
+    echo "Checking if device contains a Citadel install..."
 
     if [[ -f "${EXTERNAL_CITADEL_ROOT}"/.umbrel ]]; then
-      echo "Yes, it contains an Umbrel install"
+      echo "Yes, it contains a Citadel install"
     else
-      echo "No, it doesn't contain an Umbrel install"
+      echo "No, it doesn't contain a Citadel install"
       echo "Unmounting partition..."
       unmount_partition
       setup_new_device $block_device $partition_path
