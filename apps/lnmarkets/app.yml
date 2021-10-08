@@ -55,3 +55,5 @@ containers:
       LND_REST_PORT: $LND_REST_PORT
 
       BITCOIN_NETWORK: $BITCOIN_NETWORK
+    permissions:
+      - "lnd"
