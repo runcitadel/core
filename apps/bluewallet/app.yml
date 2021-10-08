@@ -31,7 +31,7 @@ metadata:
 
 containers:
 - name: redis
-  image: redis:6.2.2-buster@sha256:e10f55f92478715698a2cef97c2bbdc48df2a05081edd884938903aa60df6396
+  image: redis:6.2.6-bullseye@sha256:0c0484b1d1ff36faace984fe9d8e0fe58892ecc34a4859b97171045b9cd343e1
   command: redis-server --requirepass moneyprintergobrrr
   data:
   - data/redis:/data
