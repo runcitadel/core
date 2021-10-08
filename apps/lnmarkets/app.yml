@@ -44,11 +44,9 @@ containers:
     user: 1000:1000
     init: true
     stop_grace_period: 1m
-    ports:
-      - "$APP_LNMARKETS_PORT:$APP_LNMARKETS_PORT"
     environment:
       APP_URL: 0.0.0.0
-      API_PORT: $APP_LNMARKETS_PORT
+      API_PORT: $APP_LNMARKETS_LNMARKETS_PORT
 
       LND_IP: $LND_IP
       LND_GRPC_PORT: $LND_GRPC_PORT

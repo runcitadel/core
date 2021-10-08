@@ -45,10 +45,8 @@ containers:
   - name: web
     image: nodered/node-red:2.0.6-12@sha256:c15bfeef73c2b348c0fb5f70d3b3013575a6ebf2af942a1d8196c7d7d842f6bb
     stop_grace_period: 1m
-    ports:
-      - "${APP_NODE_RED_PORT}:${APP_NODE_RED_PORT}"
     data:
-      - /:/data
+      - data:/data
     environment:
       PORT: $APP_NODE_RED_PORT
       BITCOIN_NETWORK: $BITCOIN_NETWORK

@@ -30,6 +30,12 @@
         "version": "1.6.0"
     },
     {
+        "id": "krystal-bull",
+        "name": "Krystal Bull",
+        "repo": "https://github.com/bitcoin-s/krystal-bull",
+        "version": "1.7.0-212-d9126650"
+    },
+    {
         "id": "element",
         "name": "Element",
         "repo": "https://github.com/vector-im/element-web",
@@ -108,6 +114,12 @@
         "version": "v0.5.1-alpha"
     },
     {
+        "id": "node-red",
+        "name": "Node-RED",
+        "repo": "https://github.com/node-red/node-red",
+        "version": "2.0.6-12"
+    },
+    {
         "id": "btcpay-server",
         "name": "BTCPay Server",
         "repo": "https://github.com/btcpayserver/btcpayserver",
@@ -130,5 +142,11 @@
         "name": "Synapse",
         "repo": "https://github.com/matrix-org/synapse",
         "version": "1.43.0"
+    },
+    {
+        "id": "lnmarkets",
+        "name": "LN Markets",
+        "repo": "https://github.com/lnmarkets/umbrel",
+        "version": "1.0.0"
     }
 ]
