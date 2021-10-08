@@ -102,7 +102,7 @@ else:
   print("============ CONFIGURING =============")
   reconfiguring=False
 
-print("============== UMBREL  ===============")
+print("============== CITADEL  ==============")
 print("======================================")
 print()
 
@@ -300,7 +300,6 @@ APP_CODE_SERVER_PORT="8091"
 APP_SPECTER_DESKTOP_PORT="25441"
 
 DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
-# run "which docker" using subprocess and read STDERR
 DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
 # Get the real path by following symlinks
 DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
