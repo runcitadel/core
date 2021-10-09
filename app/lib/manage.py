@@ -197,7 +197,7 @@ def compose(app, arguments):
     # Allow more app seeds, with random numbers from 1-5 assigned in a loop
     for i in range(1, 6):
         os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
-    os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app, "data")
+    os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app)
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
     # List all hidden services for an app and put their hostname in the environment
