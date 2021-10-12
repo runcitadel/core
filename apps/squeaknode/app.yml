@@ -33,6 +33,7 @@ metadata:
   - 3.jpg
   path: /login?user=umbrel
   defaultPassword: $APP_SEED
+  mainContainer: web
 
 containers:
 
