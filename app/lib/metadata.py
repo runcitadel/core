@@ -5,7 +5,18 @@
 import os
 import yaml
 
+from lib.composegenerator.v1.networking import getMainContainer
 from lib.entropy import deriveEntropy
+
+def getUpdateContainer(app: dict):
+    if len(app['containers']) == 1:
+        return app['containers'][0]
+    else:
+        if 'updateContainer' in app['metadata']:
+            for container in app['containers']:
+                    if container['name'] == app['metadata']['updateContainer']:
+                        return container
+    return getMainContainer(app)
 
 # For every app, parse the app.yml in ../apps/[name] and
 # check their metadata, and return a list of all app's metadata
@@ -46,5 +57,8 @@ def getSimpleAppRegistry(apps, app_path):
                     'repo': app_yml['metadata']['repo'],
                     'version': app_yml['metadata']['version']
                 }
+                if"version" in app_yml and str(app_yml["version"]) == "1":
+                    updateContainer = getUpdateContainer(app_yml)
+                    metadata['image'] = updateContainer['image'].split(":")[0]
                 app_metadata.append(metadata)
     return app_metadata

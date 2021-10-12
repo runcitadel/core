@@ -88,6 +88,16 @@ def assignPort(container: dict, appId: str, networkingFile: str, envFile: str):
     # where the outer {{ }} will be replaced by {} in the returned string
     return {"port": port, "env_var": "${{{}}}".format(env_var)}
 
+def getMainContainer(app: dict):
+    if len(app['containers']) == 1:
+        return app['containers'][0]
+    else:
+        if not 'mainContainer' in app['metadata']:
+            app['metadata']['mainContainer'] = 'main'
+        for container in app['containers']:
+            if container['name'] == app['metadata']['mainContainer']:
+                return container
+    raise Exception("No main container found")
 
 def configureMainPort(app: dict, nodeRoot: str):
     registryFile = path.join(nodeRoot, "apps", "registry.json")
@@ -101,19 +111,7 @@ def configureMainPort(app: dict, nodeRoot: str):
 
     dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
 
-    if len(app['containers']) == 1:
-        mainContainer = app['containers'][0]
-    else:
-        mainContainer = None
-        if not 'mainContainer' in app['metadata']:
-            app['metadata']['mainContainer'] = 'main'
-        for container in app['containers']:
-            if container['name'] == app['metadata']['mainContainer']:
-                mainContainer = container
-                break
-        if mainContainer is None:
-            raise Exception("No main container found")
-    
+    mainContainer = getMainContainer(app)
 
     portDetails = assignPort(mainContainer, app['metadata']['id'], path.join(
         nodeRoot, "apps", "networking.json"), path.join(nodeRoot, ".env"))

@@ -13,6 +13,7 @@
     },
     {
         "id": "squeaknode",
+        "image": "yzernik/squeaknode",
         "name": "Squeaknode",
         "repo": "https://github.com/yzernik/squeaknode",
         "version": "0.1.158"
@@ -31,6 +32,7 @@
     },
     {
         "id": "krystal-bull",
+        "image": "bitcoinscala/oracle-server-ui",
         "name": "Krystal Bull",
         "repo": "https://github.com/bitcoin-s/krystal-bull",
         "version": "1.7.0-212-d9126650"
@@ -43,6 +45,7 @@
     },
     {
         "id": "home-assistant",
+        "image": "homeassistant/home-assistant",
         "name": "Home Assistant",
         "repo": "https://github.com/home-assistant/core",
         "version": "2021.9.7"
@@ -55,24 +58,28 @@
     },
     {
         "id": "mempool",
+        "image": "mempool/frontend",
         "name": "Mempool",
         "repo": "https://github.com/mempool/mempool",
         "version": "2.2.2"
     },
     {
         "id": "samourai-server",
+        "image": "louneskmt/dojo-nodejs",
         "name": "Samourai Server",
         "repo": "https://github.com/louneskmt/umbrel-samourai-dojo/tree/v1.10.1-umbrel",
         "version": "1.11.0"
     },
     {
         "id": "btc-rpc-explorer",
+        "image": "runcitadel/btc-rpc-explorer",
         "name": "BTC RPC Explorer",
         "repo": "https://github.com/janoside/btc-rpc-explorer",
         "version": "3.2.0"
     },
     {
         "id": "nextcloud",
+        "image": "nextcloud",
         "name": "Nextcloud",
         "repo": "https://github.com/nextcloud/server",
         "version": "22.1.1"
@@ -97,6 +104,7 @@
     },
     {
         "id": "bluewallet",
+        "image": "bluewalletorganization/lndhub",
         "name": "BlueWallet Lightning",
         "repo": "https://github.com/BlueWallet/LndHub",
         "version": "1.4.1"
@@ -115,6 +123,7 @@
     },
     {
         "id": "node-red",
+        "image": "nodered/node-red",
         "name": "Node-RED",
         "repo": "https://github.com/node-red/node-red",
         "version": "2.0.6-12"
@@ -145,6 +154,7 @@
     },
     {
         "id": "lnmarkets",
+        "image": "ghcr.io/lnmarkets/umbrel",
         "name": "LN Markets",
         "repo": "https://github.com/lnmarkets/umbrel",
         "version": "1.0.0"

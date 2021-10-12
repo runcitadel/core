@@ -76,6 +76,10 @@
         "mainContainer": {
           "type": "string",
           "description": "The name of the main container for the app. If set, IP, port, and hidden service will be assigned to it automatically."
+        },
+        "updateContainer": {
+          "type": "string",
+          "description": "The container the developer system should automatically update."
         }
       },
       "required": [
