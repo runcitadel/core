@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app/app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Lightning Node Management
   name: Lightning Terminal
@@ -27,13 +31,13 @@ metadata:
   - lnd
   repo: https://github.com/lightninglabs/lightning-terminal
   support: https://github.com/lightninglabs/lightning-terminal/issues/new
-  port: 3004
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
   - 4.jpg
   defaultPassword: moneyprintergobrrr
+
 containers:
 - image: lightninglabs/lightning-terminal:v0.5.1-alpha@sha256:6c71d4b5a5076187db75abaf2eceafdd763d7b7369c451a302600a64ae90fde5
   user: 1000:1000
@@ -53,4 +57,3 @@ containers:
   - data:/data
   permissions:
   - lnd
-  ip: $APP_LIGHTNING_TERMINAL_IP
