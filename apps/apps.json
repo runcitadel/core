@@ -16,7 +16,7 @@
         "image": "yzernik/squeaknode",
         "name": "Squeaknode",
         "repo": "https://github.com/yzernik/squeaknode",
-        "version": "0.1.158"
+        "version": "0.1.160"
     },
     {
         "id": "pi-hole",
@@ -126,7 +126,7 @@
         "image": "nodered/node-red",
         "name": "Node-RED",
         "repo": "https://github.com/node-red/node-red",
-        "version": "2.0.6-12"
+        "version": "2.0.6"
     },
     {
         "id": "btcpay-server",

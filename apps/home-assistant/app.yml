@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
-
 version: 1
 metadata:
   category: Automation
@@ -10,32 +6,30 @@ metadata:
   tagline: Home automation that puts local control & privacy first
   description: >-
     Open source home automation that puts local control and privacy first,
-    powered by a worldwide community of tinkerers and DIY enthusiasts. Home Assistant
-    integrates with over a thousand different devices and services. Once you have
-    integrated all your devices at home, you can unleash Home Assistant’s advanced
-    automation engine to make your home work for you. Examples:
-    
-    
+    powered by a worldwide community of tinkerers and DIY enthusiasts. Home
+    Assistant integrates with over a thousand different devices and services.
+    Once you have integrated all your devices at home, you can unleash Home
+    Assistant’s advanced automation engine to make your home work for you.
+    Examples:
+
+
     - Turn on the light when the sun sets or when coming home
-    
+
     - Alert you when you leave your garage door open
-    
-    All your smart home data stays local. Home Assistant communicates
-    with your devices locally, and will fallback to pulling in data from the cloud
-    if there is no other option. No data is stored in the cloud, and everything
-    is processed locally.
+
+    All your smart home data stays local. Home Assistant communicates with your devices locally, and will fallback to pulling in data from the cloud if there is no other option. No data is stored in the cloud, and everything is processed locally.
   developer: Home Assistant
   website: https://home-assistant.io
   dependencies: []
   repo: https://github.com/home-assistant/core
   support: https://community.home-assistant.io
   gallery:
-  - 1.jpg
-  - 2.jpg
-  - 3.jpg
+    - 1.jpg
+    - 2.jpg
+    - 3.jpg
 containers:
-- name: server
-  image: homeassistant/home-assistant:2021.9.7@sha256:2de155d8cfddd7525e3415b415c299ed239d5332107b01dbaaa19a915e779b22
-  port: 8123
-  data:
-  - data:/config
+  - name: server
+    image: homeassistant/home-assistant:2021.10.4@homeassistant/home-assistant@sha256:ff82218ce1045692a0345cf6d869554d4562232c45a4e9e0f985d21b5db8454c
+    port: 8123
+    data:
+      - data:/config
