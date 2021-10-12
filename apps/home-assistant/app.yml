@@ -2,7 +2,7 @@ version: 1
 metadata:
   category: Automation
   name: Home Assistant
-  version: 2021.9.7
+  version: 2021.10.4
   tagline: Home automation that puts local control & privacy first
   description: >-
     Open source home automation that puts local control and privacy first,

@@ -9,51 +9,66 @@ version: 1
 metadata:
   category: Lightning Node Management
   name: Lightning Terminal
-  version: v0.5.1-alpha
+  version: 0.5.2-alpha
   tagline: The easiest way to manage channel liquidity
-  description: "Lightning Terminal is the easiest way to manage inbound and outbound\
-    \ liquidity on the Lightning Network. Keep your channels open and the funds flowing.\
-    \ It provides a visual interface for interacting with your channels and balances\
-    \ using Loop. \n\nNew: Introducing Lightning Pool, a marketplace for Lightning\
-    \ channels. You can now earn sats by opening new channels to those looking to\
-    \ receive funds on Lightning for a set period of time, or rent a channel to start\
-    \ accepting payments instantly. Join the marketplace and start putting your Bitcoin\
-    \ to work.\n\nWhy use Pool?\n- Earn a return on Lightning capital\n- Rent a channel\
-    \ and start accepting payments instantly\n- Open channels for less with transaction\
-    \ batching\n\nWhy use Loop?\n- Add \"inbound liquidity\" to receive payments\n\
-    - Reduce transaction fees by recycling and reusing Lightning channels\n- Send\
-    \ funds to and from users or services that aren't yet Lightning enabled\n- Configurable\
-    \ wait times and \"batching\" allow for further fee savings\n- Refill and offload\
-    \ funds from any number of Lightning channels in a single on-chain transaction"
+  description: >-
+    Lightning Terminal is the easiest way to manage inbound and outbound
+    liquidity on the Lightning Network. Keep your channels open and the funds
+    flowing. It provides a visual interface for interacting with your channels
+    and balances using Loop. 
+
+
+    New: Introducing Lightning Pool, a marketplace for Lightning channels. You can now earn sats by opening new channels to those looking to receive funds on Lightning for a set period of time, or rent a channel to start accepting payments instantly. Join the marketplace and start putting your Bitcoin to work.
+
+
+    Why use Pool?
+
+    - Earn a return on Lightning capital
+
+    - Rent a channel and start accepting payments instantly
+
+    - Open channels for less with transaction batching
+
+
+    Why use Loop?
+
+    - Add "inbound liquidity" to receive payments
+
+    - Reduce transaction fees by recycling and reusing Lightning channels
+
+    - Send funds to and from users or services that aren't yet Lightning enabled
+
+    - Configurable wait times and "batching" allow for further fee savings
+
+    - Refill and offload funds from any number of Lightning channels in a single on-chain transaction
   developer: Lightning Labs
   website: https://lightning.engineering
   dependencies:
-  - lnd
+    - lnd
   repo: https://github.com/lightninglabs/lightning-terminal
   support: https://github.com/lightninglabs/lightning-terminal/issues/new
   gallery:
-  - 1.jpg
-  - 2.jpg
-  - 3.jpg
-  - 4.jpg
+    - 1.jpg
+    - 2.jpg
+    - 3.jpg
+    - 4.jpg
   defaultPassword: moneyprintergobrrr
-
 containers:
-- image: lightninglabs/lightning-terminal:v0.5.1-alpha@sha256:6c71d4b5a5076187db75abaf2eceafdd763d7b7369c451a302600a64ae90fde5
-  user: 1000:1000
-  ports:
-  - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
-  environment:
-    HOME: /data
-  command:
-  - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
-  - --network="$BITCOIN_NETWORK"
-  - --lnd-mode="remote"
-  - --remote.lnd.rpcserver=$LND_IP:$LND_GRPC_PORT
-  - --remote.lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
-  - --remote.lnd.tlscertpath="/lnd/tls.cert"
-  name: web
-  data:
-  - data:/data
-  permissions:
-  - lnd
+  - image: lightninglabs/lightning-terminal:v0.5.2-alpha@lightninglabs/lightning-terminal@sha256:fa6415256bbac022784c2f555dbf1443da0df65cbad742dc433e00afd00841f1
+    user: 1000:1000
+    ports:
+      - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
+    environment:
+      HOME: /data
+    command:
+      - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
+      - --network="$BITCOIN_NETWORK"
+      - --lnd-mode="remote"
+      - --remote.lnd.rpcserver=$LND_IP:$LND_GRPC_PORT
+      - --remote.lnd.macaroonpath="/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon"
+      - --remote.lnd.tlscertpath="/lnd/tls.cert"
+    name: web
+    data:
+      - data:/data
+    permissions:
+      - lnd
