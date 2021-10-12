@@ -63,7 +63,7 @@
         "id": "samourai-server",
         "name": "Samourai Server",
         "repo": "https://github.com/louneskmt/umbrel-samourai-dojo/tree/v1.10.1-umbrel",
-        "version": "1.10.1"
+        "version": "1.11.0"
     },
     {
         "id": "btc-rpc-explorer",
