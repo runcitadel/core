@@ -38,20 +38,20 @@ logs/*
 statuses/*
 tor/*
 app-data/*
+apps/*
 
 # Commit these files
 
 !statuses/update-status.json
 
 # Commit these empty directories
-
+!apps/.gitkeep
 !db/.gitkeep
 !events/signals/.gitkeep
 !lnd/.gitkeep
 !logs/.gitkeep
 !tor/data/.gitkeep
 !tor/run/.gitkeep
-apps/networking.json
-apps/registry.json
-apps/*/docker-compose.yml
+
+
 !**/*.license

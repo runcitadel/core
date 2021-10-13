@@ -35,7 +35,8 @@ def joinThreads(threads: List[threading.Thread]):
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
-sourcesList = os.path.join(appsDir, "sources.list")
+appSystemDir = os.path.join(nodeRoot, "app-system")
+sourcesList = os.path.join(appSystemDir, "sources.list")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
@@ -93,7 +94,7 @@ def update(verbose: bool = False):
     print("Wrote registry to registry.json")
 
     simpleRegistry = getSimpleAppRegistry(apps, appsDir)
-    with open(os.path.join(appsDir, "apps.json"), "w") as f:
+    with open(os.path.join(appSystemDir, "apps.json"), "w") as f:
         json.dump(simpleRegistry, f, indent=4, sort_keys=True)
     print("Wrote version information to apps.json")
 
@@ -190,7 +191,7 @@ def compose(app, arguments):
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-    commonComposeFile = os.path.join(appsDir, "docker-compose.common.yml")
+    commonComposeFile = os.path.join(appSystemDir, "docker-compose.common.yml")
     os.environ["APP_DOMAIN"] = subprocess.check_output(
         "hostname -s 2>/dev/null || echo 'umbrel'", shell=True).decode("utf-8") + ".local"
     os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
