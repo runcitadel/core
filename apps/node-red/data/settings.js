@@ -1,3 +1,9 @@
+
+/**
+ * SPDX-FileCopyrightText: 2021 Oren Zomer
+ * 
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
 /**
  * This is the default settings file provided by Node-RED.
  *

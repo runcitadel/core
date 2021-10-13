@@ -1,6 +1,7 @@
 [
     {
         "id": "thunderhub",
+        "image": "apotdevin/thunderhub",
         "name": "ThunderHub",
         "repo": "https://github.com/apotdevin/thunderhub",
         "version": "0.12.30"
@@ -26,6 +27,7 @@
     },
     {
         "id": "specter-desktop",
+        "image": "lncm/specter-desktop",
         "name": "Specter Desktop",
         "repo": "https://github.com/cryptoadvance/specter-desktop",
         "version": "1.6.0"
@@ -48,7 +50,7 @@
         "image": "homeassistant/home-assistant",
         "name": "Home Assistant",
         "repo": "https://github.com/home-assistant/core",
-        "version": "2021.9.7"
+        "version": "2021.10.4"
     },
     {
         "id": "photoprism",
@@ -86,6 +88,7 @@
     },
     {
         "id": "sphinx-relay",
+        "image": "sphinxlightning/sphinx-relay",
         "name": "Sphinx Relay",
         "repo": "https://github.com/stakwork/sphinx-relay",
         "version": "2.2.1"
@@ -98,6 +101,7 @@
     },
     {
         "id": "vaultwarden",
+        "image": "vaultwarden/server",
         "name": "Vaultwarden",
         "repo": "https://github.com/dani-garcia/vaultwarden",
         "version": "1.22.2"
@@ -117,9 +121,10 @@
     },
     {
         "id": "lightning-terminal",
+        "image": "lightninglabs/lightning-terminal",
         "name": "Lightning Terminal",
         "repo": "https://github.com/lightninglabs/lightning-terminal",
-        "version": "v0.5.1-alpha"
+        "version": "0.5.2-alpha"
     },
     {
         "id": "node-red",

@@ -1,4 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Jonathan Zernik
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+# yaml-language-server: $schema=../../app-standard-v1.json
+
 version: 1
+
 metadata:
   category: Social
   name: Squeaknode
@@ -21,7 +28,7 @@ metadata:
     - 1.jpg
     - 2.jpg
     - 3.jpg
-  path: /login?user=umbrel
+  path: /login?user=citadel
   defaultPassword: $APP_SEED
   mainContainer: web
 containers:
@@ -43,7 +50,7 @@ containers:
       SQUEAKNODE_LND_TLS_CERT_PATH: /lnd/tls.cert
       SQUEAKNODE_LND_MACAROON_PATH: /lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon
       SQUEAKNODE_WEBADMIN_ENABLED: "true"
-      SQUEAKNODE_WEBADMIN_USERNAME: umbrel
+      SQUEAKNODE_WEBADMIN_USERNAME: citadel
       SQUEAKNODE_WEBADMIN_PASSWORD: ${APP_SEED}
       SQUEAKNODE_NODE_NETWORK: $BITCOIN_NETWORK
       SQUEAKNODE_NODE_SQK_DIR_PATH: /sqk

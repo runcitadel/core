@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Bastien Guillaumat <bastien.guillaumat@gmail.com>
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: AGPL-3.0-only
 
-# yaml-language-server: $schema=../../app/app-standard-v1.json
+# yaml-language-server: $schema=../../app-standard-v1.json
 
 version: 1
 

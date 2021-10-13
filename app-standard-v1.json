@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "app.yml specification v1",
+  "description": "The app.yml format, cleaned up. This format should be used for new apps, but the autoconverter can only convert to v0, so v0 will be kept for some time.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": ["string", "number"],
+      "description": "The version of the app.yml format you're using."
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Displayed name of the app",
+          "type": "string"
+        },
+        "version": {
+          "description": "Displayed version for the app",
+          "type": "string"
+        },
+        "category": {
+          "description": "The category you'd put the app in",
+          "type": "string"
+        },
+        "tagline": {
+          "description": "A clever tagline",
+          "type": "string"
+        },
+        "description": {
+          "description": "A longer description of the app",
+          "type": "string"
+        },
+        "developer": {
+          "description": "The awesome people behind the app",
+          "type": "string"
+        },
+        "website": {
+          "description": "Displayed version for the app",
+          "type": "string"
+        },
+        "dependencies": {
+          "description": "The services the app depends on",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repo": {
+          "description": "The development repository for your app",
+          "type": "string"
+        },
+        "support": {
+          "description": "A link to the app support wiki/chat/...",
+          "type": "string"
+        },
+        "gallery": {
+          "type": "array",
+          "description": "URLs or paths in the runcitadel/app-images/[app-name] folder with app images",
+          "items": {
+            "type": "string"
+          }
+        },
+        "path": {
+          "description": "The path of the app's visible site the open button should open",
+          "type": "string"
+        },
+        "defaultPassword": {
+          "description": "The app's default password",
+          "type": "string"
+        },
+        "torOnly": {
+          "description": "Whether the app is only available over tor",
+          "type": "boolean"
+        },
+        "mainContainer": {
+          "type": "string",
+          "description": "The name of the main container for the app. If set, IP, port, and hidden service will be assigned to it automatically."
+        },
+        "updateContainer": {
+          "type": "string",
+          "description": "The container the developer system should automatically update."
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "category",
+        "tagline",
+        "description",
+        "developer",
+        "website",
+        "repo",
+        "support",
+        "gallery"
+      ],
+      "additionalProperties": false
+    },
+    "containers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["lnd", "bitcoind", "electrum", "root", "hw"]
+            }
+          },
+          "ports": {
+            "type": "array",
+            "items": {
+              "type": ["string", "number"]
+            }
+          },
+          "port": {
+            "type": "number",
+            "description": "If this is the main container, the port inside the container which will be exposed to the outside as the port specified in metadata."
+          },
+          "environment": {
+            "type": ["object", "array"]
+          },
+          "data": {
+            "type": "array",
+            "description": "An array of at directories in the container the app stores its data in. Can be empty. Please only list top-level directories.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "user": {
+            "type": "string",
+            "description": "The user the container should run as"
+          },
+          "stop_grace_period": {
+            "type": "string",
+            "description": "The grace period for stopping the container. Defaults to 1 minute."
+          },
+          "depends_on": {
+            "type": "array",
+            "description": "The services the container depends on"
+          },
+          "entrypoint": {
+            "type": ["string", "array"],
+            "description": "The entrypoint for the container"
+          },
+          "command": {
+            "type": ["string", "array"],
+            "description": "The command for the container"
+          },
+          "init": {
+            "type": "boolean",
+            "description": "Whether the container should be run with init"
+          },
+          "stop_signal": {
+            "type": "string",
+            "description": "The signal to send to the container when stopping"
+          },
+          "noNetwork": {
+            "type": "boolean",
+            "description": "Set this to true if the container shouldn't get an IP & port exposed."
+          },
+          "needsHiddenService": {
+            "type": "boolean",
+            "description": "Set this to true if the container should be assigned a hidden service even if it's not the main container."
+          },
+          "hiddenServicePort": {
+            "type": "number",
+            "description": "Set this to a port if your container exposes multiple ports, but only one should be a hidden service."
+          },
+          "hiddenServicePorts": {
+            "type": "object",
+            "description": "Set this to a map of service names to hidden service ports if your container exposes multiple ports, and all of them should be hidden services.",
+            "patternProperties": {
+              "^[a-zA-Z0-9_]+$": {
+                "type": ["number", "array"]
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "required": ["name", "image"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["metadata", "containers"],
+  "additionalProperties": false
+}

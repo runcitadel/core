@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
-from lib.manage import createDataDir, deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy
+from lib.manage import createDataDir, deleteData, download, getUserData, runCompose, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -46,7 +46,7 @@ if args.action == 'list':
         print(app)
     exit(0)
 elif args.action == 'download':
-    download(args.app)
+    updateRepos()
     exit(0)
 elif args.action == 'update':
     if(args.invoked_by_configure):
@@ -62,7 +62,7 @@ elif args.action == 'update':
         os.system("docker compose start app_3_tor")
     exit(0)
 elif args.action == 'update-online':
-    download()
+    updateRepos()
     print("Downloaded all updates")
     if(args.invoked_by_configure):
         update(args.app)

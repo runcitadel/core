@@ -1,3 +1,9 @@
+/*
+SPDX-FileCopyrightText: 2019-2021 The Mempool Open Source Project Developers
+
+SPDX-License-Identifier: AGPL-3.0-only
+*/
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 

@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2021 Kilian Botrel
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-only
 
-# yaml-language-server: $schema=../../app/app-standard-v1.json
+# yaml-language-server: $schema=../../app-standard-v1.json
 
 version: 1
 
@@ -21,7 +21,7 @@ metadata:
       with a median fee of 1 sat for instant P&L delivery to your wallet.
       
       
-    This Umbrel App gives you another way to interact with LN Markets:
+    This app gives you another way to interact with LN Markets:
       you can directly deposit, withdraw, get trading stats and get instantly connected to your account to take positions as usual.
       More features may come in the future!
     

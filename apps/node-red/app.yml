@@ -1,4 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Oren Zomer
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+# yaml-language-server: $schema=../../app-standard-v1.json
+
 version: 1
+
 metadata:
   category: Automation
   name: Node-RED

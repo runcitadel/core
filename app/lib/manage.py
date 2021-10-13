@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import stat
+import tempfile
 import threading
 from typing import List
 from sys import argv
@@ -34,6 +35,7 @@ def joinThreads(threads: List[threading.Thread]):
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
+sourcesList = os.path.join(appsDir, "sources.list")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
@@ -272,3 +274,46 @@ def getAppHiddenServices(app: str):
             results.append(subdir[len("app-{}-".format(app)):])
     return results
 
+
+# Parse the sources.list repo file, which contains a list of sources in the format
+# <git-url> <branch>
+# For every line, clone the repo to a temporary dir and checkout the branch
+# Then, check that repos apps in the temporary dir/apps and for every app,
+# overwrite the current app dir with the contents of the temporary dir/apps/app
+# Also, keep a list of apps from every repo, a repo later in the file may not overwrite an app from a repo earlier in the file
+def updateRepos():
+    # Get the list of repos
+    repos = []
+    with open(sourcesList) as f:
+        repos = f.readlines()
+    # For each repo, clone the repo to a temporary dir, checkout the branch,
+    # and overwrite the current app dir with the contents of the temporary dir/apps/app
+    alreadyInstalled = []
+    for repo in repos:
+        repo = repo.strip()
+        if repo == "":
+            continue
+        # Split the repo into the git url and the branch
+        repo = repo.split(" ")
+        if len(repo) != 2:
+            print("Error: Invalid repo format in " + sourcesList)
+            exit(1)
+        gitUrl = repo[0]
+        branch = repo[1]
+        # Clone the repo to a temporary dir
+        tempDir = tempfile.mkdtemp()
+        os.system("git clone {} {}".format(gitUrl, tempDir))
+        # Checkout the branch
+        os.chdir(tempDir)
+        os.system("git checkout {}".format(branch))
+        # Overwrite the current app dir with the contents of the temporary dir/apps/app
+        for app in os.listdir(os.path.join(tempDir, "apps")):
+            # if the app is already installed, don't overwrite it
+            if app in alreadyInstalled:
+                continue
+            if os.path.isdir(os.path.join(tempDir, "apps", app)):
+                shutil.copytree(os.path.join(tempDir, "apps", app), os.path.join(appsDir, app),
+                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))
+                alreadyInstalled.append(app)
+        # Remove the temporary dir
+        shutil.rmtree(tempDir)
