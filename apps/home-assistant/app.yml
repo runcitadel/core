@@ -1,4 +1,11 @@
+# SPDX-FileCopyrightText: 2020-2021 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+
+# yaml-language-server: $schema=../../app-standard-v1.json
+
 version: 1
+
 metadata:
   category: Automation
   name: Home Assistant
@@ -29,7 +36,7 @@ metadata:
     - 3.jpg
 containers:
   - name: server
-    image: homeassistant/home-assistant:2021.10.4@homeassistant/home-assistant@sha256:ff82218ce1045692a0345cf6d869554d4562232c45a4e9e0f985d21b5db8454c
+    image: homeassistant/home-assistant:2021.10.4@sha256:ff82218ce1045692a0345cf6d869554d4562232c45a4e9e0f985d21b5db8454c
     port: 8123
     data:
       - data:/config

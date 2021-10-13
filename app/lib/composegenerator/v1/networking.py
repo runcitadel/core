@@ -97,7 +97,7 @@ def getMainContainer(app: dict):
         for container in app['containers']:
             if container['name'] == app['metadata']['mainContainer']:
                 return container
-    raise Exception("No main container found")
+    raise Exception("No main container found for app {}".format(app['metadata']['name']))
 
 def configureMainPort(app: dict, nodeRoot: str):
     registryFile = path.join(nodeRoot, "apps", "registry.json")

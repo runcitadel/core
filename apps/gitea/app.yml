@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Development
   name: Gitea
@@ -35,25 +39,24 @@ metadata:
   dependencies: []
   repo: https://github.com/go-gitea/gitea
   support: https://discourse.gitea.io
-  port: 8085
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
-  torOnly: false
+  mainContainer: server
+
 containers:
 - image: gitea/gitea:1.15.3-rootless@sha256:3902efd5f11da1fb60cbe4a39ceb5f75630900af46bee86c90c49eddd4efd4d5
   user: 1000:1000
   ports:
-  - ${APP_GITEA_PORT}:${APP_GITEA_PORT}
-  - ${APP_GITEA_SSH_PORT}:${APP_GITEA_SSH_PORT}
+  - 2222:2222
   environment:
     GITEA__security__INSTALL_LOCK: 'true'
     GITEA__server__DOMAIN: ${APP_DOMAIN}
-    GITEA__server__HTTP_PORT: ${APP_GITEA_PORT}
+    GITEA__server__HTTP_PORT: ${APP_GITEA_SERVER_PORT}
     GITEA__server__SSH_DOMAIN: ${APP_DOMAIN}
-    GITEA__server__SSH_PORT: ${APP_GITEA_SSH_PORT}
-    GITEA__server__SSH_LISTEN_PORT: ${APP_GITEA_SSH_PORT}
+    GITEA__server__SSH_PORT: 2222
+    GITEA__server__SSH_LISTEN_PORT: 2222
     GITEA__server__START_SSH_SERVER: 'true'
     GITEA__database__DB_TYPE: mysql
     GITEA__database__HOST: ${APP_GITEA_DB_IP}:3306
@@ -64,7 +67,7 @@ containers:
   data:
   - data/gitea/config:/etc/gitea
   - data/gitea/data:/var/lib/gitea
-  ip: $APP_GITEA_IP
+
 - image: mariadb:10.6.4@sha256:4bbee12b1adf299211f844ebbe89563675c46965470dcfa40f5278d63c56d030
   user: 1000:1000
   environment:
@@ -75,4 +78,3 @@ containers:
   name: db
   data:
   - data/db:/var/lib/mysql
-  ip: $APP_GITEA_DB_IP

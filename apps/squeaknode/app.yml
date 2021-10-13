@@ -5,11 +5,10 @@
 # yaml-language-server: $schema=../../app-standard-v1.json
 
 version: 1
-
 metadata:
   category: Social
   name: Squeaknode
-  version: 0.1.160
+  version: 0.1.161
   tagline: A peer-to-peer status feed on Lightning
   description: >-
     The Squeaknode app allows you to create, view, buy, and sell squeaks. A
@@ -33,7 +32,7 @@ metadata:
   mainContainer: web
 containers:
   - name: web
-    image: yzernik/squeaknode:v0.1.160@sha256:307f6ef50c9c9f801e4b2461b87081b8cdf4c2d675af4323691fb6458a82e748
+    image: yzernik/squeaknode:v0.1.161@sha256:ca8c2b0d85b89223885039fe8cbe79a108661c94846c9a0fe024d0d1744d6bc3
     stop_grace_period: 1m
     port: 12994
     ports:

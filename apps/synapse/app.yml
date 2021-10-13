@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Social
   name: Synapse
@@ -37,23 +41,21 @@ metadata:
   dependencies: []
   repo: https://github.com/matrix-org/synapse
   support: https://matrix.to/#/#synapse:matrix.org
-  port: 8008
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
   torOnly: false
+
 containers:
 - image: matrixdotorg/synapse:v1.43.0
   user: 1000:1000
-  ports:
-  - $APP_SYNAPSE_PORT:$APP_SYNAPSE_PORT
   entrypoint: bash
   command: -c './start.py generate && ./start.py migrate_config && exec ./start.py'
   environment:
     UID: '1000'
     GID: '1000'
-    SYNAPSE_HTTP_PORT: ${APP_SYNAPSE_PORT}
+    SYNAPSE_HTTP_PORT: ${APP_SYNAPSE_SERVER_PORT}
     SYNAPSE_SERVER_NAME: ${APP_HIDDEN_SERVICE}
     SYNAPSE_REPORT_STATS: 'yes'
     SYNAPSE_ENABLE_REGISTRATION: 'yes'
@@ -61,4 +63,3 @@ containers:
   name: server
   data:
   - data/synapse:/data
-  ip: $APP_SYNAPSE_IP

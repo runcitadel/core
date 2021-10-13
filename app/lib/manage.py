@@ -302,10 +302,10 @@ def updateRepos():
         branch = repo[1]
         # Clone the repo to a temporary dir
         tempDir = tempfile.mkdtemp()
-        os.system("git clone {} {}".format(gitUrl, tempDir))
-        # Checkout the branch
-        os.chdir(tempDir)
-        os.system("git checkout {}".format(branch))
+        print("Cloning the repository")
+        # Git clone with a depth of 1 to avoid cloning the entire repo
+        # Dont print anything to stdout, as we don't want to see the git clone output
+        subprocess.run("git clone --depth 1 {} {}".format(gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
         # Overwrite the current app dir with the contents of the temporary dir/apps/app
         for app in os.listdir(os.path.join(tempDir, "apps")):
             # if the app is already installed, don't overwrite it

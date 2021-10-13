@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Social
   name: Element
@@ -40,15 +44,13 @@ metadata:
   dependencies: []
   repo: https://github.com/vector-im/element-web
   support: https://matrix.to/#/#element-web:matrix.org
-  port: 8088
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
   torOnly: false
+
 containers:
 - image: getumbrel/element-web:v1.7.34@sha256:f7f6229d2dca55b08fc976088d5797d6348842bcb2317e72d40704c3c9b117c2
-  ports:
-  - $APP_ELEMENT_PORT:80
+  port: 80
   name: web
-  ip: $APP_ELEMENT_IP

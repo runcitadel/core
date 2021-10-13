@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
+# yaml-language-server: $schema=../../app-standard-v1.json
+
+version: 1
+
 metadata:
   category: Payments
   name: BTCPay Server
@@ -30,11 +34,11 @@ metadata:
   - bitcoind
   repo: https://github.com/btcpayserver/btcpayserver
   support: https://chat.btcpayserver.org
-  port: 3003
   gallery:
   - 1.jpg
   - 2.jpg
   - 3.jpg
+  mainContainer: web
 
 containers:
 - name: nbxplorer
@@ -55,7 +59,6 @@ containers:
   - data/nbxplorer:/data
   permissions:
   - bitcoind
-  ip: $APP_BTCPAY_SERVER_NBXPLORER_IP
 
 - name: web
   image: btcpayserver/btcpayserver:1.2.4@sha256:2929130a4cc3323a917564091ccb2243e3e28959727154174448a3458287ed5c
@@ -65,8 +68,6 @@ containers:
   entrypoint:
   - dotnet
   - BTCPayServer.dll
-  ports:
-  - $APP_BTCPAY_SERVER_PORT:$APP_BTCPAY_SERVER_PORT
   environment:
     HOME: /data
     BTCPAY_DATADIR: /data
@@ -74,7 +75,7 @@ containers:
     BTCPAY_DOCKERDEPLOYMENT: 'false'
     BTCPAY_POSTGRES: User ID=postgres;Host=$APP_BTCPAY_SERVER_POSTGRES_IP;Port=5432;Database=btcpayserver$BITCOIN_NETWORK
     BTCPAY_NETWORK: $BITCOIN_NETWORK
-    BTCPAY_BIND: 0.0.0.0:$APP_BTCPAY_SERVER_PORT
+    BTCPAY_BIND: 0.0.0.0:$APP_BTCPAY_SERVER_WEB_PORT
     BTCPAY_CHAINS: btc
     BTCPAY_BTCEXPLORERURL: http://$APP_BTCPAY_SERVER_NBXPLORER_IP:32838
     BTCPAY_BTCLIGHTNING: type=lnd-rest;server=https://$LND_IP:$LND_REST_PORT/;macaroonfilepath=/lnd/data/chain/bitcoin/$BITCOIN_NETWORK/admin.macaroon;allowinsecure=true
@@ -84,7 +85,6 @@ containers:
   - data/btcpay:/data
   permissions:
   - lnd
-  ip: $APP_BTCPAY_SERVER_IP
   user: 1000:1000
 
 - name: postgres
@@ -94,4 +94,3 @@ containers:
     POSTGRES_HOST_AUTH_METHOD: trust
   data:
   - data/postgres:/var/lib/postgresql/data
-  ip: $APP_BTCPAY_SERVER_POSTGRES_IP

@@ -1,6 +1,6 @@
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
-#
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+// SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+// 
+// SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 let dojoHost = `${window.location.hostname}:${dojoLocalPort}`;
 const dojoBaseRoute = bitcoinNetwork == "testnet" ? "test/v2" : "v2";

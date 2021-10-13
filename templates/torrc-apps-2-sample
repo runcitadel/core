@@ -3,25 +3,3 @@
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
 # Apps 2
-
-# pi-hole Hidden Service
-HiddenServiceDir /var/lib/tor/app-pi-hole
-HiddenServicePort 80 <app-pi-hole-ip>:80
-
-# home-assistant Hidden Service
-HiddenServiceDir /var/lib/tor/app-home-assistant
-HiddenServicePort 80 <app-home-assistant-ip>:8123
-
-# gitea Hidden Service
-HiddenServiceDir /var/lib/tor/app-gitea
-HiddenServicePort 80 <app-gitea-ip>:<app-gitea-port>
-HiddenServicePort 22 <app-gitea-ip>:<app-gitea-ssh-port>
-
-# simple-torrent Hidden Service
-HiddenServiceDir /var/lib/tor/app-simple-torrent
-HiddenServicePort 80 <app-simple-torrent-ip>:<app-simple-torrent-port>
-
-# synapse Hidden Service
-HiddenServiceDir /var/lib/tor/app-synapse
-HiddenServicePort 80 <app-synapse-ip>:<app-synapse-port>
-HiddenServicePort <app-synapse-port> <app-synapse-ip>:<app-synapse-port>

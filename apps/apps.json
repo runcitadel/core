@@ -8,6 +8,7 @@
     },
     {
         "id": "ride-the-lightning",
+        "image": "shahanafarooqui/rtl",
         "name": "Ride The Lightning",
         "repo": "https://github.com/Ride-The-Lightning/RTL",
         "version": "0.11.2"
@@ -17,10 +18,11 @@
         "image": "yzernik/squeaknode",
         "name": "Squeaknode",
         "repo": "https://github.com/yzernik/squeaknode",
-        "version": "0.1.160"
+        "version": "0.1.161"
     },
     {
         "id": "pi-hole",
+        "image": "pihole/pihole",
         "name": "Pi-hole",
         "repo": "https://github.com/pi-hole/pi-hole",
         "version": "2021.09"
@@ -41,6 +43,7 @@
     },
     {
         "id": "element",
+        "image": "getumbrel/element-web",
         "name": "Element",
         "repo": "https://github.com/vector-im/element-web",
         "version": "2.1.5"
@@ -54,6 +57,7 @@
     },
     {
         "id": "photoprism",
+        "image": "photoprism/photoprism",
         "name": "PhotoPrism",
         "repo": "https://github.com/photoprism/photoprism",
         "version": "210925-96168e4b"
@@ -95,6 +99,7 @@
     },
     {
         "id": "code-server",
+        "image": "codercom/code-server",
         "name": "code-server",
         "repo": "https://github.com/cdr/code-server",
         "version": "3.12.0"
@@ -115,6 +120,7 @@
     },
     {
         "id": "gitea",
+        "image": "gitea/gitea",
         "name": "Gitea",
         "repo": "https://github.com/go-gitea/gitea",
         "version": "1.15.3"
@@ -135,24 +141,28 @@
     },
     {
         "id": "btcpay-server",
+        "image": "btcpayserver/btcpayserver",
         "name": "BTCPay Server",
         "repo": "https://github.com/btcpayserver/btcpayserver",
         "version": "1.2.4"
     },
     {
         "id": "lnbits",
+        "image": "lnbitsdocker/lnbits",
         "name": "LNbits",
         "repo": "https://github.com/lnbits/lnbits",
         "version": "0f8d6e3"
     },
     {
         "id": "simple-torrent",
+        "image": "boypt/cloud-torrent",
         "name": "SimpleTorrent",
         "repo": "https://github.com/boypt/simple-torrent",
         "version": "1.3.8"
     },
     {
         "id": "synapse",
+        "image": "matrixdotorg/synapse",
         "name": "Synapse",
         "repo": "https://github.com/matrix-org/synapse",
         "version": "1.43.0"

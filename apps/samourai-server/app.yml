@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-# yaml-language-server: $schema=../../app/app-standard-v1.json
+# yaml-language-server: $schema=../../app-standard-v1.json
 
 version: 1
 

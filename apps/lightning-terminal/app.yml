@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
 
-# yaml-language-server: $schema=../../app/app-standard-v1.json
+# yaml-language-server: $schema=../../app-standard-v1.json
 
 version: 1
 
@@ -54,14 +54,12 @@ metadata:
     - 4.jpg
   defaultPassword: moneyprintergobrrr
 containers:
-  - image: lightninglabs/lightning-terminal:v0.5.2-alpha@lightninglabs/lightning-terminal@sha256:fa6415256bbac022784c2f555dbf1443da0df65cbad742dc433e00afd00841f1
+  - image: lightninglabs/lightning-terminal:v0.5.2-alpha@sha256:fa6415256bbac022784c2f555dbf1443da0df65cbad742dc433e00afd00841f1
     user: 1000:1000
-    ports:
-      - $APP_LIGHTNING_TERMINAL_PORT:$APP_LIGHTNING_TERMINAL_PORT
     environment:
       HOME: /data
     command:
-      - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_PORT
+      - --insecure-httplisten=0.0.0.0:$APP_LIGHTNING_TERMINAL_WEB_PORT
       - --network="$BITCOIN_NETWORK"
       - --lnd-mode="remote"
       - --remote.lnd.rpcserver=$LND_IP:$LND_GRPC_PORT
