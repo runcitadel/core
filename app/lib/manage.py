@@ -311,6 +311,8 @@ def updateRepos():
             # if the app is already installed, don't overwrite it
             if app in alreadyInstalled:
                 continue
+            if os.path.isdir(os.path.join(appsDir, app)):
+                shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
             if os.path.isdir(os.path.join(tempDir, "apps", app)):
                 shutil.copytree(os.path.join(tempDir, "apps", app), os.path.join(appsDir, app),
                                 symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))

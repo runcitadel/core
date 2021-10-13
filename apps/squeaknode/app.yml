@@ -33,7 +33,7 @@ metadata:
   mainContainer: web
 containers:
   - name: web
-    image: yzernik/squeaknode:v0.1.160@yzernik/squeaknode@sha256:307f6ef50c9c9f801e4b2461b87081b8cdf4c2d675af4323691fb6458a82e748
+    image: yzernik/squeaknode:v0.1.160@sha256:307f6ef50c9c9f801e4b2461b87081b8cdf4c2d675af4323691fb6458a82e748
     stop_grace_period: 1m
     port: 12994
     ports:
