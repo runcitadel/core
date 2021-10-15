@@ -20,6 +20,7 @@ set -euo pipefail
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 MOUNT_POINT="/mnt/data"
+EXTERNAL_UMBREL_ROOT="${MOUNT_POINT}/umbrel"
 EXTERNAL_CITADEL_ROOT="${MOUNT_POINT}/citadel"
 DOCKER_DIR="/var/lib/docker"
 EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
@@ -241,6 +242,11 @@ main () {
   fi
 
   echo "Bind mounting external storage over local Citadel installation..."
+  # If EXTERNAL_UMBREL_ROOT exists, move it to EXTERNAL_CITADEL_ROOT
+  if [[ -d "${EXTERNAL_UMBREL_ROOT}" ]]; then
+    mv "${EXTERNAL_UMBREL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
+    touch "${EXTERNAL_CITADEL_ROOT}"/.citadel
+  fi
   mount --bind "${EXTERNAL_CITADEL_ROOT}" "${CITADEL_ROOT}"
 
   echo "Bind mounting external storage over local Docker data dir..."
