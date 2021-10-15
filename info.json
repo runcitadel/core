@@ -1,6 +1,6 @@
 {
-    "version": "0.4.12",
-    "name": "Citadel update",
-    "requires": ">=0.2.1",
-    "notes": "This update fixes a lot of issues with apps and includes the new apps from Umbrel 0.4.4."
+    "version": "0.4.13",
+    "name": "Citadel 0.4.13",
+    "requires": ">=0.4.11",
+    "notes": "In this update, we fixed a few more issues and made it easier for us to troubleshoot the remaining issues with you. We also prepared Citadel further for the upcoming 0.5.0 update and it's now possible to add 3rd party app repositories (Only manually via SSH right now)."
 }
