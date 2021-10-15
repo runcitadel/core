@@ -53,7 +53,7 @@ services:
                         ipv4_address: $APPS_3_TOR_IP
         nginx:
                 container_name: nginx
-                image: nginx:1.17.8@sha256:380eb808e2a3b0dd954f92c1cae2f845e6558a15037efefcabc5b4e03d666d03
+                image: nginx:1.21.3@sha256:644a70516a26004c97d0d85c7fe1d0c3a67ea8ab7ddf4aff193d9f301670cf36
                 depends_on: [ dashboard, manager ]
                 volumes:
                         - ${PWD}/nginx:/etc/nginx
@@ -166,7 +166,7 @@ services:
                         ipv4_address: $MANAGER_IP
         middleware:
                 container_name: middleware
-                image: runcitadel/middleware:main@sha256:c7d2e6eadbef2f71e9f77d6915895600779da949652a6cb9ad00b913bab09b15
+                image: runcitadel/middleware:main@sha256:26451df6882c310d562b6926266ae1a4344c712c9a898d4550987de6f8ba4e44
                 depends_on: [ manager, bitcoin, lnd ]
                 command: ["./wait-for-node-manager.sh", $MANAGER_IP, "npm", "start"]
                 restart: on-failure
