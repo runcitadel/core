@@ -11,7 +11,7 @@ services:
                 user: toruser
                 restart: on-failure
                 volumes:
-                    - ${PWD}/tor/torrc-umbrel:/etc/tor/torrc
+                    - ${PWD}/tor/torrc-core:/etc/tor/torrc
                     - ${PWD}/tor/data:/var/lib/tor/
                 ports:
                   - "127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT"

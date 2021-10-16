@@ -290,10 +290,10 @@ def replace_vars(file_path):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
 templates_to_build = {
-  "./templates/torrc-apps-sample": "./tor/torrc-apps",
-  "./templates/torrc-apps-2-sample": "./tor/torrc-apps-2",
-  "./templates/torrc-apps-3-sample": "./tor/torrc-apps-3",
-  "./templates/torrc-umbrel-sample": "./tor/torrc-umbrel",
+  "./templates/torrc-empty": "./tor/torrc-apps",
+  "./templates/torrc-empty": "./tor/torrc-apps-2",
+  "./templates/torrc-empty": "./tor/torrc-apps-3",
+  "./templates/torrc-core-sample": "./tor/torrc-core",
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
