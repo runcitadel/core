@@ -10,12 +10,20 @@ cd "${NODE_ROOT}"
 if [[ $UID != 0 ]]; then
     echo "This script must run as root"
     echo "Please re-run this script as"
-    echo "  sudo ¨~/umbrel/scripts/debug"
+    echo "  sudo ¨~/citadel/scripts/debug"
     exit 1
 fi
 
-# Try to load Umbrel OS version info to detect Umbrel OS
 [[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
+if [[ ! -z "${UMBREL_OS:-}" ]]; then
+    # Fail on Umbrel OS
+    echo "This script is not supported on Umbrel OS"
+    echo "Please upgrade to Citadel OS."
+    exit 1
+fi
+
+# Try to load Citadel OS version on Citadel OS
+[[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
 [[ -f "./.env" ]] && source "./.env"
 
 # function to upload the output to our debug log server
@@ -29,7 +37,7 @@ upload() {
     https://api.debug.umbrel.tech/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
-    | awk -F '"' '{print "https://umbrel-paste.vercel.app/"$1}'
+    | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'
 }
 
 torupload() {
@@ -42,7 +50,7 @@ torupload() {
     https://api.debug.umbrel.tech/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
-    | awk -F '"' '{print "https://umbrel-paste.vercel.app/"$1}'
+    | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'
 }
 
 list_block_devices () {
@@ -61,11 +69,11 @@ if [[ "${1}" == "--run" ]]; then
     echo "------------"
     cat info.json | jq .version | sed 's/"//g'
     
-    if [[ ! -z "${UMBREL_OS:-}" ]]; then
+    if [[ ! -z "${CITADEL_OS:-}" ]]; then
         echo
         echo "Flashed OS version"
         echo "-----------------"
-        echo $UMBREL_OS
+        echo $CITADEL_OS
         
         echo
         echo "Raspberry Pi Model"
@@ -104,21 +112,21 @@ if [[ "${1}" == "--run" ]]; then
     
     df --human-readable / "${NODE_ROOT}"
     
-    if [[ ! -z "${UMBREL_OS:-}" ]]; then
+    if [[ ! -z "${CITADEL_OS:-}" ]]; then
         echo
         echo "Startup service logs"
         echo "--------------------"
-        journalctl --unit=umbrel-startup.service | tail -n 30  | sed '/onion/d'
+        journalctl --unit=citadel-startup.service | tail -n 30  | sed '/onion/d'
         
         echo
         echo "External storage service logs"
         echo "-----------------------------"
-        journalctl --unit=umbrel-external-storage.service | tail -n 30
+        journalctl --unit=citadel-external-storage.service | tail -n 30
         
         echo
         echo "External storage SD card update service logs"
         echo "--------------------------------------------"
-        journalctl --unit=umbrel-external-storage-sdcard-update.service | tail -n 30
+        journalctl --unit=citadel-external-storage-sdcard-update.service | tail -n 30
     fi
     
     
