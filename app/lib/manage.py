@@ -16,9 +16,7 @@ import json
 import yaml
 import subprocess
 
-from lib.composegenerator.v0.generate import createComposeConfigFromV0
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
-from lib.appymlgenerator import convertComposeYMLToAppYML
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry, getSimpleAppRegistry
 from lib.entropy import deriveEntropy
@@ -67,22 +65,6 @@ def getAppYml(name):
 
 def getAppYmlPath(app):
     return os.path.join(appsDir, app, 'app.yml')
-
-
-def composeToAppYml(app):
-    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-    appYml = os.path.join(appsDir, app, "app.yml")
-    # Read the compose file and parse it
-    with open(composeFile, "r") as f:
-        compose = yaml.safe_load(f)
-    registry = os.path.join(appsDir, "registry.json")
-    # Load the registry
-    with open(registry, "r") as f:
-        registryData = json.load(f)
-    converted = convertComposeYMLToAppYML(compose, app, registryData)
-    # Put converted into the app.yml after encoding it as YAML
-    with open(appYml, "w") as f:
-        f.write(yaml.dump(converted, sort_keys=False))
 
 
 def update(verbose: bool = False):
@@ -184,7 +166,7 @@ def getApp(appFile: str, appId: str):
     if('version' in app and str(app['version']) == "1"):
         return createComposeConfigFromV1(app, nodeRoot)
     else:
-        return createComposeConfigFromV0(app)
+        raise Exception("Error: Unsupported version of app.yml")
 
 
 def compose(app, arguments):
@@ -293,6 +275,9 @@ def updateRepos():
     for repo in repos:
         repo = repo.strip()
         if repo == "":
+            continue
+        # Also ignore comments
+        if repo.startswith("#"):
             continue
         # Split the repo into the git url and the branch
         repo = repo.split(" ")
