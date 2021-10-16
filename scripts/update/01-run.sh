@@ -36,7 +36,21 @@ if [[ -z "${UMBREL_OS:-}" ]] && [[ -n "${CITADEL_OS:-}" ]]; then
     rm -rf "${CITADEL_ROOT}/electrs/db"
 fi
 
-# Make Umbrel OS specific updates
+# If the Citadel OS version is 0.0.1, fail
+if [[ ! -z "${CITADEL_OS:-}" ]] && [[ "${CITADEL_OS}" == "0.0.1" ]]; then
+    echo "Citadel OS version is 0.0.1. This is not supported."
+  cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 50, "description": "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue.", "updateTo": "$RELEASE"}
+EOF
+    rm "${CITADEL_ROOT}/statuses/update-in-progress"
+    docker stop bitcoin
+    docker stop lnd
+    docker stop electrs
+    echo "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue."
+    exit 1
+fi
+
+# Make Citadel OS specific updates
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
     echo "============================================="
@@ -63,7 +77,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     fi
 
     # This makes sure systemd services are always updated (and new ones are enabled).
-    UMBREL_SYSTEMD_SERVICES="${CITADEL_ROOT}/.citadel-${RELEASE}/scripts/umbrel-os/services/*.service"
+    UMBREL_SYSTEMD_SERVICES="${CITADEL_ROOT}/.citadel-${RELEASE}/scripts/citadel-os/services/*.service"
     for service_path in $UMBREL_SYSTEMD_SERVICES; do
       service_name=$(basename "${service_path}")
       install -m 644 "${service_path}" "/etc/systemd/system/${service_name}"

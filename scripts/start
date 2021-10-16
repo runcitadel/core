@@ -36,13 +36,8 @@ check_dependencies rsync jq curl
 CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 CITADEL_LOGS="${CITADEL_ROOT}/logs"
 
-set_status="${CITADEL_ROOT}/scripts/umbrel-os/status-server/set-status"
-
-$set_status umbrel started
-
 if [[ ! -d "$CITADEL_ROOT" ]]; then
   echo "Root dir does not exist '$CITADEL_ROOT'"
-  $set_status umbrel errored umbrel-root-missing
   exit 1
 fi
 
@@ -120,13 +115,9 @@ echo "Starting Docker services..."
 echo
 docker compose up --detach --build --remove-orphans || {
   echo "Failed to start containers"
-  $set_status umbrel errored docker-failed
   exit 1
 }
 echo
-
-echo "Removing status server iptables entry..."
-"${CITADEL_ROOT}/scripts/umbrel-os/status-server/setup-iptables" --delete
 
 # Unlock the user file on each start of Umbrel to avoid issues
 # Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
@@ -147,5 +138,3 @@ echo "  http://${DEVICE_IP}"
 if [[ ! -z "${hidden_service_url:-}" ]]; then
     echo "  http://${hidden_service_url}"
 fi
-
-$set_status umbrel completed
