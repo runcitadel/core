@@ -28,12 +28,10 @@ echo
 IS_MIGRATING=0
 # Check if UMBREL_OS is set and CITADEL_OS is not
 if [[ -z "${UMBREL_OS:-}" ]] && [[ -n "${CITADEL_OS:-}" ]]; then
-    echo "Umbrel OS is being used..."
-    echo "Upgrading to Citadel OS..."
-    echo "export CITADEL_OS='0.0.1'" > /etc/default/citadel
-    IS_MIGRATING=1
-    CITADEL_OS='0.0.1'
-    rm -rf "${CITADEL_ROOT}/electrs/db"
+    echo "Umbrel OS is no longer supported."
+  cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 50, "description": "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue.", "updateTo": "$RELEASE"}
+EOF
 fi
 
 # If the Citadel OS version is 0.0.1, fail

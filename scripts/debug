@@ -10,15 +10,7 @@ cd "${NODE_ROOT}"
 if [[ $UID != 0 ]]; then
     echo "This script must run as root"
     echo "Please re-run this script as"
-    echo "  sudo ¨~/citadel/scripts/debug"
-    exit 1
-fi
-
-[[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
-if [[ ! -z "${UMBREL_OS:-}" ]]; then
-    # Fail on Umbrel OS
-    echo "This script is not supported on Umbrel OS"
-    echo "Please upgrade to Citadel OS."
+    echo "  sudo ~/citadel/scripts/debug"
     exit 1
 fi
 
