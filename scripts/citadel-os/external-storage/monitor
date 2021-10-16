@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@web.de>
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
+
+set -euo pipefail
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 block_device="${1}"
 mount_point="${2}"
-
-set_status="/status-server/set-status"
-setup_iptables="/status-server/setup-iptables"
 
 check_if_not_already_running() {
   if ps ax | grep $0 | grep -v $$ | grep bash | grep -v grep
@@ -48,8 +48,6 @@ main () {
 
   echo "Stopping Citadel due to failed storage device check..."
   docker kill $(docker ps -aq)
-  $set_status mount errored monitor-check
-  $setup_iptables --force
 }
 
 main

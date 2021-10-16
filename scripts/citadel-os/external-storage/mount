@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@web.de>
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
 set -euo pipefail
 
@@ -19,14 +20,11 @@ set -euo pipefail
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
 MOUNT_POINT="/mnt/data"
-EXTERNAL_UMBREL_ROOT="${MOUNT_POINT}/umbrel"
 EXTERNAL_CITADEL_ROOT="${MOUNT_POINT}/citadel"
 DOCKER_DIR="/var/lib/docker"
 EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
 SWAP_DIR="/swap"
 SWAP_FILE="${SWAP_DIR}/swapfile"
-
-set_status="/status-server/set-status"
 
 check_root () {
   if [[ $UID != 0 ]]; then
@@ -71,25 +69,6 @@ get_block_device_model () {
   echo "$(echo $vendor) $(echo $model)"
 }
 
-# By default Linux uses the UAS driver for most devices. This causes major
-# stability problems on the Raspberry Pi, not due to issues with UAS, but due
-# to devices running in UAS mode using much more power. The Pi can't reliably
-# provide enough power to the USB port and the entire system experiences
-# extreme instability. By blacklisting all devices from the UAS driver on boot
-# we fall back to the mass-storage driver, which results in decreased
-# performance, but lower power usage, and much better system stability.
-blacklist_uas () {
-  usb_quirks=$(lsusb | awk '{print $6":u"}' | tr '\n' ',' | sed 's/,$//')
-  echo -n "${usb_quirks}" > /sys/module/usb_storage/parameters/quirks
-
-  echo "Rebinding USB drivers..."
-  for i in /sys/bus/pci/drivers/[uoex]hci_hcd/*:*; do
-    [[ -e "$i" ]] || continue;
-    echo "${i##*/}" > "${i%/*}/unbind"
-    echo "${i##*/}" > "${i%/*}/bind"
-  done
-}
-
 is_partition_ext4 () {
   partition_path="${1}"
   # We need to run sync here to make sure the filesystem is reflecting the
@@ -129,6 +108,19 @@ unmount_partition () {
   umount "${MOUNT_POINT}"
 }
 
+# This disables UAS for all USB devices, then rebinds them
+disable_uas () {
+  usb_quirks=$(lsusb | awk '{print $6":u"}' | tr '\n' ',' | sed 's/,$//')
+  echo -n "${usb_quirks}" > /sys/module/usb_storage/parameters/quirks
+
+  echo "Rebinding USB drivers..."
+  for i in /sys/bus/pci/drivers/[uoex]hci_hcd/*:*; do
+    [[ -e "$i" ]] || continue;
+    echo "${i##*/}" > "${i%/*}/unbind"
+    echo "${i##*/}" > "${i%/*}/bind"
+  done
+}
+
 # Formats and sets up a new device
 setup_new_device () {
   block_device="${1}"
@@ -158,7 +150,6 @@ copy_docker_to_external_storage () {
 }
 
 main () {
-  $set_status mount started
   echo "Running external storage mount script..."
   check_root
   check_dependencies sed wipefs parted mount sync umount modprobe
@@ -183,7 +174,6 @@ main () {
     if [[ $retry_for_block_devices -gt 20 ]]; then
       echo "No block devices found in 20 tries..."
       echo "Exiting mount script without doing anything"
-      $set_status mount errored no-block-device
       exit 1
     fi
 
@@ -192,7 +182,6 @@ main () {
   if [[ $no_of_block_devices -gt 1 ]]; then
     echo "Multiple block devices found, only one drive is supported"
     echo "Exiting mount script without doing anything"
-    $set_status mount errored multiple-block-devices
     exit 1
   fi
 
@@ -208,21 +197,18 @@ main () {
   echo "Found device \"${block_device_model}\""
 
   if [[ $block_device != nvme* ]]; then
-    echo "Blacklisting USB device IDs against UAS driver..."
+    echo "Disabling UAS for USB devices..."
     blacklist_uas
 
-    echo "Checking USB devices are back..."
+    echo "Checking if the devices can be found again..."
     retry_for_usb_devices=1
     while [[ ! -e "${block_device_path}" ]]; do
       retry_for_usb_devices=$(( $retry_for_usb_devices + 1 ))
       if [[ $retry_for_usb_devices -gt 10 ]]; then
-        echo "USB devices weren't registered after 10 tries..."
-        echo "Exiting mount script without doing anything"
-        $set_status mount errored rebinding-failed
+        echo "Disabled UAS for the USB device, that seems to have broken it"
+        echo "Please contact the Citadel developers"
         exit 1
       fi
-
-      echo "Waiting for USB devices..."
       sleep 1
     done
   fi
@@ -243,7 +229,7 @@ main () {
       unmount_partition
       setup_new_device $block_device $partition_path
     fi
-
+    
   else
     echo "No, it's not ext4"
     setup_new_device $block_device $partition_path
@@ -255,11 +241,6 @@ main () {
   fi
 
   echo "Bind mounting external storage over local Citadel installation..."
-  # If EXTERNAL_UMBREL_ROOT exists, move it to EXTERNAL_CITADEL_ROOT
-  if [[ -d "${EXTERNAL_UMBREL_ROOT}" ]]; then
-    mv "${EXTERNAL_UMBREL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
-    touch "${EXTERNAL_CITADEL_ROOT}"/.citadel
-  fi
   mount --bind "${EXTERNAL_CITADEL_ROOT}" "${CITADEL_ROOT}"
 
   echo "Bind mounting external storage over local Docker data dir..."
@@ -299,7 +280,6 @@ main () {
   ${CITADEL_ROOT}/scripts/citadel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &
 
   echo "Mount script completed successfully!"
-  $set_status mount completed
 }
 
 main
