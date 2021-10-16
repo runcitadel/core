@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@web.de>
+# SPDX-FileCopyrightText: 2021 https://github.com/o3o3o
 #
-# SPDX-License-Identifier: PolyForm-Noncommercial-1.0.0
+# SPDX-License-Identifier: MIT
 
 set -euo pipefail
 
