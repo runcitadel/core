@@ -61,12 +61,12 @@ echo
 echo "Setting environment variables..."
 echo
 
-# Check Umbrel OS
-[[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
-if [[ -z "${UMBREL_OS:-}" ]]; then
-  export IS_UMBREL_OS="false"
+# Check Citadel OS
+[[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
+if [[ -z "${CITADEL_OS:-}" ]]; then
+  export IS_CITADEL_OS="false"
 else
-  export IS_UMBREL_OS="true"
+  export IS_CITADEL_OS="true"
 fi
 
 # Whitelist device IP, hostname and hidden service for CORS
