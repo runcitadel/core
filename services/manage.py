@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import json
 import yaml
 import os
 import argparse
@@ -41,6 +42,13 @@ def installService(name):
     # Write the main compose file
     with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
+    # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
+    with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+        installed = yaml.safe_load(stream)
+    installed.append(name)
+    with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
+        json.dump(installed, stream, sort_keys=False)
+
 
 def uninstallService(name):
     # Read the main compose file
@@ -53,6 +61,13 @@ def uninstallService(name):
     # Write the main compose file
     with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
+    # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
+    with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+        installed = yaml.safe_load(stream)
+    installed.remove(name)
+    with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
+        json.dump(installed, stream, sort_keys=False)
+        
 
 if args.action == "install":
     installService(args.app)
