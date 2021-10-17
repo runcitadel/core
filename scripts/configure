@@ -106,6 +106,10 @@ print("============== CITADEL  ==============")
 print("======================================")
 print()
 
+if not reconfiguring:
+  print("Installing electrs...")
+  data = subprocess.run("\"{}\" install electrs".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
+
 # Parse a dotenv file
 # Values can either be KEY=VALUE or KEY="VALUE" or KEY='VALUE'
 # Returns all env vars as a dict

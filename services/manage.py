@@ -51,7 +51,7 @@ def installService(name):
         installed = []
     installed.append(name)
     with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
-        json.dump(installed, stream, sort_keys=False)
+        json.dump(list(set(installed)), stream, sort_keys=False)
 
 
 def uninstallService(name):
@@ -79,7 +79,7 @@ def uninstallService(name):
     except ValueError:
         pass
     with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
-        json.dump(installed, stream, sort_keys=False)
+        json.dump(list(set(installed)), stream, sort_keys=False)
 
 
 if args.action == "install":

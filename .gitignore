@@ -55,3 +55,4 @@ apps/*
 
 
 !**/*.license
+services/installed.json

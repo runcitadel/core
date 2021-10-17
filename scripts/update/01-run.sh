@@ -212,8 +212,11 @@ for app in $("$CITADEL_ROOT/app/app-manager.py" ls-installed); do
 done
 wait
 
-# On Citadel, the main network is now called Citadel
-docker network rm umbrel_main_network || true
+# If CITADEL_ROOT doesn't contain services/installed.json, then put '["electrs"]' into it.
+# This is to ensure that the 0.5.0 update doesn't remove electrs.
+if [[ ! -f "${CITADEL_ROOT}/services/installed.json" ]]; then
+  echo '["electrs"]' > "${CITADEL_ROOT}/services/installed.json"
+fi
 
 # Start updated containers
 echo "Starting new containers"
