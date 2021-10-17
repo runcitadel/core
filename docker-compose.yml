@@ -216,20 +216,6 @@ services:
     networks:
       default:
         ipv4_address: $NEUTRINO_SWITCHER_IP
-  electrs:
-    container_name: electrs
-    image: ghcr.io/runcitadel/electrs:main@sha256:86705bd425b9b20d0b83d8ef5673cee261766b5a50bcfa8e95ebfec2e5adfcae
-    working_dir: /data
-    volumes:
-    - ${PWD}/bitcoin:/bitcoin:ro
-    - ${PWD}/electrs:/data
-    restart: on-failure
-    stop_grace_period: 5m
-    ports:
-    - $ELECTRUM_PORT:$ELECTRUM_PORT
-    networks:
-      default:
-        ipv4_address: $ELECTRUM_IP
 networks:
   default:
     name: citadel_main_network

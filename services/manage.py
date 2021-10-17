@@ -43,8 +43,12 @@ def installService(name):
     with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
-    with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
-        installed = yaml.safe_load(stream)
+    # If the file doesn't exist, put [] in it, then run the code below
+    try:
+        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+            installed = yaml.safe_load(stream)
+    except FileNotFoundError:
+        installed = []
     installed.append(name)
     with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
         json.dump(installed, stream, sort_keys=False)
@@ -56,18 +60,27 @@ def uninstallService(name):
         compose = yaml.safe_load(stream)
 
     # Remove the service from the main compose file
-    del compose['services'][name]
+    try:
+        del compose['services'][name]
+    except KeyError:
+        pass
 
     # Write the main compose file
     with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
-    with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
-        installed = yaml.safe_load(stream)
-    installed.remove(name)
+    try:
+        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+            installed = yaml.safe_load(stream)
+    except FileNotFoundError:
+        installed = []
+    try:
+        installed.remove(name)
+    except ValueError:
+        pass
     with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
         json.dump(installed, stream, sort_keys=False)
-        
+
 
 if args.action == "install":
     installService(args.app)
