@@ -198,7 +198,7 @@ main () {
 
   if [[ $block_device != nvme* ]]; then
     echo "Disabling UAS for USB devices..."
-    blacklist_uas
+    disable_uas
 
     echo "Checking if the devices can be found again..."
     retry_for_usb_devices=1

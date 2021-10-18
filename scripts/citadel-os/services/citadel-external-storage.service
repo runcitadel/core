@@ -16,9 +16,6 @@ ExecStart=/home/citadel/citadel/scripts/citadel-os/external-storage/mount
 TimeoutStartSec=45min
 User=root
 Group=root
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=external storage mounter
 RemainAfterExit=yes
 
 [Install]
