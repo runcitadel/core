@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import json
+from typing import List
 import yaml
 import os
 import argparse
@@ -19,7 +20,7 @@ scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..")
 
 parser = argparse.ArgumentParser(description="Manage services on your Citadel")
-parser.add_argument('action', help='What to do with the service.', choices=["install", "uninstall"])
+parser.add_argument('action', help='What to do with the service.', choices=["install", "uninstall", "setup"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
     'app', help='The service to perform an action on.')
@@ -85,9 +86,22 @@ def uninstallService(name):
     with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
         json.dump(list(set(installed)), stream, sort_keys=False)
 
+# install all services from installed.json
+def installServices():
+    try:
+        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+            installed: List[str] = yaml.safe_load(stream)
+    except FileNotFoundError:
+        installed: List[str] = []
+    for service in installed:
+        installService(service)
+    
+
 
 if args.action == "install":
     installService(args.app)
 elif args.action == "uninstall":
     uninstallService(args.app)
+elif args.action == "setup":
+    installServices()
     
