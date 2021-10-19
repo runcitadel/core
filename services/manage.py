@@ -55,6 +55,10 @@ def installService(name):
 
 
 def uninstallService(name):
+    # First check if a service yml definition exists to avoid uninstalling something that can't be installed or isn't supposed to be removed
+    if not os.path.isfile(os.path.join(nodeRoot, "services", name + ".yml")):
+        print("Service definition not found, cannot uninstall")
+        exit(1)
     # Read the main compose file
     with open(os.path.join(nodeRoot, "docker-compose.yml"), 'r') as stream:
         compose = yaml.safe_load(stream)
