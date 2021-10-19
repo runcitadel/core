@@ -11,3 +11,5 @@ SPDX-License-Identifier: MIT
 
 Citadel Core contains simple, minimalistic host system components for running a Citadel server.
 It uses docker and docker-compose to orchestrate containers for the core system and apps.
+
+This repository also contains `karen`, a background daemon responsible for communication between Citadel docker containers and the Citadel Core.
