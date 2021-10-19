@@ -1,6 +1,6 @@
 {
-    "version": "0.4.13",
-    "name": "Citadel 0.4.13",
+    "version": "0.4.14",
+    "name": "Citadel 0.4.14",
     "requires": ">=0.4.11",
-    "notes": "In this update, we fixed a few more issues and made it easier for us to troubleshoot the remaining issues with you. We also prepared Citadel further for the upcoming 0.5.0 update and it's now possible to add 3rd party app repositories (Only manually via SSH right now)."
+    "notes": "You should never see this update (Citadel 0.4.14) or this message. If you do, please DO NOT UPDATE! Instead, contact the Citadel developers."
 }
