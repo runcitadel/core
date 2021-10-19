@@ -134,7 +134,7 @@ services:
       JWT_PRIVATE_KEY_FILE: /jwt-private-key/jwt.key
       JWT_EXPIRATION: '3600'
       DOCKER_COMPOSE_DIRECTORY: $PWD
-      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://umbrel.local"}
+      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
       UMBREL_SEED_FILE: /db/umbrel-seed/seed
@@ -152,7 +152,7 @@ services:
       SHUTDOWN_SIGNAL_FILE: /signals/shutdown
       REBOOT_SIGNAL_FILE: /signals/reboot
       GITHUB_REPO: runcitadel/compose-nonfree
-      GITHUB_BRANCH: main
+      GITHUB_BRANCH: dev
       UMBREL_VERSION_FILE: /info.json
       UPDATE_STATUS_FILE: /statuses/update-status.json
       UPDATE_SIGNAL_FILE: /signals/update
@@ -192,7 +192,7 @@ services:
       LND_NETWORK: $BITCOIN_NETWORK
       LND_HOST: ${LND_IP}
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
-      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://umbrel.local"}
+      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
     networks:
       default:
         ipv4_address: $MIDDLEWARE_IP
