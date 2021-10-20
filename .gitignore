@@ -47,6 +47,9 @@ apps/*
 # Commit these empty directories
 !apps/.gitkeep
 !db/.gitkeep
+!db/citadel-seed
+db/citadel-seed/*
+!db/citadel-seed/.gitkeep
 !events/signals/.gitkeep
 !lnd/.gitkeep
 !logs/.gitkeep

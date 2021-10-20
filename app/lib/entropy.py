@@ -6,8 +6,8 @@ scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 
 def deriveEntropy(identifier: str):
-    seedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
-    alternativeSeedFile = os.path.join(nodeRoot, "db", "umbrel-seed", "seed")
+    seedFile = os.path.join(nodeRoot, "db", "citadel-seed", "seed")
+    alternativeSeedFile = os.path.join(nodeRoot, "db", "citadel-seed", "seed")
     if not os.path.isfile(seedFile):
         if(os.path.isfile(alternativeSeedFile)):
             seedFile = alternativeSeedFile

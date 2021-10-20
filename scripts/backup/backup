@@ -27,7 +27,7 @@ check_dependencies openssl tar gpg shuf curl
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   identifier="${1}"
-  umbrel_seed=$(cat "${CITADEL_ROOT}/db/umbrel-seed/seed") || true
+  umbrel_seed=$(cat "${CITADEL_ROOT}/db/citadel-seed/seed") || true
 
   if [[ -z "$umbrel_seed" ]] || [[ -z "$identifier" ]]; then
     >&2 echo "Missing derivation parameter, this is unsafe, exiting."

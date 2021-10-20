@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: runcitadel/manager:main@sha256:a6c99412d082037efaf2bec006c1e24e978287742658a12e94ed5f52521c8182
+    image: runcitadel/manager:main@sha256:2d7c01c3e6369d945ec7817ec3c500ecf824c8baf0fb1e1ea3d0507002597af0
     depends_on:
     - tor
     restart: on-failure
@@ -137,8 +137,8 @@ services:
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
-      UMBREL_SEED_FILE: /db/umbrel-seed/seed
-      UMBREL_DASHBOARD_HIDDEN_SERVICE_FILE: /var/lib/tor/web/hostname
+      SEED_FILE: /db/citadel-seed/seed
+      DASHBOARD_HIDDEN_SERVICE_FILE: /var/lib/tor/web/hostname
       BITCOIN_P2P_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-p2p/hostname
       BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
       BITCOIN_RPC_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-rpc/hostname
@@ -153,7 +153,7 @@ services:
       REBOOT_SIGNAL_FILE: /signals/reboot
       GITHUB_REPO: runcitadel/compose-nonfree
       GITHUB_BRANCH: dev
-      UMBREL_VERSION_FILE: /info.json
+      VERSION_FILE: /info.json
       UPDATE_STATUS_FILE: /statuses/update-status.json
       UPDATE_SIGNAL_FILE: /signals/update
       UPDATE_LOCK_FILE: /statuses/update-in-progress
@@ -162,7 +162,6 @@ services:
       TOR_PROXY_IP: ${TOR_PROXY_IP}
       TOR_PROXY_PORT: ${TOR_PROXY_PORT}
       TOR_HIDDEN_SERVICE_DIR: /var/lib/tor
-      IS_UMBREL_OS: ${IS_CITADEL_OS:-"false"}
       IS_CITADEL_OS: ${IS_CITADEL_OS:-"false"}
     networks:
       default:
