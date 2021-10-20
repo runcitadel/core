@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(description="Manage services on your Citadel")
 parser.add_argument('action', help='What to do with the service.', choices=["install", "uninstall", "setup"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
-    'app', help='The service to perform an action on.')
+    'app', help='The service to perform an action on.', nargs='?')
 args = parser.parse_args()
 
 # Function to install a service
