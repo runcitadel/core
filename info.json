@@ -1,6 +1,6 @@
 {
-    "version": "0.4.14",
-    "name": "Citadel 0.4.14",
-    "requires": ">=0.4.11",
-    "notes": "You should never see this update (Citadel 0.4.14) or this message. If you do, please DO NOT UPDATE! Instead, contact the Citadel developers."
+    "version": "0.4.15",
+    "name": "Citadel 0.4.15",
+    "requires": ">=0.4.14",
+    "notes": "Unless you are beta testing Citadel OS, you should never see this update (Citadel 0.4.15) or this message. If you do, please DO NOT UPDATE! Instead, contact the Citadel developers. (Beta testers too, please)."
 }
