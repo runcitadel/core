@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+import sys
+import os
+from lib.rpcauth import get_data
+import re
+import subprocess
+import json
+
+# Print an error if the user isn't running on Linux.
+if sys.platform != 'linux':
+    print('This script only works on Linux!')
+    exit(1)
+
+# Print an error if user is not root
+if os.getuid() != 0:
+  print('This script must be run as root!')
+  exit(1)
+
+# Check if the system is arm64 or amd64
+def is_arm64():
+  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'aarch64'
+def is_amd64():
+  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'x86_64'
+
+if not is_arm64() and not is_amd64():
+  print('Umbrel only works on arm64 and amd64!')
+  exit(1)
+
+# Check the output of "docker compose version", if it matches "Docker Compose version v2.0.0-rc.3", return true
+# Otherwise, return false
+def is_compose_rc():
+  try:
+    output = subprocess.check_output(['docker', 'compose', 'version'])
+    if(output.decode('utf-8').strip() == 'Docker Compose version v2.0.0-rc.3'):
+      print("Using rc docker compose, updating...")
+      return True
+    else:
+      return False
+  except:
+    return True
+
+# Download docker-compose from https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64
+# or https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64
+# and put it in $HOME/.docker/cli-plugins/docker-compose
+def download_docker_compose():
+  # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
+  subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
+  if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc():
+    return
+  if is_arm64():
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  elif is_amd64():
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
+
+
+try:
+    subprocess.check_call(['wget', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+except:
+    print('Wget is not installed!')
+    exit(1)
+
+try:
+    subprocess.check_call(['docker', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+except:
+    print('Docker is not installed!')
+    exit(1)
+
+# Switch to node root directory.
+CITADEL_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.chdir(CITADEL_ROOT)
+
+updating = False
+status_dir = os.path.join(CITADEL_ROOT, 'statuses')
+# Make sure to use the main status dir for updates
+if os.path.isfile('../.umbrel'):
+    status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
+    updating = True
+
+# Configure for mainnet or testnet or regtest depending
+# upon the user-supplied value of $NETWORK
+# If the network is not specified, then use the mainnet
+BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
+
+# Check if network neither mainnet nor testnet nor regtest
+if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
+    print('Error: Network must be either mainnet, testnet, or regtest!')
+    exit(1)
+
+with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
+  CITADEL_VERSION=json.load(file)['version']
+
+print()
+print("======================================")
+if os.path.isfile(status_dir+'/configured'):
+  print("=========== RECONFIGURING ============")
+  reconfiguring=True
+else:
+  print("============ CONFIGURING =============")
+  reconfiguring=False
+
+print("============== CITADEL  ==============")
+print("======================================")
+print()
+
+if not reconfiguring:
+  print("Installing electrs...")
+  data = subprocess.run("\"{}\" install electrs".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
+
+print("Installing additional services")
+data = subprocess.run("\"{}\" setup".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
+
+# Parse a dotenv file
+# Values can either be KEY=VALUE or KEY="VALUE" or KEY='VALUE'
+# Returns all env vars as a dict
+def parse_dotenv(file_path):
+  envVars: dict = {}
+  with open(file_path, 'r') as file:
+    for line in file:
+      line = line.strip()
+      if line.startswith('#') or len(line) == 0:
+        continue
+      if '=' in line:
+        key, value = line.split('=', 1)
+        value = value.strip('"').strip("'")
+        envVars[key] = value
+      else:
+        print("Error: Invalid line in {}: {}".format(file_path, line))
+        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
+        exit(1)
+  return envVars
+
+  
+##########################################################
+############ Generate configuration variables ############
+##########################################################
+
+NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
+
+if reconfiguring:
+  if os.path.isfile('../.umbrel'):
+    dotenv=parse_dotenv('../.env')
+  else:
+    dotenv=parse_dotenv('./.env')
+
+  BITCOIN_NETWORK=os.environ.get('OVERWRITE_NETWORK') or dotenv['BITCOIN_NETWORK']
+  # Check if network neither mainnet nor testnet nor regtest
+  if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
+      print('Error: Network must be either mainnet, testnet, or regtest!')
+      exit(1)
+  print("Using {} network".format(BITCOIN_NETWORK))
+  print()
+  BITCOIN_RPC_PORT=dotenv['BITCOIN_RPC_PORT']
+  BITCOIN_P2P_PORT=dotenv['BITCOIN_P2P_PORT']
+  BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
+  BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
+  BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
+  TOR_PASSWORD=dotenv['TOR_PASSWORD']
+  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
+  NGINX_PORT=dotenv['NGINX_PORT']
+else:
+  # Generate RPC credentials
+  print("Generating auth credentials")
+  print()
+  BITCOIN_RPC_USER="umbrel"
+  BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
+  BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
+  BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
+
+  # Pull Tor image and generate Tor password
+  print("Generating Tor password")
+  print()
+  os.system('docker pull --quiet lncm/tor:0.4.6.7')
+  TOR_PASSWORD=get_data('itdoesntmatter')['password']
+
+  # run 'docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "$TOR_PASS"' and get its output
+  # this is the password that is used to connect to the Tor network
+  # the password is stored in the .env file
+  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
+
+BITCOIN_NODE="neutrino"
+ALIAS_AND_COLOR=""
+ADDITIONAL_BITCOIN_OPTIONS=""
+BOLT_DB_OPTIONS=""
+CHANNEL_LIMITATIONS=""
+
+if os.path.isfile("./lnd/lnd.conf"):
+  with open("./lnd/lnd.conf", 'r') as file:
+    # We generally don't want to allow changing lnd.conf, but we keep as many custom settings as possible
+    for line in file:
+      if line.startswith("bitcoin.node="):
+        BITCOIN_NODE = line.split("=")[1].strip()
+      if line.startswith("alias="):
+        ALIAS_AND_COLOR += "\n" + line.strip()
+      if line.startswith("color="):
+        ALIAS_AND_COLOR += "\n" + line.strip()
+      if line.startswith("bitcoin.basefee"):
+        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
+      if line.startswith("bitcoin.feerate"):
+        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
+      if line.startswith("minchansize"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("maxchansize"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("maxpendingchannels"):
+        CHANNEL_LIMITATIONS += "\n" + line.strip()
+      if line.startswith("db.bolt.auto-compact"):
+        BOLT_DB_OPTIONS += "\n" + line.strip()
+
+if BOLT_DB_OPTIONS != "":
+  BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
+
+if CHANNEL_LIMITATIONS == "":
+  CHANNEL_LIMITATIONS = "maxpendingchannels=3\nminchansize=10000"
+
+NEUTRINO_PEERS=""
+if BITCOIN_NETWORK == "mainnet":
+  BITCOIN_RPC_PORT=8332
+  BITCOIN_P2P_PORT=8333
+elif BITCOIN_NETWORK == "testnet":
+  BITCOIN_RPC_PORT=18332
+  BITCOIN_P2P_PORT=18333
+  NEUTRINO_PEERS='''
+[neutrino]
+neutrino.addpeer=testnet1-btcd.zaphq.io
+neutrino.addpeer=testnet2-btcd.zaphq.io
+  '''
+elif BITCOIN_NETWORK == "regtest":
+  BITCOIN_RPC_PORT=18334
+  BITCOIN_P2P_PORT=18335
+  BITCOIN_NODE="bitcoind"
+else:
+  exit(1)
+
+# IP addresses for services
+NETWORK_IP="10.21.21.0"
+GATEWAY_IP="10.21.21.1"
+NGINX_IP="10.21.21.2"
+DASHBOARD_IP="10.21.21.3"
+MANAGER_IP="10.21.21.4"
+MIDDLEWARE_IP="10.21.21.5"
+NEUTRINO_SWITCHER_IP="10.21.21.6"
+BITCOIN_IP="10.21.21.8"
+LND_IP="10.21.21.9"
+ELECTRUM_IP="10.21.21.10"
+TOR_PROXY_IP="10.21.21.11"
+APPS_TOR_IP="10.21.21.12"
+APPS_2_TOR_IP="10.21.21.13"
+APPS_3_TOR_IP="10.21.21.14"
+BITCOIN_RPC_PORT="8332"
+BITCOIN_P2P_PORT="8333"
+BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
+BITCOIN_ZMQ_RAWTX_PORT="28333"
+BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
+LND_GRPC_PORT="10009"
+LND_REST_PORT="8080"
+ELECTRUM_PORT="50001"
+TOR_PROXY_PORT="9050"
+TOR_CONTROL_PORT="29051"
+
+DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
+DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
+# Get the real path by following symlinks
+DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
+
+# Set LND fee URL for neutrino on mainnet
+LND_FEE_URL=""
+# If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
+if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
+   LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
+
+# Checks if a variable with the name exists, if not, check if an env var with the name existts
+# if neither exists, then exit with an error
+def get_var(var_name, other_locals, file_name):
+  if var_name in locals():
+    return str(locals()[var_name])
+  elif var_name in other_locals:
+    return str(other_locals[var_name])
+  elif var_name in globals():
+    return str(globals()[var_name])
+  else:
+    print("Error: {} is not defined! (In file {})".format(var_name, file_name))
+    exit(1)
+
+# Converts a string to uppercase, also replaces all - with _
+def convert_to_upper(string):
+  return string.upper().replace('-', '_')
+
+# Put variables in the config file. A config file accesses an env var $EXAMPLE_VARIABLE by containing <example-variable>
+# in the config file. Check for such occurences and replace them with the actual variable
+def replace_vars(file_path):
+  with open(file_path, 'r') as file:
+    file_contents = file.read()
+  return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
+
+templates_to_build = {
+  "./templates/torrc-empty": "./tor/torrc-apps",
+  "./templates/torrc-empty": "./tor/torrc-apps-2",
+  "./templates/torrc-empty": "./tor/torrc-apps-3",
+  "./templates/torrc-core-sample": "./tor/torrc-core",
+  "./templates/lnd-sample.conf": "./lnd/lnd.conf",
+  "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
+  "./templates/.env-sample": "./.env",
+  "./templates/electrs-sample.toml": "./electrs/electrs.toml",
+  "./templates/nginx-sample.conf": "./nginx/nginx.conf"
+}
+
+print("Generating configuration files")
+print()
+
+# Loop through templates_to_build and build them
+for template_path, output_path in templates_to_build.items():
+  data = replace_vars(template_path)
+  if data != "" and data != None:
+    with open(output_path, 'w') as file:
+      file.write(data)
+
+print("Installing docker-compose...")
+print()
+download_docker_compose()
+if not updating:
+  print("Updating apps...")
+  print()
+  os.system('./app/app-manager.py --invoked-by-configure update-online')
+print("Configuring permissions")
+print()
+os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+# Touch status_dir/configured
+with open(status_dir+'/configured', 'w') as file:
+  file.write('')
+print("Configuration successful")
+print("You can now start Citadel by running:")
+print("  sudo ./scripts/start")

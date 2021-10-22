@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# SPDX-FileCopyrightText: 2020 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+
+# Fail if not running as root
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root" 1>&2
+  exit 1
+fi
+
+# Get the memory usage of a docker container by name
+function get_memory_usage() {
+  docker stats --no-stream --format "{{.MemPerc}}" "$1" | sed "s/%//"
+}
+
+# Convert a memory usage in MiB to the percentage of the total memory
+# With two decimal places
+function mem_usage_to_percent() {
+  local mem_usage="$1"
+  local total_mem="$(free -m | awk 'NR==2 {print $2}')"
+  echo "$(awk "BEGIN {printf \"%.1f\", $mem_usage / $total_mem * 100}")"
+}
+
+get_total_used_mem_raw() {
+  free -m | awk 'NR==2 {print $3}'
+}
+
+get_total_used_mem() {
+  echo "$(mem_usage_to_percent "$(get_total_used_mem_raw)")"
+}
+
+# To get the containers of the app, list every container whose name starts with the name of the app
+get_app_containers () {
+  local app_name="$1"
+  "${CITADEL_ROOT}/app/app-manager.py" compose "${app_name}" ps | awk '{print $1}' | grep -v 'Name\|-----'
+}
+
+# Get the memory usage of the whole system, excluding docker containers
+get_system_memory_usage() {
+  local docker_usage_all="$(docker stats --no-stream --format "{{.MemUsage}}" | awk '{sum+=$1} END {print sum}')"
+  # Now, subtract that from get_total_used_mem_raw, and convert the output to a percentage
+  local total_usage="$(get_total_used_mem_raw)"
+  local system_usage="$(awk "BEGIN {printf \"%.1f\", $total_usage - $docker_usage_all}")"
+  echo "$(mem_usage_to_percent "$system_usage")"
+}
+
+main() {
+  echo "total: $(get_total_used_mem)%"&
+  for service in bitcoin lnd electrs tor; do
+    echo "${service}: $(get_memory_usage "$service")%" &
+  done
+  for app in $("${CITADEL_ROOT}/app/app-manager.py" ls-installed); do
+    # For every container of the app, get the mem usage, save it, and at the end, print the total mem usage of the app
+    local mem_usage=0
+    for container in $(get_app_containers "$app"); do
+      # Use awk to add, it supports floating point numbers
+      mem_usage=$(awk "BEGIN {printf \"%.2f\", $mem_usage + $(get_memory_usage "$container")}")
+    done
+    wait
+    echo "${app}: $mem_usage%"
+  done
+  echo "system: $(get_system_memory_usage)%"
+  wait
+}
+
+main | sort --key 2 --numeric-sort --reverse

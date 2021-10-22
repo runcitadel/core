@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Citadel External Storage Mounter
+# Installed at /etc/systemd/system/citadel-external-storage.service
+
+[Unit]
+Description=External Storage Mounter
+Before=docker.service
+
+[Service]
+Type=oneshot
+Restart=no
+ExecStart=/home/citadel/citadel/scripts/citadel-os/external-storage/mount
+TimeoutStartSec=45min
+User=root
+Group=root
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

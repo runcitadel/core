@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Citadel External Storage SDcard Updater
+# Installed at /etc/systemd/system/citadel-external-storage-sdcard-update.service
+
+[Unit]
+Description=External Storage SDcard Updater
+Requires=citadel-external-storage.service
+After=citadel-external-storage.service
+Wants=network-online.target
+After=network-online.target
+Wants=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+Restart=no
+ExecStart=/home/citadel/citadel/scripts/citadel-os/external-storage/update-from-sdcard
+TimeoutStartSec=45min
+User=root
+Group=root
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

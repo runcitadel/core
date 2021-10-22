@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+
+resource="${1}"
+interval="${2}"´
+
+status_script="${CITADEL_ROOT}/scripts/status/${resource}"
+output_path="${CITADEL_ROOT}/statuses/${resource}-status.json"
+
+# Every $interval seconds, run the status script and write the output to the $output_path.
+while true; do
+    "${status_script}" > "${output_path}"
+    sleep "${interval}"
+done

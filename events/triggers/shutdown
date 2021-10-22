@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -euo pipefail
+
+./scripts/stop
+shutdown -h now

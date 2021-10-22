@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+NODE_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+
+"${NODE_ROOT}/app/app-manager.py" "$@"

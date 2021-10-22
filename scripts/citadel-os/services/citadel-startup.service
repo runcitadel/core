@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Citadel Startup Service
+# Installed at /etc/systemd/system/citadel-startup.service
+
+[Unit]
+Description=Citadel Startup Service
+Requires=citadel-external-storage.service
+After=citadel-external-storage.service
+Requires=citadel-external-storage-sdcard-update.service
+After=citadel-external-storage-sdcard-update.service
+Wants=network-online.target
+After=network-online.target
+Wants=docker.service
+After=docker.service
+
+# This prevents us hitting restart rate limits and ensures we keep restarting
+# indefinitely.
+StartLimitInterval=0
+
+[Service]
+Type=forking
+TimeoutStartSec=infinity
+TimeoutStopSec=16min
+ExecStart=/home/citadel/citadel/scripts/start
+ExecStop=/home/citadel/citadel/scripts/stop
+User=root
+Group=root
+RemainAfterExit=yes
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

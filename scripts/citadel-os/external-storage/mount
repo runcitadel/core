@@ -1,0 +1,299 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@web.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -euo pipefail
+
+# This script will:
+# - Look for external storage devices
+# - Check if they contain an Citadel install
+# - If yes
+# - - Mount it
+# - If no
+# - - Format it
+# - - Mount it
+# - - Install Citadel on it
+# - Bind mount the external installation on top of the local installation
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../../..)"
+MOUNT_POINT="/mnt/data"
+EXTERNAL_UMBREL_ROOT="${MOUNT_POINT}/umbrel"
+EXTERNAL_CITADEL_ROOT="${MOUNT_POINT}/citadel"
+DOCKER_DIR="/var/lib/docker"
+EXTERNAL_DOCKER_DIR="${MOUNT_POINT}/docker"
+SWAP_DIR="/swap"
+SWAP_FILE="${SWAP_DIR}/swapfile"
+SD_MOUNT_POINT="/sd-root"
+SD_CITADEL_ROOT="${SD_MOUNT_POINT}${CITADEL_ROOT}"
+
+check_root () {
+  if [[ $UID != 0 ]]; then
+    echo "This script must be run as root"
+    exit 1
+  fi
+}
+
+check_dependencies () {
+  for cmd in "$@"; do
+    if ! command -v $cmd >/dev/null 2>&1; then
+      echo "This script requires \"${cmd}\" to be installed"
+      exit 1
+    fi
+  done
+}
+
+# Returns a list of block device paths
+list_block_devices () {
+  # We need to run sync here to make sure the filesystem is reflecting the
+  # the latest changes in /sys/block/*
+  sync
+  # We use "2>/dev/null || true" to swallow errors if there are
+  # no block devices. In that case the function just returns nothing
+  # instead of an error which is what we want.
+  #
+  # sed 's!.*/!!' is to return the device path so we get sda (or nvme0n1)
+  # instead of /sys/block/sda (or /sys/block/nvme0n1)
+  (ls -d /sys/block/sd* /sys/block/nvme*n* 2>/dev/null || true) | sed 's!.*/!!'
+}
+
+# Returns the vendor and model name of a block device
+get_block_device_model () {
+  device="${1}"
+  # We use "2>/dev/null || true" to swallow errors if there is
+  # no vendor/device recognized. In that case the function just returns nothing
+  # instead of an error which is what we want.
+  vendor=$(cat "/sys/block/${device}/device/vendor" 2>/dev/null || true)
+  model=$(cat "/sys/block/${device}/device/model"  2>/dev/null || true)
+
+  # We echo in a subshell without quotes to strip surrounding whitespace
+  echo "$(echo $vendor) $(echo $model)"
+}
+
+is_partition_ext4 () {
+  partition_path="${1}"
+  # We need to run sync here to make sure the filesystem is reflecting the
+  # the latest changes in /dev/*
+  sync
+  blkid -o value -s TYPE "${partition_path}" | grep --quiet '^ext4$'
+}
+
+# Wipes a block device and reformats it with a single EXT4 partition
+format_block_device () {
+  device="${1}"
+  device_path="/dev/${device}"
+  if [[ $block_device != sd* ]]; then
+    echo "SSD device"
+    partition_path="${block_device_path}p1"
+  else
+    partition_path="${block_device_path}1"
+  fi
+  wipefs -a "${device_path}"
+  parted --script "${device_path}" mklabel gpt
+  parted --script "${device_path}" mkpart primary ext4 0% 100%
+  # We need to run sync here to make sure the filesystem is reflecting the
+  # the latest changes in /dev/*
+  sync
+  mkfs.ext4 -F -L citadel "${partition_path}"
+}
+
+# Mounts the device given in the first argument at $MOUNT_POINT
+mount_partition () {
+  partition_path="${1}"
+  mkdir -p "${MOUNT_POINT}"
+  mount "${partition_path}" "${MOUNT_POINT}"
+}
+
+# Unmounts $MOUNT_POINT
+unmount_partition () {
+  umount "${MOUNT_POINT}"
+}
+
+# This disables UAS for all USB devices, then rebinds them
+disable_uas () {
+  usb_quirks=$(lsusb | awk '{print $6":u"}' | tr '\n' ',' | sed 's/,$//')
+  echo -n "${usb_quirks}" > /sys/module/usb_storage/parameters/quirks
+
+  echo "Rebinding USB drivers..."
+  for i in /sys/bus/pci/drivers/[uoex]hci_hcd/*:*; do
+    [[ -e "$i" ]] || continue;
+    echo "${i##*/}" > "${i%/*}/unbind"
+    echo "${i##*/}" > "${i%/*}/bind"
+  done
+}
+
+# Formats and sets up a new device
+setup_new_device () {
+  block_device="${1}"
+  partition_path="${2}"
+
+  echo "Formatting device..."
+  format_block_device $block_device
+
+  echo "Mounting partition..."
+  mount_partition "${partition_path}"
+
+  echo "Copying Citadel install to external storage..."
+  mkdir -p "${EXTERNAL_CITADEL_ROOT}"
+  cp  --recursive \
+      --archive \
+      --no-target-directory \
+      "${CITADEL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
+}
+
+# Copy Docker data dir to external storage
+copy_docker_to_external_storage () {
+  mkdir -p "${EXTERNAL_DOCKER_DIR}"
+  cp  --recursive \
+      --archive \
+      --no-target-directory \
+      "${DOCKER_DIR}" "${EXTERNAL_DOCKER_DIR}"
+}
+
+main () {
+  echo "Running external storage mount script..."
+  check_root
+  check_dependencies sed wipefs parted mount sync umount modprobe
+
+  # Enable NVME kernel module if not enabled
+  modprobe nvme
+
+  no_of_block_devices=$(list_block_devices | wc -l)
+
+  retry_for_block_devices=1
+
+  while [[ $no_of_block_devices -lt 1 ]]; do
+
+    echo "No block devices found"
+    echo "Waiting for 5 seconds before checking again..."
+
+    sleep 5
+
+    no_of_block_devices=$(list_block_devices | wc -l)
+    retry_for_block_devices=$(( $retry_for_block_devices + 1 ))
+
+    if [[ $retry_for_block_devices -gt 20 ]]; then
+      echo "No block devices found in 20 tries..."
+      echo "Exiting mount script without doing anything"
+      exit 1
+    fi
+
+  done
+
+  if [[ $no_of_block_devices -gt 1 ]]; then
+    echo "Multiple block devices found, only one drive is supported"
+    echo "Exiting mount script without doing anything"
+    exit 1
+  fi
+
+  # At this point we know there is only one block device attached
+  block_device=$(list_block_devices)
+  block_device_path="/dev/${block_device}"
+  if [[ $block_device != sd* ]]; then
+    partition_path="${block_device_path}p1"
+  else
+    partition_path="${block_device_path}1"
+  fi
+  block_device_model=$(get_block_device_model $block_device)
+  echo "Found device \"${block_device_model}\""
+
+  if [[ $block_device != nvme* ]]; then
+    echo "Disabling UAS for USB devices..."
+    disable_uas
+
+    echo "Checking if the devices can be found again..."
+    retry_for_usb_devices=1
+    while [[ ! -e "${block_device_path}" ]]; do
+      retry_for_usb_devices=$(( $retry_for_usb_devices + 1 ))
+      if [[ $retry_for_usb_devices -gt 10 ]]; then
+        echo "Disabled UAS for the USB device, that seems to have broken it"
+        echo "Please contact the Citadel developers"
+        exit 1
+      fi
+      sleep 1
+    done
+  fi
+
+  echo "Checking if the device is ext4..."
+
+  if is_partition_ext4 "${partition_path}" ; then
+    echo "Yes, it is ext4"
+    mount_partition "${partition_path}"
+
+    echo "Checking if device contains a Citadel install..."
+
+    if [[ -f "${EXTERNAL_CITADEL_ROOT}"/.citadel ]] || [[ -f "${EXTERNAL_UMBREL_ROOT}"/.umbrel ]]; then
+      echo "Yes, it contains a Citadel install"
+    else
+      echo "No, it doesn't contain a Citadel install"
+      echo "Unmounting partition..."
+      unmount_partition
+      setup_new_device $block_device $partition_path
+    fi
+    
+  else
+    echo "No, it's not ext4"
+    setup_new_device $block_device $partition_path
+  fi
+
+  if [[ ! -d "${EXTERNAL_DOCKER_DIR}" ]]; then
+    echo "Copying Docker data directory to external storage..."
+    copy_docker_to_external_storage
+  fi
+
+  echo "Bind mounting external storage over local Citadel installation..."
+  SHOULD_UPGRADE=0
+  # If EXTERNAL_UMBREL_ROOT exists, move it to EXTERNAL_CITADEL_ROOT
+  if [[ -d "${EXTERNAL_UMBREL_ROOT}" ]]; then
+    mv "${EXTERNAL_UMBREL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
+    touch "${EXTERNAL_CITADEL_ROOT}"/.citadel
+    SHOULD_UPGRADE=1
+  fi
+  mount --bind "${EXTERNAL_CITADEL_ROOT}" "${CITADEL_ROOT}"
+
+  echo "Bind mounting external storage over local Docker data dir..."
+  mount --bind "${EXTERNAL_DOCKER_DIR}" "${DOCKER_DIR}"
+
+  echo "Bind mounting external storage to ${SWAP_DIR}"
+  mkdir -p "${MOUNT_POINT}/swap" "${SWAP_DIR}"
+  mount --bind "${MOUNT_POINT}/swap" "${SWAP_DIR}"
+
+  echo "Bind mounting SD card root at /sd-card..."
+  [[ ! -d "/sd-root" ]] && mkdir -p "/sd-root"
+  mount --bind "/" "/sd-root"
+
+  echo "Checking Citadel root is now on external storage..."
+  sync
+  sleep 1
+  df -h "${CITADEL_ROOT}" | grep --quiet "${block_device_path}"
+
+  echo "Checking ${DOCKER_DIR} is now on external storage..."
+  df -h "${DOCKER_DIR}" | grep --quiet "${block_device_path}"
+
+  echo "Checking ${SWAP_DIR} is now on external storage..."
+  df -h "${SWAP_DIR}" | grep --quiet "${block_device_path}"
+
+  echo "Setting up swapfile"
+  rm "${SWAP_FILE}" || true
+  fallocate -l 4G "${SWAP_FILE}"
+  chmod 600 "${SWAP_FILE}"
+  mkswap "${SWAP_FILE}"
+  swapon "${SWAP_FILE}"
+
+  echo "Checking SD Card root is bind mounted at /sd-root..."
+  df -h "/sd-root${CITADEL_ROOT}" | grep --quiet "/dev/root"
+
+  echo "Starting external drive mount monitor..."
+  echo
+  ${CITADEL_ROOT}/scripts/citadel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &
+
+  if [[ ${SHOULD_UPGRADE} -eq 1 ]]; then
+    echo "Upgrading Citadel..."
+    "${CITADEL_ROOT}/scripts/update/update" --path "${EXTERNAL_CITADEL_ROOT}"
+  fi
+  echo "Mount script completed successfully!"
+}
+
+main

@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: 2020 Umbrel
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+# 
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Files and data directories created by services
+# that we shouldn't accidently commit
+
+*.dat
+*.log
+*.lock
+*.cookie
+*.pid
+*.env
+.backup
+*.pyc
+bitcoin/*
+lnd/*
+tor/*
+db/*
+statuses/*
+app-data
+apps
+electrs
+nginx
+events/signals
+
+# Commit these empty directories
+!statuses/update-status.json
+!apps/.gitkeep
+!db/.gitkeep
+!db/citadel-seed
+db/citadel-seed/*
+!db/citadel-seed/.gitkeep
+!events/signals/.gitkeep
+!lnd/.gitkeep
+!logs/.gitkeep
+!tor/data/.gitkeep
+!tor/run/.gitkeep
+!db/.gitkeep
+
+!**/*.license
+services/installed.json

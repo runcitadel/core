@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+import sys
+import os
+import time
+import subprocess
+import io
+import qrcode
+
+def create_qr(data):
+    output_buffer = io.TextIOWrapper(io.BytesIO(), sys.stdout.encoding)
+
+    qr = qrcode.QRCode(border=0, error_correction=qrcode.constants.ERROR_CORRECT_Q)
+    qr.add_data(data)
+    qr.print_ascii(out=output_buffer)
+
+    output_buffer.seek(0)
+    qr_ascii = output_buffer.read().strip()
+
+    return qr_ascii
+
+def read_file_when_available(file_path, timeout):
+    start = time.time()
+    while not os.path.exists(file_path):
+        if (time.time() - start) > timeout:
+            return False
+        time.sleep(1)
+
+    with open(file_path, "r") as file:
+        file_contents = file.read()
+
+    return file_contents
+
+def run(command):
+    result = subprocess.run(command, stdout=subprocess.PIPE)
+    return result.stdout.decode('utf-8').rstrip("\n")
+
+def main():
+    timeout = 30
+    tor_hostname_file = "/home/citadel/citadel/tor/data/web/hostname"
+    tor_hostname = read_file_when_available(tor_hostname_file, timeout)
+
+    ip = run(['hostname', '-I']).split(" ")[0]
+
+    if not tor_hostname or not ip:
+        print("Couldn't get connection details")
+        return
+
+    tor_hostname_qr_ascii = create_qr(tor_hostname.strip())
+
+    connection_details = f"""
+
+
+{tor_hostname_qr_ascii}
+
+    Your Citadel is up and running at:
+
+        http://citadel.local
+        http://{ip}
+        http://{tor_hostname}
+    """
+    print(connection_details)
+
+main()

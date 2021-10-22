@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Citadel Connection Details Logger (TTY) 
+# Installed at /etc/systemd/system/citadel-connection-details.service
+
+[Unit]
+Description=Connection Details
+Requires=citadel-startup.service
+After=citadel-startup.service
+
+[Service]
+Type=oneshot
+Restart=no
+ExecStart=/home/citadel/citadel/scripts/citadel-os/citadel-details
+User=root
+Group=root
+StandardOutput=tty
+TTYPath=/dev/tty1
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

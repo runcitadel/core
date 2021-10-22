@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+filesystem_total_storage_bytes() {
+  local directory="${1}"
+  df --block-size=1 --output=size "${directory}" | tail -n 1
+}
+
+filesystem_used_storage_bytes() {
+  local directory="${1}"
+  df --block-size=1 --output=used "${directory}" | tail -n 1
+}
+
+directory_size_bytes() {
+  local directory="${1}"
+  du --block-size=1 --max-depth=0 "${directory}" | awk '{print $1}'
+}
+
+json="{}"
+
+total=$(filesystem_total_storage_bytes "${CITADEL_ROOT}")
+json=$(echo $json | jq --arg total "${total}" '. + {total: $total|tonumber}')
+
+used=$(filesystem_used_storage_bytes "${CITADEL_ROOT}")
+json=$(echo $json | jq --arg used "${used}" '. + {used: $used|tonumber}')
+
+cumulative_app_size="0"
+for app in $( "${CITADEL_ROOT}/app/app-manager.py" ls-installed); do
+  app_size=$(directory_size_bytes "${CITADEL_ROOT}/app-data/${app}")
+  cumulative_app_size=$(($cumulative_app_size+$app_size))
+  json=$(echo $json | jq --arg app "${app}" --arg app_size "${app_size}" '.breakdown |= .+ [{id: $app, used: $app_size|tonumber}]')
+done
+
+citadel=$(($used-$cumulative_app_size))
+json=$(echo $json | jq --arg citadel "${citadel}" '.breakdown |= .+ [{id: "citadel", used: $citadel|tonumber}]')
+
+echo $json | jq '.breakdown |= sort_by(-.used)'

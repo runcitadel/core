@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2020 Umbrel https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -euo pipefail
+
+# Start Citadel
+
+if [[ $UID != 0 ]]; then
+    echo "Citadel must be started as root"
+    echo "Please re-run this script as"
+    echo "  sudo ./scripts/start"
+    exit 1
+fi
+
+check_dependencies () {
+  for cmd in "$@"; do
+    if ! command -v $cmd >/dev/null 2>&1; then
+      echo "This script requires \"${cmd}\" to be installed"
+      exit 1
+    fi
+  done
+}
+
+# Check system's dependencies
+check_dependencies readlink dirname ip docker
+
+# Check karen's dependencies
+check_dependencies fswatch
+
+# Check OTA update scripts' dependencies
+check_dependencies rsync jq curl
+
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+CITADEL_LOGS="${CITADEL_ROOT}/logs"
+
+if [[ ! -d "$CITADEL_ROOT" ]]; then
+  echo "Root dir does not exist '$CITADEL_ROOT'"
+  exit 1
+fi
+
+# Configure Umbrel if it isn't already configured
+if [[ ! -f "${CITADEL_ROOT}/statuses/configured" ]]; then
+  NGINX_PORT=${NGINX_PORT:-80} NETWORK="${NETWORK:-mainnet}" "${CITADEL_ROOT}/scripts/configure"
+fi
+
+echo
+echo "======================================"
+echo "============= STARTING ==============="
+echo "============= CITADEL ================"
+echo "======================================"
+echo
+
+echo "Setting environment variables..."
+echo
+
+# Check Citadel OS
+[[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
+if [[ -z "${CITADEL_OS:-}" ]]; then
+  export IS_CITADEL_OS="false"
+else
+  export IS_CITADEL_OS="true"
+fi
+
+# Whitelist device IP, hostname and hidden service for CORS
+DEVICE_IP=$(hostname -I | awk '{print $1}')
+DEVICE_HOSTNAME="$(hostname)"
+DEVICE_HOSTS="http://${DEVICE_IP},http://${DEVICE_HOSTNAME}.local,https://${DEVICE_HOSTNAME}.local,http://${DEVICE_HOSTNAME},https://${DEVICE_HOSTNAME}"
+if [[ -f "${CITADEL_ROOT}/tor/data/web/hostname" ]]; then
+    hidden_service_url=$(cat "${CITADEL_ROOT}/tor/data/web/hostname")
+    DEVICE_HOSTS="${DEVICE_HOSTS},http://${hidden_service_url}"
+fi
+export DEVICE_HOSTS=$DEVICE_HOSTS
+export DEVICE_HOSTNAME="${DEVICE_HOSTNAME}.local"
+
+# Increase default Docker and Compose timeouts to 240s
+# as bitcoin can take a long while to respond
+export DOCKER_CLIENT_TIMEOUT=240
+export COMPOSE_HTTP_TIMEOUT=240
+
+cd "$CITADEL_ROOT"
+
+echo "Starting karen..."
+echo
+./karen &>> "${CITADEL_LOGS}/karen.log" &
+
+echo "Starting status monitors..."
+pkill -f ./scripts/status-monitor || true
+./scripts/status-monitor memory 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor storage 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor temperature 15 &>> "${CITADEL_LOGS}/status-monitor.log" &
+./scripts/status-monitor uptime 15 &>> "${CITADEL_LOGS}/status-monitor.log" &
+
+echo "Starting backup monitor..."
+echo
+./scripts/backup/monitor &>> "${CITADEL_LOGS}/backup-monitor.log" &
+
+echo "Starting decoy backup trigger..."
+echo
+./scripts/backup/decoy-trigger &>> "${CITADEL_LOGS}/backup-decoy-trigger.log" &
+
+echo
+echo "Resetting config files"
+echo
+./scripts/configure
+
+echo
+echo "Starting Docker services..."
+echo
+docker compose up --detach --build --remove-orphans || {
+  echo "Failed to start containers"
+  exit 1
+}
+echo
+
+# Unlock the user file on each start of Umbrel to avoid issues
+# Normally, the user file shouldn't ever be locked, if it is, something went wrong, but it could still be working
+if [[ -f "${CITADEL_ROOT}/db/user.json.lock" ]]; then
+  echo "WARNING: The user file was locked, Citadel probably wasn't shut down properly"
+  rm "${CITADEL_ROOT}/db/user.json.lock"
+fi
+
+echo
+echo "Starting installed apps..."
+echo
+./app/app-manager.py start installed
+echo
+
+echo "Citadel is now accessible at"
+echo "  http://${DEVICE_HOSTNAME}"
+echo "  http://${DEVICE_IP}"
+if [[ ! -z "${hidden_service_url:-}" ]]; then
+    echo "  http://${hidden_service_url}"
+fi

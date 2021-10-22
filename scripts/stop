@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+set -euo pipefail
+
+# Stop Citadel
+
+if [[ $UID != 0 ]]; then
+    echo "Citadel must be stopped as root"
+    echo "Please re-run this script as"
+    echo "  sudo ./scripts/stop"
+    exit 1
+fi
+
+CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
+
+if [[ ! -d "$CITADEL_ROOT" ]]; then
+  echo "Root dir does not exist '$CITADEL_ROOT'"
+  exit 1
+fi
+
+cd "$CITADEL_ROOT"
+
+# Increase default Docker and Compose timeouts to 240s
+# As bitcoin can take a long while to respond
+export DOCKER_CLIENT_TIMEOUT=240
+export COMPOSE_HTTP_TIMEOUT=240
+
+echo "Stopping installed apps..."
+echo
+"${CITADEL_ROOT}/app/app-manager.py" stop installed &
+echo
+
+echo "Stopping Docker services..."
+echo
+docker compose down &
+
+echo "Waiting for everything to finish"
+wait
+

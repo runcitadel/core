@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
+# SPDX-FileCopyrightText: 2021 Citadel and contributors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+if [[ $UID != 0 ]]; then
+    echo "Update script must be run as root"
+    exit 1
+fi
+
+check_dependencies () {
+  for cmd in "$@"; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      echo "This script requires \"${cmd}\" to be installed"
+      exit 1
+    fi
+  done
+}
+
+check_dependencies jq curl rsync
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+update_type=""
+if [[ "${1}" == "--ota" ]]; then
+  update_type="ota"
+elif [[ "${1}" == "--path" ]]; then
+  update_type="path"
+  update_path="${2}"
+elif [[ "${1}" == "--repo" ]]; then
+  update_type="repo"
+  descriptor="${2}"
+  if [[ "${descriptor}" != *"#"* ]]; then
+    descriptor="${descriptor}#main"
+  fi
+  repo="${descriptor%%#*}"
+  branch="${descriptor#*#}"
+else
+  echo "Update requires \"--ota\", \"--path <path>\", or \"--repo user/repo[#branch]\" option."
+  exit 1
+fi
+
+if [[ "${update_type}" == "repo" ]]; then
+  repo_path="/tmp/citadel-update/"
+  rm -rf "${repo_path}" 2> /dev/null || true
+  mkdir -p "${repo_path}"
+  git clone --single-branch --branch "${branch}" "https://github.com/${repo}.git" "${repo_path}"
+
+  # Now hand over to the path updater
+  update_type="path"
+  update_path="${repo_path}"
+fi
+
+if [[ "${update_type}" == "path" ]] && [[ ! -f "${update_path}/.umbrel" ]] && [[ ! -f "${update_path}/.citadel" ]]; then
+  echo "Update path doesn't seem to be an Umbrel or Citadel install."
+  exit 1
+fi
+
+if [[ "${update_type}" == "ota" ]]; then
+  RELEASE=$(cat "$CITADEL_ROOT"/statuses/update-status.json | jq .updateTo -r)
+elif [[ "${update_type}" == "path" ]]; then
+  RELEASE=$(cat "$update_path"/info.json | jq .version -r)
+fi
+
+echo
+echo "======================================="
+echo "=============== UPDATE ================"
+echo "======================================="
+echo "========== Stage: Download ============"
+echo "======================================="
+echo
+
+# Make sure an update is not in progres
+if [[ -f "$CITADEL_ROOT/statuses/update-in-progress" ]]; then
+    echo "An update is already in progress. Exiting now."
+    exit 2
+fi
+
+echo "Creating lock"
+touch "$CITADEL_ROOT"/statuses/update-in-progress
+
+# Cleanup just in case there's temp stuff lying around from previous update
+echo "Cleaning up any previous mess"
+[[ -d "$CITADEL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$CITADEL_ROOT"/.citadel-"$RELEASE"
+
+# Update status file
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 10, "description": "Downloading Citadel $RELEASE", "updateTo": "$RELEASE"}
+EOF
+
+# Download new release
+if [[ "${update_type}" == "ota" ]]; then
+  echo "Downloading Citadel ${RELEASE}"
+  mkdir -p "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  cd "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  curl -L "https://github.com/runcitadel/core/archive/$RELEASE.tar.gz" | tar -xz --strip-components=1
+fi
+
+# Copy over new release from path
+if [[ "${update_type}" == "path" ]]; then
+  echo "Copying Citadel ${RELEASE} from ${update_path}"
+  mkdir -p "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  cp --recursive \
+    --archive \
+    --no-target-directory \
+    "${update_path}" "${CITADEL_ROOT}/.citadel-${RELEASE}"
+  cd "${CITADEL_ROOT}/.citadel-${RELEASE}"
+fi
+
+# Run update scripts
+echo "Running update install scripts of the new release"
+cd scripts/update
+UPDATE_INSTALL_SCRIPTS=$(ls *-run.sh)
+for script in $UPDATE_INSTALL_SCRIPTS; do
+    if [[ -x $script ]]; then
+        echo
+        echo "== Begin Update Script $script =="
+        ./"$script" "$RELEASE" "$CITADEL_ROOT"
+        echo "== End Update Script $script =="
+        echo
+    fi
+done
+
+# Delete cloned repo
+echo "Deleting cloned repository"
+[[ -d "$CITADEL_ROOT"/.citadel-"$RELEASE" ]] && rm -rf "$CITADEL_ROOT"/.citadel-"$RELEASE"
+
+echo "Removing lock"
+rm -f "$CITADEL_ROOT"/statuses/update-in-progress
+
+exit 0

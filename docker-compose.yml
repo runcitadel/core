@@ -1,0 +1,244 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+version: '3.8'
+services:
+  tor:
+    container_name: tor
+    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    user: toruser
+    restart: on-failure
+    volumes:
+    - ${PWD}/tor/torrc-core:/etc/tor/torrc
+    - ${PWD}/tor/data:/var/lib/tor/
+    ports:
+    - 127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT
+    networks:
+      default:
+        ipv4_address: $TOR_PROXY_IP
+  app_tor:
+    container_name: app_tor
+    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    user: toruser
+    restart: on-failure
+    volumes:
+    - ${PWD}/tor/torrc-apps:/etc/tor/torrc
+    - ${PWD}/tor/data:/var/lib/tor/
+    networks:
+      default:
+        ipv4_address: $APPS_TOR_IP
+  app_2_tor:
+    container_name: app_2_tor
+    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    user: toruser
+    restart: on-failure
+    volumes:
+    - ${PWD}/tor/torrc-apps-2:/etc/tor/torrc
+    - ${PWD}/tor/data:/var/lib/tor/
+    networks:
+      default:
+        ipv4_address: $APPS_2_TOR_IP
+  app_3_tor:
+    container_name: app_3_tor
+    image: lncm/tor:0.4.5.7@sha256:a83e0d9fd1a35adf025f2f34237ec1810e2a59765988dce1dfb222ca8ef6583c
+    user: toruser
+    restart: on-failure
+    volumes:
+    - ${PWD}/tor/torrc-apps-3:/etc/tor/torrc
+    - ${PWD}/tor/data:/var/lib/tor/
+    networks:
+      default:
+        ipv4_address: $APPS_3_TOR_IP
+  nginx:
+    container_name: nginx
+    image: nginx:1.21.3@sha256:644a70516a26004c97d0d85c7fe1d0c3a67ea8ab7ddf4aff193d9f301670cf36
+    depends_on:
+    - dashboard
+    - manager
+    volumes:
+    - ${PWD}/nginx:/etc/nginx
+    restart: on-failure
+    stop_grace_period: 30s
+    ports:
+    - ${NGINX_PORT}:80
+    networks:
+      default:
+        ipv4_address: $NGINX_IP
+  bitcoin:
+    container_name: bitcoin
+    image: lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507
+    depends_on:
+    - tor
+    - manager
+    - nginx
+    volumes:
+    - ${PWD}/bitcoin:/data/.bitcoin
+    restart: on-failure
+    stop_grace_period: 15m30s
+    ports:
+    - $BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT
+    networks:
+      default:
+        ipv4_address: $BITCOIN_IP
+  lnd:
+    container_name: lnd
+    image: lightninglabs/lnd:v0.13.3-beta@sha256:b8f96d4d7fb9dcd349542240a6bff1ca0170715a16e6d79b0e9188e34ea18471
+    user: 1000:1000
+    depends_on:
+    - tor
+    - manager
+    volumes:
+    - ${PWD}/lnd:/data/.lnd
+    - ${PWD}/walletpassword:/walletpassword
+    environment:
+      HOME: /data
+    restart: on-failure
+    stop_grace_period: 5m30s
+    ports:
+    - 9735:9735
+    - $LND_REST_PORT:$LND_REST_PORT
+    - $LND_GRPC_PORT:$LND_GRPC_PORT
+    networks:
+      default:
+        ipv4_address: $LND_IP
+  dashboard:
+    container_name: dashboard
+    image: runcitadel/dashboard:main@sha256:2a21cda0dd64883d7511f2f7056ca39497c9203d8a0dc6ea45f5dda590a12559
+    restart: on-failure
+    stop_grace_period: 1m30s
+    networks:
+      default:
+        ipv4_address: $DASHBOARD_IP
+  manager:
+    container_name: manager
+    image: runcitadel/manager:main@sha256:2d7c01c3e6369d945ec7817ec3c500ecf824c8baf0fb1e1ea3d0507002597af0
+    depends_on:
+    - tor
+    restart: on-failure
+    init: true
+    stop_grace_period: 5m30s
+    volumes:
+    - ${PWD}:${PWD}
+    - ${PWD}/info.json:/info.json
+    - ${PWD}/db:/db
+    - ${PWD}/events/signals:/signals
+    - ${PWD}/apps:/apps
+    - ${PWD}/lnd:/lnd:ro
+    - ${PWD}/statuses:/statuses
+    - ${PWD}/tor/data:/var/lib/tor/
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ${DOCKER_BINARY:-/usr/bin/docker}:/usr/bin/docker
+    - jwt-public-key:/jwt-public-key
+    - jwt-private-key:/jwt-private-key
+    environment:
+      PORT: '3006'
+      USER_PASSWORD_FILE: /db/user.json
+      JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
+      JWT_PRIVATE_KEY_FILE: /jwt-private-key/jwt.key
+      JWT_EXPIRATION: '3600'
+      DOCKER_COMPOSE_DIRECTORY: $PWD
+      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
+      DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
+      MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
+      SEED_FILE: /db/citadel-seed/seed
+      DASHBOARD_HIDDEN_SERVICE_FILE: /var/lib/tor/web/hostname
+      BITCOIN_P2P_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-p2p/hostname
+      BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
+      BITCOIN_RPC_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-rpc/hostname
+      BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
+      BITCOIN_RPC_USER: $BITCOIN_RPC_USER
+      BITCOIN_RPC_PASSWORD: $BITCOIN_RPC_PASS
+      LND_REST_HIDDEN_SERVICE_FILE: /var/lib/tor/lnd-rest/hostname
+      LND_GRPC_HIDDEN_SERVICE_FILE: /var/lib/tor/lnd-grpc/hostname
+      LND_CERT_FILE: /lnd/tls.cert
+      LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
+      SHUTDOWN_SIGNAL_FILE: /signals/shutdown
+      REBOOT_SIGNAL_FILE: /signals/reboot
+      GITHUB_REPO: runcitadel/core
+      GITHUB_BRANCH: dev
+      VERSION_FILE: /info.json
+      UPDATE_STATUS_FILE: /statuses/update-status.json
+      UPDATE_SIGNAL_FILE: /signals/update
+      UPDATE_LOCK_FILE: /statuses/update-in-progress
+      BACKUP_STATUS_FILE: /statuses/backup-status.json
+      DEBUG_STATUS_FILE: /statuses/debug-status.json
+      TOR_PROXY_IP: ${TOR_PROXY_IP}
+      TOR_PROXY_PORT: ${TOR_PROXY_PORT}
+      TOR_HIDDEN_SERVICE_DIR: /var/lib/tor
+      IS_CITADEL_OS: ${IS_CITADEL_OS:-"false"}
+    networks:
+      default:
+        ipv4_address: $MANAGER_IP
+  middleware:
+    container_name: middleware
+    image: runcitadel/middleware:main@sha256:26451df6882c310d562b6926266ae1a4344c712c9a898d4550987de6f8ba4e44
+    depends_on:
+    - manager
+    - bitcoin
+    - lnd
+    command:
+    - ./wait-for-node-manager.sh
+    - $MANAGER_IP
+    - npm
+    - start
+    restart: on-failure
+    volumes:
+    - ${PWD}/lnd:/lnd
+    - jwt-public-key:/jwt-public-key
+    environment:
+      PORT: '3005'
+      BITCOIN_HOST: $BITCOIN_IP
+      RPC_PORT: $BITCOIN_RPC_PORT
+      RPC_USER: $BITCOIN_RPC_USER
+      RPC_PASSWORD: $BITCOIN_RPC_PASS
+      LND_NETWORK: $BITCOIN_NETWORK
+      LND_HOST: ${LND_IP}
+      JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
+      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
+    networks:
+      default:
+        ipv4_address: $MIDDLEWARE_IP
+  neutrino-switcher:
+    container_name: neutrino-switcher
+    image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
+    depends_on:
+    - bitcoin
+    - lnd
+    restart: on-failure
+    volumes:
+    - ${PWD}/lnd:/lnd
+    - ${PWD}/statuses:/statuses
+    - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
+      RPCUSER: $BITCOIN_RPC_USER
+      RPCPASS: $BITCOIN_RPC_PASS
+      LND_CONTAINER_NAME: lnd
+      SLEEPTIME: 3600
+    networks:
+      default:
+        ipv4_address: $NEUTRINO_SWITCHER_IP
+  electrs:
+    container_name: electrs
+    image: ghcr.io/runcitadel/electrs:main@sha256:86705bd425b9b20d0b83d8ef5673cee261766b5a50bcfa8e95ebfec2e5adfcae
+    working_dir: /data
+    volumes:
+    - ${PWD}/bitcoin:/bitcoin:ro
+    - ${PWD}/electrs:/data
+    restart: on-failure
+    stop_grace_period: 5m
+    ports:
+    - $ELECTRUM_PORT:$ELECTRUM_PORT
+    networks:
+      default:
+        ipv4_address: $ELECTRUM_IP
+networks:
+  default:
+    name: citadel_main_network
+    ipam:
+      driver: default
+      config:
+      - subnet: $NETWORK_IP/24
+volumes:
+  jwt-public-key: null
+  jwt-private-key: null
