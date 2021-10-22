@@ -181,7 +181,10 @@ def compose(app, arguments):
     os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app)
     # Chown and chmod dataDir to have the owner 1000:1000 and the same permissions as appDir
     subprocess.call("chown -R 1000:1000 {}".format(os.path.join(appDataDir, app)), shell=True)
-    os.chmod(os.path.join(appDataDir, app), os.stat(os.path.join(appDataDir, app)).st_mode)
+    try:
+        os.chmod(os.path.join(appDataDir, app), os.stat(os.path.join(appsDir, app)).st_mode)
+    except Exception:
+        pass
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
     # List all hidden services for an app and put their hostname in the environment
