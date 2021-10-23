@@ -67,7 +67,7 @@
         "image": "mempool/frontend",
         "name": "Mempool",
         "repo": "https://github.com/mempool/mempool",
-        "version": "2.2.2"
+        "version": "2.3.0-dev1"
     },
     {
         "id": "samourai-server",
