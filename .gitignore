@@ -22,7 +22,7 @@ statuses/*
 app-data
 apps
 electrs/*
-nginx
+nginx/*
 events/signals
 
 # Commit these empty directories
@@ -40,6 +40,7 @@ db/citadel-seed/*
 !tor/run/.gitkeep
 !tor/.gitkeep
 !db/.gitkeep
+!nginx/.gitkeep
 
 !**/*.license
 services/installed.json
