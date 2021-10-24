@@ -21,11 +21,12 @@ db/*
 statuses/*
 app-data
 apps
-electrs
+electrs/*
 nginx
 events/signals
 
 # Commit these empty directories
+!**/.gitkeep
 !statuses/update-status.json
 !apps/.gitkeep
 !db/.gitkeep
