@@ -16,7 +16,7 @@
 *.pyc
 bitcoin/*
 lnd/*
-tor/*
+!tor/*
 db/*
 statuses/*
 app-data
@@ -37,6 +37,7 @@ db/citadel-seed/*
 !logs/.gitkeep
 !tor/data/.gitkeep
 !tor/run/.gitkeep
+!tor/.gitkeep
 !db/.gitkeep
 
 !**/*.license
