@@ -1,6 +1,6 @@
 {
-    "version": "0.4.15",
-    "name": "Citadel 0.4.15",
-    "requires": ">=0.4.14",
-    "notes": "Unless you are beta testing Citadel OS, you should never see this update (Citadel 0.4.15) or this message. If you do, please DO NOT UPDATE! Instead, contact the Citadel developers. (Beta testers too, please)."
+    "version": "0.5.0",
+    "name": "Citadel 0.5.0",
+    "requires": ">=0.4.1",
+    "notes": "DO NOT INSTALL THIS UPDATE! Citadel OS 0.5.0 will only installable via a different method. https://runcitadel.space will soon provide more information on this."
 }
