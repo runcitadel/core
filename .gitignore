@@ -16,7 +16,7 @@
 *.pyc
 bitcoin/*
 lnd/*
-!tor/*
+tor/*
 db/*
 statuses/*
 app-data
