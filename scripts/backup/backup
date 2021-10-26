@@ -107,7 +107,7 @@ check_if_exists() {
     -X GET \
     "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F${1}?alt=media"
 }
-}
+
 # Upload a file to Firebase Cloud Storage by uloading its name + a random ID.
 # Before uploading, we need to check if a file with the same name already exists, and if it does, change the random ID.
 # For example, if we want to upload a file named "<THE_FILE_NAME>" with the content AA, we'd use this command to upload:
