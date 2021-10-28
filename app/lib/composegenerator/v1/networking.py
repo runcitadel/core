@@ -119,14 +119,28 @@ def configureMainPort(app: dict, nodeRoot: str):
     portAsEnvVar = portDetails['env_var']
     portToAppend = portAsEnvVar
 
+    mainPort = False
+
     if "port" in mainContainer:
         portToAppend = "{}:{}".format(portAsEnvVar, mainContainer['port'])
+        mainPort = mainContainer['port']
         del mainContainer['port']
     else:
         portToAppend = "{}:{}".format(portAsEnvVar, portAsEnvVar)
 
     if "ports" in mainContainer:
         mainContainer['ports'].append(portToAppend)
+        # Set the main port to the first port in the list, if it contains a :, it's the port after the :
+        # If it doesn't contain a :, it's the port itself
+        if not mainPort:
+            mainPort = mainContainer['ports'][0]
+            if(mainPort.find(":") != -1):
+                mainPort = mainPort.split(":")[1]
+    
+    if not mainPort:
+        mainPort = containerPort
+
+
     else:
         mainContainer['ports'] = [portToAppend]
 
@@ -140,7 +154,7 @@ def configureMainPort(app: dict, nodeRoot: str):
         "-", "_"), mainContainer['name'].upper().replace("-", "_"))]
 
     hiddenservice = getHiddenService(
-        app['metadata']['name'], app['metadata']['id'], containerIP, containerPort)
+        app['metadata']['name'], app['metadata']['id'], containerIP, mainPort)
 
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]

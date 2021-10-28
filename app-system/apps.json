@@ -105,6 +105,13 @@
         "version": "3.12.0"
     },
     {
+        "id": "lnme",
+        "image": "ghcr.io/runcitadel/lnme",
+        "name": "LnMe (Early beta)",
+        "repo": "https://github.com/bumi/lnme",
+        "version": "1.4.0"
+    },
+    {
         "id": "vaultwarden",
         "image": "vaultwarden/server",
         "name": "Vaultwarden",
