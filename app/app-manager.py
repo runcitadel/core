@@ -138,11 +138,11 @@ elif args.action == 'restart':
     if not args.app:
         print("No app provided")
         exit(1)
-    if(args.app == "installed"):
+    if args.app == "installed":
         stopInstalled()
         startInstalled()
         exit(0)
-    
+
     userData = getUserData()
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
@@ -157,7 +157,7 @@ elif args.action == 'compose':
     compose(args.app, " ".join(args.other))
 
 elif args.action == "entropy":
-    if(args.app == ""):
+    if args.app == "":
         print("Missing identifier for entropy")
         exit(1)
     print(deriveEntropy(args.app))
