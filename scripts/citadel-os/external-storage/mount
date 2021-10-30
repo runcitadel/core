@@ -244,12 +244,10 @@ main () {
   fi
 
   echo "Bind mounting external storage over local Citadel installation..."
-  SHOULD_UPGRADE=0
   # If EXTERNAL_UMBREL_ROOT exists, move it to EXTERNAL_CITADEL_ROOT
   if [[ -d "${EXTERNAL_UMBREL_ROOT}" ]]; then
     mv "${EXTERNAL_UMBREL_ROOT}" "${EXTERNAL_CITADEL_ROOT}"
     touch "${EXTERNAL_CITADEL_ROOT}"/.citadel
-    SHOULD_UPGRADE=1
   fi
   mount --bind "${EXTERNAL_CITADEL_ROOT}" "${CITADEL_ROOT}"
 
@@ -289,10 +287,6 @@ main () {
   echo
   ${CITADEL_ROOT}/scripts/citadel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &
 
-  if [[ ${SHOULD_UPGRADE} -eq 1 ]]; then
-    echo "Upgrading Citadel..."
-    "${CITADEL_ROOT}/scripts/update/update" --path "${EXTERNAL_CITADEL_ROOT}"
-  fi
   echo "Mount script completed successfully!"
 }
 
