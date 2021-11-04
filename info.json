@@ -1,6 +1,6 @@
 {
-    "version": "0.5.0",
-    "name": "Citadel 0.5.0",
+    "version": "0.5.1",
+    "name": "Citadel 0.5.1",
     "requires": ">=0.4.1",
-    "notes": "DO NOT INSTALL THIS UPDATE! Citadel OS 0.5.0 will only installable via a different method. https://runcitadel.space will soon provide more information on this."
+    "notes": "This update fixes a security issue in BTCPayServer and updates the elctrs service. We also fixed a few bugs and updated more apps."
 }
