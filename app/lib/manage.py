@@ -18,7 +18,7 @@ import subprocess
 
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.validate import findAndValidateApps
-from lib.metadata import getAppRegistry, getSimpleAppRegistry
+from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
 
 # For an array of threads, join them and wait for them to finish
@@ -70,11 +70,6 @@ def update(verbose: bool = False):
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
         json.dump(registry, f, indent=4, sort_keys=True)
     print("Wrote registry to registry.json")
-
-    simpleRegistry = getSimpleAppRegistry(apps, appsDir)
-    with open(os.path.join(appSystemDir, "apps.json"), "w") as f:
-        json.dump(simpleRegistry, f, indent=4, sort_keys=True)
-    print("Wrote version information to apps.json")
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
