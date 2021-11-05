@@ -32,7 +32,7 @@
         "image": "lncm/specter-desktop",
         "name": "Specter Desktop",
         "repo": "https://github.com/cryptoadvance/specter-desktop",
-        "version": "1.6.0"
+        "version": "1.7.0"
     },
     {
         "id": "krystal-bull",
