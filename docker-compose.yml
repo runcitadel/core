@@ -2,7 +2,7 @@ version: '3.8'
 services:
   tor:
     container_name: tor
-    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
     volumes:
@@ -15,7 +15,7 @@ services:
         ipv4_address: $TOR_PROXY_IP
   app_tor:
     container_name: app_tor
-    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
     volumes:
@@ -26,7 +26,7 @@ services:
         ipv4_address: $APPS_TOR_IP
   app_2_tor:
     container_name: app_2_tor
-    image: lncm/tor:0.4.6.7@sha256:472c8d1265679e7cfd641edcbc44ec2fa0e500f6929bd8dc1f4811feffcfefaa
+    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
     volumes:
@@ -37,7 +37,7 @@ services:
         ipv4_address: $APPS_2_TOR_IP
   app_3_tor:
     container_name: app_3_tor
-    image: lncm/tor:0.4.5.7@sha256:a83e0d9fd1a35adf025f2f34237ec1810e2a59765988dce1dfb222ca8ef6583c
+    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
     volumes:
