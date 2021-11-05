@@ -78,7 +78,7 @@ os.chdir(CITADEL_ROOT)
 updating = False
 status_dir = os.path.join(CITADEL_ROOT, 'statuses')
 # Make sure to use the main status dir for updates
-if os.path.isfile('../.umbrel'):
+if os.path.isfile('../.citadel'):
     status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
     updating = True
 
@@ -143,7 +143,7 @@ def parse_dotenv(file_path):
 NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 
 if reconfiguring:
-  if os.path.isfile('../.umbrel'):
+  if os.path.isfile('../.citadel'):
     dotenv=parse_dotenv('../.env')
   else:
     dotenv=parse_dotenv('./.env')

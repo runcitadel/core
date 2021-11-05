@@ -53,8 +53,8 @@ if [[ "${update_type}" == "repo" ]]; then
   update_path="${repo_path}"
 fi
 
-if [[ "${update_type}" == "path" ]] && [[ ! -f "${update_path}/.umbrel" ]] && [[ ! -f "${update_path}/.citadel" ]]; then
-  echo "Update path doesn't seem to be an Umbrel or Citadel install."
+if [[ "${update_type}" == "path" ]] && [[ ! -f "${update_path}/.citadel" ]]; then
+  echo "Update path doesn't seem to be a Citadel install."
   exit 1
 fi
 
