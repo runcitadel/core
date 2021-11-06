@@ -1,6 +1,6 @@
 {
-    "version": "0.5.1",
-    "name": "Citadel 0.5.1",
+    "version": "0.5.2",
+    "name": "Citadel 0.5.2",
     "requires": ">=0.4.1",
-    "notes": "This update fixes a security issue in BTCPayServer and updates the elctrs service. We also fixed a few bugs and updated more apps."
+    "notes": "This update fixes a security issue in BTCPayServer, updates the elctrs service. We also fixed a few bugs, updated more apps and prepared your node for an upcoming new feature."
 }
