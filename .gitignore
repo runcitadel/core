@@ -24,7 +24,7 @@ apps
 electrs/*
 nginx/*
 redis/*
-events/signals
+events/signals/*
 
 # Commit these empty directories
 !**/.gitkeep
@@ -43,6 +43,7 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !redis/.gitkeep
+!events/signals/.gitkeep
 
 !**/*.license
 services/installed.json
