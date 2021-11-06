@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: runcitadel/manager:main@sha256:136823670f62683fca82272981f5441f0bfd1a4a0d31b3feb7b69d2903a97280
+    image: runcitadel/manager:main@sha256:d973c00fada702996ee52b9ebd3a831d0ba255ae584dbaa353fdb9e59ea7aba7
     depends_on:
     - tor
     restart: on-failure
