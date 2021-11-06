@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: runcitadel/manager:main@sha256:d973c00fada702996ee52b9ebd3a831d0ba255ae584dbaa353fdb9e59ea7aba7
+    image: runcitadel/manager:main@sha256:3b15c8d5a9dba558092f6b04b083380d47e7c9e64a3e0a7d619368fb5d959431
     depends_on:
     - tor
     restart: on-failure
@@ -165,7 +165,7 @@ services:
       IS_CITADEL_OS: ${IS_CITADEL_OS:-"false"}
       REDIS_PASSWORD: freedom
       REDIS_IP: $REDIS_IP
-      REDIS_PORT: $REDIS_PORT
+      REDIS_PORT: 6379
     networks:
       default:
         ipv4_address: $MANAGER_IP
