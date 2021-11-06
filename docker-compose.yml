@@ -229,6 +229,19 @@ services:
     networks:
       default:
         ipv4_address: $ELECTRUM_IP
+  redis:
+    container_name: redis
+    image: redis: "6.2"
+    working_dir: /data
+    volumes:
+    - ${PWD}/redis:/data
+    command: "redis-server --requirepass freedom"
+    restart: "on-failure"
+    stop_grace_period: "5m"
+    init: true
+    networks:
+      default:
+        ipv4_address: $REDIS_IP
 networks:
   default:
     name: citadel_main_network
