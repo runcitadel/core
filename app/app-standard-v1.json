@@ -150,6 +150,10 @@
             "type": ["string", "array"],
             "description": "The entrypoint for the container"
           },
+          "bitcoin_mount_dir": {
+            "type": "string",
+            "description": "Where to mount the bitcoin dir"
+          },
           "command": {
             "type": ["string", "array"],
             "description": "The command for the container"

@@ -43,6 +43,18 @@ def convertDataDirToVolume(app: dict):
                     print("Data dir " + dataDir +
                           " contains invalid characters")
             del container['data']
+        if 'bitcoin_mount_dir' in container:
+            if not 'permissions' in container or not 'bitcoind' in container['permissions']:
+                print("Warning: container {} of app {} defines bitcoin_mount_dir but has no permissions for bitcoind".format(container['name'], app['metadata']['name']))
+                # Skip this container
+                continue
+            if not 'volumes' in container:
+                container['volumes'] = []
+            # Also skip the container if container['bitcoin_mount_dir'] contains a :
+            if(container['bitcoin_mount_dir'].find(":") == -1):
+                container['volumes'].append('"${BITCOIN_DATA_DIR}:' + container['bitcoin_mount_dir'] + ':ro"')
+            del container['bitcoin_mount_dir']
+                
     return app
 
 def addStopConfig(app: dict):
