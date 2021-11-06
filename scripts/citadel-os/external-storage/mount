@@ -224,7 +224,11 @@ main () {
 
     echo "Checking if device contains a Citadel install..."
 
-    if [[ -f "${EXTERNAL_CITADEL_ROOT}"/.citadel ]] || [[ -f "${EXTERNAL_UMBREL_ROOT}"/.umbrel ]]; then
+    if [[ -f "${EXTERNAL_UMBREL_ROOT}"/.umbrel ]] && [[ ! -f "${EXTERNAL_UMBREL_ROOT}"/.citadel ]]; then
+      echo "Umbrel node. Not doing anything to avoid breaking them."
+      exit 1
+    fi
+    if [[ -f "${EXTERNAL_CITADEL_ROOT}"/.citadel ]] || [[ -f "${EXTERNAL_UMBREL_ROOT}"/.citadel ]]; then
       echo "Yes, it contains a Citadel install"
     else
       echo "No, it doesn't contain a Citadel install"

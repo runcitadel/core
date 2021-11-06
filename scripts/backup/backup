@@ -27,15 +27,15 @@ check_dependencies openssl tar gpg shuf curl
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   identifier="${1}"
-  umbrel_seed=$(cat "${CITADEL_ROOT}/db/citadel-seed/seed") || true
+  citadel_seed=$(cat "${CITADEL_ROOT}/db/citadel-seed/seed") || true
 
-  if [[ -z "$umbrel_seed" ]] || [[ -z "$identifier" ]]; then
+  if [[ -z "$citadel_seed" ]] || [[ -z "$identifier" ]]; then
     >&2 echo "Missing derivation parameter, this is unsafe, exiting."
     exit 1
   fi
 
   # We need `sed 's/^.* //'` to trim the "(stdin)= " prefix from some versions of openssl
-  printf "%s" "${identifier}" | openssl dgst -sha256 -hmac "${umbrel_seed}" | sed 's/^.* //'
+  printf "%s" "${identifier}" | openssl dgst -sha256 -hmac "${citadel_seed}" | sed 's/^.* //'
 }
 
 [[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
@@ -43,8 +43,8 @@ BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
 
 echo "Deriving keys..."
 
-backup_id=$(derive_entropy "umbrel_backup_id")
-encryption_key=$(derive_entropy "umbrel_backup_encryption_key")
+backup_id=$(derive_entropy "citadel_backup_id")
+encryption_key=$(derive_entropy "citadel_backup_encryption_key")
 
 echo "Creating backup..."
 

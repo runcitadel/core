@@ -10,6 +10,11 @@ set -euo pipefail
 RELEASE=$1
 CITADEL_ROOT=$2
 
+if [ -d "$CITADEL_ROOT/.umbrel-$RELEASE" ]; then
+    echo "Migration from Umbrel isn't supported anymore!" 
+    exit 1
+fi
+
 # Only used on Umbrel OS and Citadel OS
 SD_CARD_CITADEL_ROOT="/sd-root${CITADEL_ROOT}"
 
@@ -21,36 +26,9 @@ echo "=========== Stage: Install ============"
 echo "======================================="
 echo
 
-[[ -f "/etc/default/umbrel" ]] && source "/etc/default/umbrel"
 [[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
 
 IS_MIGRATING=0
-# Check if UMBREL_OS is set
-if [[ ! -z "${UMBREL_OS:-}" ]]; then
-    echo "Umbrel OS is no longer supported."
-  cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 50, "description": "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue.", "updateTo": "$RELEASE"}
-EOF
-    rm "${CITADEL_ROOT}/statuses/update-in-progress"
-    docker stop bitcoin
-    docker stop lnd
-    docker stop electrs
-    exit 1
-fi
-
-# If the Citadel OS version is 0.0.1, fail
-if [[ ! -z "${CITADEL_OS:-}" ]] && [[ "${CITADEL_OS}" == "0.0.1" ]]; then
-    echo "Citadel OS version is 0.0.1. This is not supported."
-  cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 50, "description": "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue.", "updateTo": "$RELEASE"}
-EOF
-    rm "${CITADEL_ROOT}/statuses/update-in-progress"
-    docker stop bitcoin
-    docker stop lnd
-    docker stop electrs
-    echo "We're sorry, but you tried installing the update on an unsupported OS. Please unplug your node and reflash the SD card with Citadel OS to continue."
-    exit 1
-fi
 
 # Make Citadel OS specific updates
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
@@ -74,7 +52,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
         echo "Fixing permissions"
         chown -R 1000:1000 "${SD_CARD_CITADEL_ROOT}/"
     else
-        echo "ERROR: No Umbrel or Citadel installation found at SD root ${SD_CARD_CITADEL_ROOT}"
+        echo "ERROR: No Citadel installation found at SD root ${SD_CARD_CITADEL_ROOT}"
         echo "Skipping updating on SD Card..."
     fi
 
@@ -131,8 +109,6 @@ echo "Fixing permissions"
 find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
-mv "$CITADEL_ROOT"/db/umbrel-seed "$CITADEL_ROOT"/db/citadel-seed || true
-
 cd "$CITADEL_ROOT"
 echo "Updating installed apps"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
@@ -159,7 +135,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-docker network rm umbrel_main_network || true
 rm -rf  "$CITADEL_ROOT"/tor/torrc-*
 ./scripts/start
 

@@ -10,12 +10,9 @@ set -euo pipefail
 RELEASE=$1
 CITADEL_ROOT=$2
 
-# Check if $CITADEL_ROOT/.umbrel-$RELEASE exists, if it does, rename it to $CITADEL_ROOT/.citadel-$RELEASE
 if [ -d "$CITADEL_ROOT/.umbrel-$RELEASE" ]; then
-    echo "Migrating from Umbrel..."
-    echo "Your Umbrel will now be turned into a Citadel"
-    echo "Please contact the Citadel team if anything goes wrong during the update"
-    mv "$CITADEL_ROOT/.umbrel-$RELEASE" "$CITADEL_ROOT/.citadel-$RELEASE"
+    echo "Migration from Umbrel isn't supported anymore!" 
+    exit 1
 fi
 
 echo

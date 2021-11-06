@@ -56,14 +56,14 @@ How over-the-air updates work on Citadel.
 
 14. [`karen`](https://github.com/runcitadel/core/blob/main/karen) is triggered (obviously) as soon as `$CITADEL_ROOT/events/signals/update` is touched/updated, and immediately runs the `update` trigger script [`$CITADEL_ROOT/events/triggers/update`](https://github.com/runcitadel/core/blob/main/events/triggers/update) as root.
 
-15. `$CITADEL_ROOT/events/triggers/update` clones release `vX.Y.Z` from github in `$CITADEL_ROOT/.umbrel-vX.Y.Z`.
+15. `$CITADEL_ROOT/events/triggers/update` clones release `vX.Y.Z` from github in `$CITADEL_ROOT/.citadel-vX.Y.Z`.
 
-16. `$CITADEL_ROOT/events/triggers/update` then executes all of the following update scripts from the new release `$CITADEL_ROOT/.umbrel-vX.Y.Z` one-by-one:
+16. `$CITADEL_ROOT/events/triggers/update` then executes all of the following update scripts from the new release `$CITADEL_ROOT/.citadel-vX.Y.Z` one-by-one:
 
-- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/00-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/00-run.sh): Pre-update preparation script (does things like making a backup)
-- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/01-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/01-run.sh): Install update script (installs the update)
-- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/02-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/02-run.sh): Post-update script (used to run unit-tests to make sure the update was successfully installed)
-- [`$CITADEL_ROOT/.umbrel-vX.Y.Z/scripts/update/03-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/03-run.sh): Success script (runs after the updated has been successfully downloaded and installed)
+- [`$CITADEL_ROOT/.citadel-vX.Y.Z/scripts/update/00-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/00-run.sh): Pre-update preparation script (does things like making a backup)
+- [`$CITADEL_ROOT/.citadel-vX.Y.Z/scripts/update/01-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/01-run.sh): Install update script (installs the update)
+- [`$CITADEL_ROOT/.citadel-vX.Y.Z/scripts/update/02-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/02-run.sh): Post-update script (used to run unit-tests to make sure the update was successfully installed)
+- [`$CITADEL_ROOT/.citadel-vX.Y.Z/scripts/update/03-run.sh`](https://github.com/runcitadel/core/blob/main/scripts/update/03-run.sh): Success script (runs after the updated has been successfully downloaded and installed)
 
 All of the above scripts continuously update `$CITADEL_ROOT/statuses/update-status.json` with the progress of update, which the dashboard periodically fetches every 2s via `manager` to keep the user updated.
 
