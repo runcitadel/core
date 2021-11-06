@@ -34,16 +34,16 @@ def assignIp(container: dict, appId: str, networkingFile: str, envFile: str):
     # An IP 10.21.21.xx, with x being a random number above 40 is asigned to the container
     # If the IP is already in use, it will be tried again until it's not in use
     # If it's not in use, it will be added to the usedIps list and written to the usedIpFile
-    # If the usedIpsFile contains all IPs between  10.21.21.40 and  10.21.21.255 (inclusive),
+    # If the usedIpsFile contains all IPs between  10.21.21.20 and  10.21.21.255 (inclusive),
     # Throw an error, because no more IPs can be used
-    if(len(usedIps) == 215):
+    if(len(usedIps) == 235):
         raise Exception("No more IPs can be used")
 
     if("{}-{}".format(appId, container['name']) in networkingData['ip_addresses']):
         ip = networkingData['ip_addresses']["{}-{}".format(appId, container['name'])]
     else:
         while True:
-            ip = "10.21.21." + str(random.randint(40, 255))
+            ip = "10.21.21." + str(random.randint(20, 255))
             if(ip not in usedIps):
                 networkingData['ip_addresses']["{}-{}".format(appId, container['name'])] = ip
                 break
