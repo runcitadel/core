@@ -16,12 +16,13 @@ def convertContainerPermissions(app):
                         container, permissions()[permission])
                 else:
                     print("Warning: container {} of app {} defines unknown permission {}".format(container['name'], app['metadata']['name'], permission))
-            del container['permissions']
     return app
 
 def convertContainersToServices(app: dict):
     app['services'] = {}
     for container in app['containers']:
+        if 'permissions' in container:
+            del container['permissions']
         app['services'][container['name']] = container
         del app['services'][container['name']]['name']
     del app['containers']
