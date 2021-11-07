@@ -135,7 +135,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-rm -rf  "$CITADEL_ROOT"/tor/torrc-*
 ./scripts/start
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
