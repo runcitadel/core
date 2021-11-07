@@ -167,7 +167,7 @@ else:
   # Generate RPC credentials
   print("Generating auth credentials")
   print()
-  BITCOIN_RPC_USER="umbrel"
+  BITCOIN_RPC_USER="citadel"
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
