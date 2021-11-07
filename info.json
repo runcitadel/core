@@ -1,6 +1,6 @@
 {
-    "version": "0.5.2",
-    "name": "Citadel 0.5.2",
+    "version": "0.5.3",
+    "name": "Citadel 0.5.3",
     "requires": ">=0.4.1",
-    "notes": "This update fixes a security issue in BTCPayServer, updates the elctrs service. We also fixed a few bugs, updated more apps and prepared your node for an upcoming new feature."
+    "notes": "This update reduces the CPU usage by fixing a bug which caused background scripts to run in a loop for ever without waiting in between. It also fies the storage, RAM and CPU temp widget on the dashboard."
 }
