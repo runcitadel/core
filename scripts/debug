@@ -26,7 +26,7 @@ upload() {
     --header "Content-Type: text/plain" \
     --request POST \
     --data-binary @- \
-    https://api.debug.umbrel.tech/api/upload \
+    https://citadel-debug-api.vercel.app/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
     | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'
@@ -39,7 +39,7 @@ torupload() {
     --request POST \
     --socks5 "localhost:${TOR_PROXY_PORT}" \
     --data-binary @- \
-    https://api.debug.umbrel.tech/api/upload \
+    https://citadel-debug-api.vercel.app/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
     | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'

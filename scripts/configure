@@ -28,7 +28,7 @@ def is_amd64():
   return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'x86_64'
 
 if not is_arm64() and not is_amd64():
-  print('Umbrel only works on arm64 and amd64!')
+  print('Citadel only works on arm64 and amd64!')
   exit(1)
 
 # Check the output of "docker compose version", if it matches "Docker Compose version v2.0.0-rc.3", return true

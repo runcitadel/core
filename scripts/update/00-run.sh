@@ -10,11 +10,6 @@ set -euo pipefail
 RELEASE=$1
 CITADEL_ROOT=$2
 
-if [ -d "$CITADEL_ROOT/.umbrel-$RELEASE" ]; then
-    echo "Migration from Umbrel isn't supported anymore!" 
-    exit 1
-fi
-
 echo
 echo "======================================="
 echo "=============== UPDATE ================"

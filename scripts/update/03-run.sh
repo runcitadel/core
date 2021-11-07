@@ -19,7 +19,6 @@ echo
 
 # Cleanup
 echo "Removing backup"
-[[ -d "$CITADEL_ROOT"/.umbrel-backup ]] && rm -rf "$CITADEL_ROOT"/.umbrel-backup
 [[ -d "$CITADEL_ROOT"/.citadel-backup ]] && rm -rf "$CITADEL_ROOT"/.citadel-backup
 
 echo "Successfully installed Citadel $RELEASE"

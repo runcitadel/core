@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText: 2021 Aaron Dewes <aaron.dewes@protonmail.com>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
+
 # A collection of fully FLOSS app definitions and FLOSS apps for Citadel.
 https://github.com/runcitadel/apps main
-# Some apps copied from Umbrel which aren't fully FLOSS yet.
-# Enabled by default so we have all features from Umbrel.
+
+# Some apps modified version of Umbrel apps, and their app definitions aren't FLOSS yet.
+# Include them anyway, but as a separate repo.
+# Add a # to the line below to disable the repo and only use FLOSS apps.
 https://github.com/runcitadel/apps-nonfree main

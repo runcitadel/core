@@ -10,12 +10,7 @@ set -euo pipefail
 RELEASE=$1
 CITADEL_ROOT=$2
 
-if [ -d "$CITADEL_ROOT/.umbrel-$RELEASE" ]; then
-    echo "Migration from Umbrel isn't supported anymore!" 
-    exit 1
-fi
-
-# Only used on Umbrel OS and Citadel OS
+# Only used on Citadel OS
 SD_CARD_CITADEL_ROOT="/sd-root${CITADEL_ROOT}"
 
 echo
@@ -39,7 +34,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
     
     # Update SD card installation
-    if  [[ -f "${SD_CARD_CITADEL_ROOT}/.umbrel" ]] || [[ -f "${SD_CARD_CITADEL_ROOT}/.citadel" ]]; then
+    if  [[ -f "${SD_CARD_CITADEL_ROOT}/.citadel" ]]; then
         echo "Replacing ${SD_CARD_CITADEL_ROOT} on SD card with the new release"
         rsync --archive \
             --verbose \
@@ -64,10 +59,6 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
       systemctl enable "${service_name}"
     done
 fi
-
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 33, "description": "Configuring settings", "updateTo": "$RELEASE"}
-EOF
 
 # Checkout to the new release
 cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
