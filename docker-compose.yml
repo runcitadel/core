@@ -238,9 +238,9 @@ services:
     working_dir: /data
     volumes:
     - ${PWD}/redis:/data
-    command: "redis-server --requirepass freedom"
-    restart: "on-failure"
-    stop_grace_period: "5m"
+    command: redis-server --requirepass freedom
+    restart: on-failure
+    stop_grace_period: 5m
     init: true
     networks:
       default:

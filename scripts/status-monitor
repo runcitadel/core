@@ -7,7 +7,7 @@
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
 resource="${1}"
-interval="${2}"´
+interval="${2}"
 
 status_script="${CITADEL_ROOT}/scripts/status/${resource}"
 output_path="${CITADEL_ROOT}/statuses/${resource}-status.json"
