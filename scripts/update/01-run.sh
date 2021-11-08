@@ -58,6 +58,9 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
       install -m 644 "${service_path}" "/etc/systemd/system/${service_name}"
       systemctl enable "${service_name}"
     done
+
+    # Apply config.txt changes
+    curl https://raw.githubusercontent.com/runcitadel/os/main/stage1/00-boot-files/files/config.txt > /boot/config.txt
 fi
 
 # Checkout to the new release

@@ -1,6 +1,6 @@
 {
     "version": "0.5.3",
-    "name": "Citadel 0.5.3",
+    "name": "Citadel 0.5.4",
     "requires": ">=0.4.1",
-    "notes": "This update reduces the CPU usage by fixing a bug which caused background scripts to run in a loop for ever without waiting in between. It also fies the storage, RAM and CPU temp widget on the dashboard."
+    "notes": "🚀 Performance boost for Raspberry Pi users: When you're on a Raspberry Pi, this update should speed up your nodes CPU. For this change to take effect, you need to reboot your node. This update also improves compatibilty with Compute Module 4 based boards like the BitPiRat."
 }
