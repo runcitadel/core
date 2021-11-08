@@ -29,7 +29,7 @@ upload() {
     https://citadel-debug-api.vercel.app/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
-    | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'
+    | awk -F '"' '{print "https://logs.runcitadel.space/"$1}'
 }
 
 torupload() {
@@ -42,7 +42,7 @@ torupload() {
     https://citadel-debug-api.vercel.app/api/upload \
     | jq '.key' \
     | sed 's/"//g' \
-    | awk -F '"' '{print "https://citadel-paste.vercel.app/"$1}'
+    | awk -F '"' '{print "https://logs.runcitadel.space/"$1}'
 }
 
 list_block_devices () {
