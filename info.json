@@ -1,5 +1,5 @@
 {
-    "version": "0.5.3",
+    "version": "0.5.4",
     "name": "Citadel 0.5.4",
     "requires": ">=0.4.1",
     "notes": "🚀 Performance boost for Raspberry Pi users: When you're on a Raspberry Pi, this update should speed up your nodes CPU. For this change to take effect, you need to reboot your node. This update also improves compatibilty with Compute Module 4 based boards like the BitPiRat."
