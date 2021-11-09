@@ -123,6 +123,8 @@ if [[ ! -f "${CITADEL_ROOT}/services/installed.json" ]]; then
   echo '["electrs"]' > "${CITADEL_ROOT}/services/installed.json"
 fi
 
+mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
+
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
