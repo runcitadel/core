@@ -61,6 +61,8 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
 
     # Apply config.txt changes
     curl https://raw.githubusercontent.com/runcitadel/os/main/stage1/00-boot-files/files/config.txt > /boot/config.txt
+
+    echo "source ~/citadel/setenv" | tee -a /home/citadel/.bashrc
 fi
 
 # Checkout to the new release
