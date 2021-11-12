@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:5736b44dc0328107307fad1632dc47b129080f44268d6cb17fb115d996203fbc
+    image: ghcr.io/runcitadel/dashboard:main@sha256:cee672450768f76888139c287596659363750a7f5ab680d35ba54955e4afe934
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -111,6 +111,7 @@ services:
     image: runcitadel/manager:main@sha256:3b15c8d5a9dba558092f6b04b083380d47e7c9e64a3e0a7d619368fb5d959431
     depends_on:
     - tor
+    - redis
     restart: on-failure
     init: true
     stop_grace_period: 5m30s
@@ -176,6 +177,7 @@ services:
     - manager
     - bitcoin
     - lnd
+    - redis
     command:
     - ./wait-for-node-manager.sh
     - $MANAGER_IP
@@ -240,7 +242,7 @@ services:
     - ${PWD}/redis:/data
     command: redis-server --requirepass freedom
     restart: on-failure
-    stop_grace_period: 5m
+    stop_grace_period: 1m
     init: true
     networks:
       default:
