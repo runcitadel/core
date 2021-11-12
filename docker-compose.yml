@@ -79,7 +79,7 @@ services:
         ipv4_address: $BITCOIN_IP
   lnd:
     container_name: lnd
-    image: lightninglabs/lnd:v0.13.3-beta@sha256:b8f96d4d7fb9dcd349542240a6bff1ca0170715a16e6d79b0e9188e34ea18471
+    image: lightninglabs/lnd:v0.14.0-beta.rc3@sha256:5a977389ecf5a17893751a715d8529897a0fae57d931e88e73aee6e32d964c2d
     user: 1000:1000
     depends_on:
     - tor
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:7a1a8318c7b3dfd1d2cbba523dc51928583f8a468367fb64363b3552a6bf76d0
+    image: ghcr.io/runcitadel/dashboard:main@sha256:2d1b5077f5f12e4d2cb7b80f963bc2507ec86d05ba1ebb06dc29399a5b2e5f31
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
