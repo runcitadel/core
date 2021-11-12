@@ -167,6 +167,7 @@ services:
       REDIS_PASSWORD: freedom
       REDIS_IP: $REDIS_IP
       REDIS_PORT: 6379
+      UNSAFE_REMOVE_CORS_CHECK: true
     networks:
       default:
         ipv4_address: $MANAGER_IP
@@ -197,6 +198,7 @@ services:
       LND_HOST: ${LND_IP}
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
+      UNSAFE_REMOVE_CORS_CHECK: true
     networks:
       default:
         ipv4_address: $MIDDLEWARE_IP
