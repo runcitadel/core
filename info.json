@@ -1,6 +1,6 @@
 {
-    "version": "0.5.4",
-    "name": "Citadel 0.5.4",
+    "version": "0.5.5",
+    "name": "Citadel 0.5.5",
     "requires": ">=0.4.1",
-    "notes": "🚀 Performance boost for Raspberry Pi users: When you're on a Raspberry Pi, this update should speed up your nodes CPU. For this change to take effect, you need to reboot your node. This update also improves compatibilty with Compute Module 4 based boards like the BitPiRat."
+    "notes": "This update basically just contains bug fixes. A ton of them. Really. Try it. We fixed a lot. Many apps are starting now which previously didn't, LND got updated, the dashboard now properly shows the Lightning page, ..."
 }
