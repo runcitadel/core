@@ -188,7 +188,7 @@ def compose(app, arguments):
         appHiddenServiceFile = os.path.join(
             nodeRoot, "tor", "data", "app-{}-{}/hostname".format(app, service))
         os.environ["APP_HIDDEN_SERVICE_{}".format(service.upper().replace("-", "_"))] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
-            appHiddenServiceFile), shell=True).decode("utf-8")
+            appHiddenServiceFile), shell=True).decode("utf-8").strip()
 
     if not os.path.isfile(composeFile):
         print("Error: Could not find docker-compose.yml in " + app)
