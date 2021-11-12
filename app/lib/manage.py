@@ -121,10 +121,11 @@ def startInstalled():
     for app in userData["installedApps"]:
         print("Starting app {}...".format(app))
         # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        thread = threading.Thread(target=compose, args=(app, "up --detach"))
-        thread.start()
-        threads.append(thread)
-    joinThreads(threads)
+        #thread = threading.Thread(target=compose, args=(app, "up --detach"))
+        #thread.start()
+        #threads.append(thread)
+        compose(app, "up --detach")
+    #joinThreads(threads)
 
 
 def stopInstalled():
