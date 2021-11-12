@@ -136,11 +136,6 @@ def configureMainPort(app: dict, nodeRoot: str):
             mainPort = mainContainer['ports'][0]
             if(mainPort.find(":") != -1):
                 mainPort = mainPort.split(":")[1]
-    
-    if not mainPort:
-        mainPort = containerPort
-
-
     else:
         mainContainer['ports'] = [portToAppend]
 
