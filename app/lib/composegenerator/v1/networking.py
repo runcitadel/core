@@ -132,12 +132,14 @@ def configureMainPort(app: dict, nodeRoot: str):
         mainContainer['ports'].append(portToAppend)
         # Set the main port to the first port in the list, if it contains a :, it's the port after the :
         # If it doesn't contain a :, it's the port itself
-        if not mainPort:
+        if mainPort == False:
             mainPort = mainContainer['ports'][0]
             if(mainPort.find(":") != -1):
                 mainPort = mainPort.split(":")[1]
     else:
         mainContainer['ports'] = [portToAppend]
+        if mainPort == False:
+            mainPort = portDetails['port']
 
     mainContainer = assignIp(mainContainer, app['metadata']['id'], path.join(
         nodeRoot, "apps", "networking.json"), path.join(nodeRoot, ".env"))
