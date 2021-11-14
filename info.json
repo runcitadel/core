@@ -1,6 +1,6 @@
 {
-    "version": "0.5.5",
-    "name": "Citadel 0.5.5",
-    "requires": ">=0.4.1",
-    "notes": "This update basically just contains bug fixes. A ton of them. Really. Try it. We fixed a lot. Many apps are starting now which previously didn't, LND got updated, the dashboard now properly shows the Lightning page, ..."
+    "version": "0.5.6",
+    "name": "Citadel 0.5.6",
+    "requires": ">=0.5.5",
+    "notes": "This update fixes a bug which caused apps not to start over Tor."
 }
