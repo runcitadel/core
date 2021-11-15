@@ -1,6 +1,6 @@
 {
-    "version": "0.5.6",
-    "name": "Citadel 0.5.6",
+    "version": "0.5.7",
+    "name": "Citadel 0.5.7",
     "requires": ">=0.5.5",
-    "notes": "This update fixes a bug which caused apps not to start over Tor."
+    "notes": "This update includes security optimizations by randomizing the default password for most apps. After this update, it is recommended to uninstall and reinstall Lightning Terminal and Thunderhub if you had used them."
 }
