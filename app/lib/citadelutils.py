@@ -4,8 +4,6 @@
 
 import re
 
-from click import types
-
 # Helper functions
 # Return a list of env vars in a string, supports both $NAM§ and ${NAME} format for the env var
 # This can potentially be used to get around permissions, so this check is critical for security
@@ -68,7 +66,7 @@ def combineObjectAndClass(theClass, obj: dict):
       theClass.__dict__[key] = value
 
 def is_builtin_type(obj):
-  return isinstance(obj, (int, float, str, bool, list, dict, types.ParamType))
+  return isinstance(obj, (int, float, str, bool, list, dict))
 
 # Convert a class to a dict
 # Also strip any class member which is null or empty
@@ -87,11 +85,11 @@ def classToDict(theClass):
         obj[key] = newList
     elif isinstance(value, dict):
       newDict = {}
-      for key, value in value.items():
-        if is_builtin_type(value):
-          newDict[key] = value
+      for subkey, subvalue in value.items():
+        if is_builtin_type(subvalue):
+          newDict[subkey] = subvalue
         else:
-          newDict[key] = classToDict(value)
+          newDict[subkey] = classToDict(subvalue)
       obj[key] = newDict
     elif is_builtin_type(value):
       obj[key] = value

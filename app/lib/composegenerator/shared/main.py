@@ -18,13 +18,14 @@ def convertContainerPermissions(app: App) -> App:
     return app
 
 def convertContainersToServices(app: AppStage3) -> AppStage3:
-    app.services = {}
+    services = {}
     for container in app.containers:
         if container.permissions:
             del container.permissions
-        app.services[container.name] = container
-        del app.services[container.name].name
+        services[container.name] = container
+        del services[container.name].name
     del app.containers
+    app.services = services
     return app
 
 # Converts the data of every container in app.containers to a volume, which is then added to the app
