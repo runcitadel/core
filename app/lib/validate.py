@@ -15,7 +15,7 @@ def validateApp(app: dict):
     with open(os.path.join(scriptDir, 'app-standard-v1.json'), 'r') as f:
         schemaVersion1 = json.loads(f.read())
 
-    if('version' in app and str(app['version']) == "1"):
+    if 'version' in app and str(app['version']) == "1":
         try:
             validate(app, schemaVersion1)
             return True

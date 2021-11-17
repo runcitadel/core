@@ -49,7 +49,7 @@ elif args.action == 'download':
     updateRepos()
     exit(0)
 elif args.action == 'update':
-    if(args.invoked_by_configure):
+    if args.invoked_by_configure:
         update(args.app)
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
@@ -64,7 +64,7 @@ elif args.action == 'update':
 elif args.action == 'update-online':
     updateRepos()
     print("Downloaded all updates")
-    if(args.invoked_by_configure):
+    if args.invoked_by_configure:
         update(args.app)
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
@@ -112,7 +112,7 @@ elif args.action == 'stop':
         print("No app provided")
         exit(1)
     userData = getUserData()
-    if(args.app == "installed"):
+    if args.app == "installed":
         if "installedApps" in userData:
             stopInstalled()
         exit(0)
@@ -124,7 +124,7 @@ elif args.action == 'start':
         exit(1)
 
     userData = getUserData()
-    if(args.app == "installed"):
+    if args.app == "installed":
         if "installedApps" in userData:
             startInstalled()
         exit(0)

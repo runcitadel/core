@@ -36,7 +36,7 @@ def getAppRegistry(apps, app_path):
             metadata['defaultPassword'] = metadata.get('defaultPassword', '')
             if metadata['defaultPassword'] == "$APP_SEED":
                 metadata['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
-            if("mainContainer" in metadata):
+            if "mainContainer" in metadata:
                 metadata.pop("mainContainer")
             app_metadata.append(metadata)
     return app_metadata

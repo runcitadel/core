@@ -3,64 +3,51 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Main functions
-from lib.citadelutils import combineObjects
+from lib.composegenerator.v1.types import App, AppStage3, AppStage2, Container
 from lib.composegenerator.shared.const import permissions
 
 
-def convertContainerPermissions(app):
-    for container in app['containers']:
-        if 'permissions' in container:
-            for permission in container['permissions']:
-                if(permission in permissions()):
-                    container = combineObjects(
-                        container, permissions()[permission])
-                else:
-                    print("Warning: container {} of app {} defines unknown permission {}".format(container['name'], app['metadata']['name'], permission))
+def convertContainerPermissions(app: App) -> App:
+    for container in app.containers:
+        for permission in container.permissions:
+            if permission in permissions():
+                container.environment_allow.extend(permissions()[permission]['environment_allow'])
+                container.volumes.extend(permissions()[permission]['volumes'])
+            else:
+                print("Warning: container {} of app {} defines unknown permission {}".format(container.name, app.metadata.name, permission))
     return app
 
-def convertContainersToServices(app: dict):
-    app['services'] = {}
-    for container in app['containers']:
-        if 'permissions' in container:
-            del container['permissions']
-        app['services'][container['name']] = container
-        del app['services'][container['name']]['name']
-    del app['containers']
+def convertContainersToServices(app: AppStage3) -> AppStage3:
+    app.services = {}
+    for container in app.containers:
+        if container.permissions:
+            del container.permissions
+        app.services[container.name] = container
+        del app.services[container.name].name
+    del app.containers
     return app
 
-# Converts the data of every container in app['containers'] to a volume, which is then added to the app
-def convertDataDirToVolume(app: dict):
-    for container in app['containers']:
-        # Loop through data dirs in container['data'], if they don't contain a .., add them to container['volumes']
+# Converts the data of every container in app.containers to a volume, which is then added to the app
+def convertDataDirToVolume(app: App) -> AppStage2:
+    for container in app.containers:
+        # Loop through data dirs in container.data, if they don't contain a .., add them to container.volumes
         # Also, a datadir shouldn't start with a /
-        if 'data' in container:
-            for dataDir in container['data']:
-                if not 'volumes' in container:
-                    container['volumes'] = []
-                if(dataDir.find("..") == -1 and dataDir[0] != "/"):
-                    container['volumes'].append(
-                        '${APP_DATA_DIR}/' + dataDir)
-                else:
-                    print("Data dir " + dataDir +
-                          " contains invalid characters")
-            del container['data']
-        if 'bitcoin_mount_dir' in container:
-            if not 'permissions' in container or not 'bitcoind' in container['permissions']:
-                print("Warning: container {} of app {} defines bitcoin_mount_dir but has no permissions for bitcoind".format(container['name'], app['metadata']['name']))
+        for dataDir in container.data:
+            if dataDir.find("..") == -1 and dataDir[0] != "/":
+                container.volumes.append(
+                    '${APP_DATA_DIR}/' + dataDir)
+            else:
+                print("Data dir " + dataDir +
+                        " contains invalid characters")
+        del container.data
+        if container.bitcoin_mount_dir != None:
+            if not 'bitcoind' in container.permissions:
+                print("Warning: container {} of app {} defines bitcoin_mount_dir but has no permissions for bitcoind".format(container.name, app.metadata.name))
                 # Skip this container
                 continue
-            if not 'volumes' in container:
-                container['volumes'] = []
-            # Also skip the container if container['bitcoin_mount_dir'] contains a :
-            if(container['bitcoin_mount_dir'].find(":") == -1):
-                container['volumes'].append('${BITCOIN_DATA_DIR}:' + container['bitcoin_mount_dir'] + ':ro')
-            del container['bitcoin_mount_dir']
+            # Also skip the container if container.bitcoin_mount_dir contains a :
+            if container.bitcoin_mount_dir.find(":") == -1:
+                container.volumes.append('${BITCOIN_DATA_DIR}:' + container.bitcoin_mount_dir + ':ro')
+            del container.bitcoin_mount_dir
                 
-    return app
-
-def addStopConfig(app: dict):
-    for container in app['containers']:
-        if not 'stop_grace_period' in container:
-            container['stop_grace_period'] = '1m'
-        container['restart'] = "on-failure"
     return app

@@ -77,7 +77,7 @@ def update(verbose: bool = False):
         appYml = os.path.join(appsDir, app, "app.yml")
         with open(composeFile, "w") as f:
             appCompose = getApp(appYml, app)
-            if(appCompose):
+            if appCompose:
                 f.write(yaml.dump(appCompose, sort_keys=False))
                 if verbose:
                     print("Wrote " + app + " to " + composeFile)
@@ -85,7 +85,7 @@ def update(verbose: bool = False):
 
 
 def download(app: str = None):
-    if(app is None):
+    if app is None:
         apps = findAndValidateApps(appsDir)
         for app in apps:
             data = getAppYml(app)
@@ -117,7 +117,7 @@ def startInstalled():
     if os.path.isfile(userFile):
         with open(userFile, "r") as f:
             userData = json.load(f)
-    threads = []
+    #threads = []
     for app in userData["installedApps"]:
         print("Starting app {}...".format(app))
         # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
@@ -155,7 +155,7 @@ def getApp(appFile: str, appId: str):
         raise Exception("Error: Could not find metadata in " + appFile)
     app["metadata"]["id"] = appId
 
-    if('version' in app and str(app['version']) == "1"):
+    if 'version' in app and str(app['version']) == "1":
         return createComposeConfigFromV1(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
