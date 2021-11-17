@@ -10,6 +10,7 @@ from lib.rpcauth import get_data
 import re
 import subprocess
 import json
+import shutil
 
 # Print an error if the user isn't running on Linux.
 if sys.platform != 'linux':
@@ -300,9 +301,7 @@ def replace_vars(file_path):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
 templates_to_build = {
-  "./templates/torrc-empty": "./tor/torrc-apps",
-  "./templates/torrc-empty": "./tor/torrc-apps-2",
-  "./templates/torrc-empty": "./tor/torrc-apps-3",
+  "./templates/torrc-empty": ["./tor/torrc-apps", "./tor/torrc-apps-2", "./tor/torrc-apps-3"],
   "./templates/torrc-core-sample": "./tor/torrc-core",
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
@@ -311,15 +310,29 @@ templates_to_build = {
   "./templates/nginx-sample.conf": "./nginx/nginx.conf"
 }
 
-print("Generating configuration files")
+print("Generating configuration files...")
 print()
 
 # Loop through templates_to_build and build them
 for template_path, output_path in templates_to_build.items():
   data = replace_vars(template_path)
-  if data != "" and data != None:
+  # If output path is a list, then it is a list of output paths
+  if isinstance(output_path, list):
+    for output_path_item in output_path:
+      # Delete the output path, no matter if it's a file or a directory
+      if os.path.isdir(output_path_item):
+        shutil.rmtree(output_path_item)
+      with open(output_path_item, 'w') as file:
+        file.write(data)
+  else:
+    # Delete the output path, no matter if it's a file or a directory
+    if os.path.isdir(output_path):
+      shutil.rmtree(output_path)
     with open(output_path, 'w') as file:
       file.write(data)
+
+print("Generated configuration files")
+print()
 
 print("Installing docker-compose...")
 print()
