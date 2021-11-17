@@ -63,6 +63,8 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     curl https://raw.githubusercontent.com/runcitadel/os/main/stage1/00-boot-files/files/config.txt > /boot/config.txt
 
     echo "source ~/citadel/setenv" | tee -a /home/citadel/.bashrc
+
+    sudo apt install -y python3-dacite
 fi
 
 # Checkout to the new release
@@ -74,7 +76,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 40, "description": "Configuring new release", "updateTo": "$RELEASE"}
 EOF
 
-./scripts/configure
+./scripts/configure || true
 
 # Pulling new containers
 echo "Pulling new containers"
