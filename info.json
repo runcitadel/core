@@ -1,6 +1,6 @@
 {
-    "version": "0.5.9",
-    "name": "Citadel 0.5.9",
+    "version": "0.5.10",
+    "name": "Citadel 0.5.10 - 2FA update",
     "requires": ">=0.5.5",
-    "notes": "This update includes improvements for the LnMe app and fixes a bug which made apps inaccessible over Tor (again)."
+    "notes": "This update includes more bug fixes and adds 2 factor authrntication via one time codes."
 }
