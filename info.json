@@ -2,5 +2,5 @@
     "version": "0.5.10",
     "name": "Citadel 0.5.10 - 2FA update",
     "requires": ">=0.5.5",
-    "notes": "This update includes more bug fixes and adds 2 factor authrntication via one time codes."
+    "notes": "This update includes more bug fixes and adds 2 factor authentication via one time codes."
 }
