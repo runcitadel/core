@@ -79,7 +79,7 @@ services:
         ipv4_address: $BITCOIN_IP
   lnd:
     container_name: lnd
-    image: lightninglabs/lnd:v0.14.0-beta.rc3@sha256:5a977389ecf5a17893751a715d8529897a0fae57d931e88e73aee6e32d964c2d
+    image: lightninglabs/lnd:v0.14.0-beta@sha256:4bf574d546822e17ddda46f80502034e58231a8c8696ada0aacaf9c7368f9ab5
     user: 1000:1000
     depends_on:
     - tor
