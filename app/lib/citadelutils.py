@@ -76,8 +76,8 @@ def classToDict(theClass):
     if value is None or (isinstance(value, list) and len(value) == 0):
       continue
     if isinstance(value, list):
+      newList = []
       for element in value:
-        newList = []
         if is_builtin_type(element):
           newList.append(element)
         else:
