@@ -1,6 +1,6 @@
 {
-    "version": "0.5.11",
-    "name": "Citadel 0.5.11 - Just some bug fixes",
+    "version": "0.5.12",
+    "name": "Citadel 0.5.12 - Update LND",
     "requires": ">=0.5.5",
-    "notes": "This update fixes another bug which caused apps to get stuck on starting."
+    "notes": "This update updates LND to fix an issue which led to incompatibilities with c-lightning and eclair"
 }
