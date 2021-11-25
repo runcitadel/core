@@ -32,7 +32,7 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
     if 'ip_addresses' in networkingData:
         usedIps = list(networkingData['ip_addresses'].values())
     else:
-        networkingData.ip_addresses = {}
+        networkingData['ip_addresses'] = {}
     # An IP 10.21.21.xx, with x being a random number above 40 is asigned to the container
     # If the IP is already in use, it will be tried again until it's not in use
     # If it's not in use, it will be added to the usedIps list and written to the usedIpFile
