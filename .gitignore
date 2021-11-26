@@ -47,3 +47,5 @@ db/citadel-seed/*
 
 !**/*.license
 services/installed.json
+
+use-core-upstream
