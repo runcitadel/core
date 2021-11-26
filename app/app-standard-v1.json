@@ -125,7 +125,7 @@
             "description": "If this is the main container, the port inside the container which will be exposed to the outside as the port specified in metadata."
           },
           "environment": {
-            "type": ["object", "array"]
+            "type": "object"
           },
           "data": {
             "type": "array",

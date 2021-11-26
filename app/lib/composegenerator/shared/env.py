@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import re
+from typing import Union
 from lib.composegenerator.v1.types import App
 from lib.composegenerator.shared.const import always_allowed_env
 from lib.citadelutils import checkArrayContainsAllElements, getEnvVars
@@ -23,6 +24,18 @@ def validateEnvByValue(env: list, allowed: list, app_name: str):
                 return False
     return True
 
+def validateEnvStringOrListorDict(env: Union[str, Union[list, dict]], existingEnv: list, app_name: str, container_name: str):
+    envList = []
+    if isinstance(env, dict):
+        envList = env.values()
+    elif isinstance(env, list):
+        envList = env
+    elif isinstance(env, str):
+        envList = [env]
+    for envVar in envList:
+        if not validateEnvByValue(getEnvVars(envVar), existingEnv, app_name):
+            raise Exception("Env var {} not defined for container {} of app {}".format(envVar, container_name, app_name))
+    
 
 def validateEnv(app: App):
     # For every container of the app, check if all env vars in the strings in environment are defined in env
@@ -33,15 +46,6 @@ def validateEnv(app: App):
                 del container.environment_allow
             else:
                 existingEnv = []
-            # The next step depends on the type of the environment object, which is either a list or dict
-            # If it's a list, split every string in it by the first=, then run getEnvVars(envVarValue) on it
-            # ON a dict, run getEnvVars(envVarValue) on every value of the environment object
-            # Then check if all env vars returned by getEnvVars are defined in env
-            if isinstance(container.environment, list):
-                raise Exception("List env vars are no longer supported for container {} of app {}".format(
-                    container.name, app.metadata.name))
-            elif isinstance(container.environment, dict):
-                for envVar in container.environment.values():
-                    if not validateEnvByValue(getEnvVars(envVar), existingEnv, app.metadata.id):
-                        raise Exception("Env vars not defined for container {} of app {}".format(
-                            container.name, app.metadata.name))
+            validateEnvStringOrListorDict(container.command, existingEnv, app.metadata.id, container.name)
+            validateEnvStringOrListorDict(container.entrypoint, existingEnv, app.metadata.id, container.name)
+            validateEnvStringOrListorDict(container.environment, existingEnv, app.metadata.id, container.name)
