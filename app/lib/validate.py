@@ -5,15 +5,15 @@
 import os
 import yaml
 from jsonschema import validate
-import json
+import yaml
 
 
 # Validates app data
 # Returns true if valid, false otherwise
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 def validateApp(app: dict):
-    with open(os.path.join(scriptDir, 'app-standard-v1.json'), 'r') as f:
-        schemaVersion1 = json.loads(f.read())
+    with open(os.path.join(scriptDir, 'app-standard-v1.yml'), 'r') as f:
+        schemaVersion1 = yaml.safe_load(f)
 
     if 'version' in app and str(app['version']) == "1":
         try:
