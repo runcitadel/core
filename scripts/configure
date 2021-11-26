@@ -147,7 +147,7 @@ if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream
     docker_compose_yml = yaml.safe_load(file)
   docker_compose_yml['services']['bitcoin']['image'] = BITCOIN_CORE_IMAGE
   with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'w') as file:
-    yaml.dump(docker_compose_yml, file)
+    yaml.dump(docker_compose_yml, file, sort_keys=False)
 
 ##########################################################
 ############ Generate configuration variables ############
