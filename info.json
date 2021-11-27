@@ -1,6 +1,6 @@
 {
-    "version": "0.5.12",
-    "name": "Citadel 0.5.12 - Update LND",
+    "version": "0.5.13",
+    "name": "Citadel 0.5.13 - Yet another bugfix release",
     "requires": ">=0.5.5",
-    "notes": "This update updates LND to fix an issue which led to incompatibilities with c-lightning and eclair"
+    "notes": "This update fixes more issues we had in the previous release. Lnbits and BTCPay Server should work again. BTCPay Server requires a reinstall to work again. In addition, we switched to Bitcoin Knots (a fork of Bitcoin Core with the same consensus rules by Bitcoin maintainer luke-jr) in this update."
 }
