@@ -178,7 +178,7 @@ properties:
               type:
                 - number
                 - array
-        restarts:
+        restart:
           type: string
           description: When the container should restart. Can be 'always' or 'on-failure'.
       additionalProperties: false

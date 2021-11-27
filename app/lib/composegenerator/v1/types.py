@@ -46,7 +46,7 @@ class Container:
     environment_allow: list = field(default_factory=list)
     # Only added later
     volumes: list = field(default_factory=list)
-    restarts: Union[str, None] = None
+    restart: Union[str, None] = None
 
 @dataclass
 class App:
@@ -88,7 +88,7 @@ class ContainerStage2:
     hiddenServicePorts: Union[dict, None] = None
     volumes: list[str] = field(default_factory=list)
     networks: NetworkConfig = field(default_factory=NetworkConfig)
-    restarts: Union[str, None] = None
+    restart: Union[str, None] = None
 
 @dataclass
 class AppStage2:
@@ -142,7 +142,7 @@ class ContainerStage4:
     hiddenServicePorts: Union[dict, None] = None
     volumes: list[str] = field(default_factory=list)
     networks: NetworkConfig = field(default_factory=NetworkConfig)
-    restarts: Union[str, None] = None
+    restart: Union[str, None] = None
 
 @dataclass
 class AppStage4:
