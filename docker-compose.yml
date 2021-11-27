@@ -63,7 +63,7 @@ services:
         ipv4_address: $NGINX_IP
   bitcoin:
     container_name: bitcoin
-    image: lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507
+    image: nolim1t/bitcoinknots:v22.0.knots20211108@sha256:a475da2b2ecda55fcc65ea23e1a36c58b2c10549f1c3d3bb3c31c7dda1127354
     depends_on:
     - tor
     - manager
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:dcfec33ce1682554490f32522855bb142e885e1e328fb5ec469ab09041a92889
+    image: ghcr.io/runcitadel/dashboard:main@sha256:3b395acbc3636bc65c99b4b76f11c45a186a7480445390c1b83690e9d1d7640c
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
