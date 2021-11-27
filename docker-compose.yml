@@ -63,8 +63,7 @@ services:
         ipv4_address: $NGINX_IP
   bitcoin:
     container_name: bitcoin
-    #image: lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507
-    image: nolim1t/bitcoinknots:v22.0.knots20211108@sha256:a475da2b2ecda55fcc65ea23e1a36c58b2c10549f1c3d3bb3c31c7dda1127354
+    image: lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507
     depends_on:
     - tor
     - manager
@@ -109,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:b79571dea3e9b1115057c89c5ba7c49ccbfba3d21d24f0fee11535603d9d448b
+    image: ghcr.io/runcitadel/manager:main@sha256:26a021cff33d9f81217b1810a743024d5a7a03493abbec766dd88680720d7102
     depends_on:
     - tor
     - redis
