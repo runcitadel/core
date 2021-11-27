@@ -67,6 +67,9 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     sudo apt install -y python3-dacite
 fi
 
+# Help migration from earlier versions
+mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
+
 # Checkout to the new release
 cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
 
@@ -126,8 +129,6 @@ wait
 if [[ ! -f "${CITADEL_ROOT}/services/installed.json" ]]; then
   echo '["electrs"]' > "${CITADEL_ROOT}/services/installed.json"
 fi
-
-mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
 
 # Start updated containers
 echo "Starting new containers"
