@@ -217,9 +217,9 @@ def createDataDir(app: str):
     appDir = os.path.join(appsDir, app)
     if os.path.isdir(dataDir):
         deleteData(app)
-    # Recursively copy everything from appDir to dataDir while excluding .gitignore
+    # Recursively copy everything from appDir to dataDir while excluding .gitkeep files
     shutil.copytree(appDir, dataDir, symlinks=False,
-                    ignore=shutil.ignore_patterns(".gitignore"))
+                    ignore=shutil.ignore_patterns(".gitkeep"))
     # Chown and chmod dataDir to have the owner 1000:1000 and the same permissions as appDir
     subprocess.call("chown -R 1000:1000 {}".format(os.path.join(appDataDir, app)), shell=True)
     os.chmod(dataDir, os.stat(appDir).st_mode)
