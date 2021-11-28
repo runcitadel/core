@@ -1,6 +1,6 @@
 {
-    "version": "0.5.13",
-    "name": "Citadel 0.5.13 - Yet another bugfix release",
+    "version": "0.5.14",
+    "name": "Citadel 0.5.14",
     "requires": ">=0.5.5",
-    "notes": "This update fixes more issues we had in the previous release. Lnbits and BTCPay Server should work again. BTCPay Server requires a reinstall to work again. In addition, we switched to Bitcoin Knots (a fork of Bitcoin Core with the same consensus rules by Bitcoin maintainer luke-jr) in this update."
+    "notes": "This update improves Lightning address support and sets the defaul base fee for Lightning to 0."
 }
