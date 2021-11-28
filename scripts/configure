@@ -201,6 +201,7 @@ ALIAS_AND_COLOR=""
 ADDITIONAL_BITCOIN_OPTIONS=""
 BOLT_DB_OPTIONS=""
 CHANNEL_LIMITATIONS=""
+BASEFEE = "bitcoin.basefee=0"
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
@@ -213,7 +214,7 @@ if os.path.isfile("./lnd/lnd.conf"):
       if line.startswith("color="):
         ALIAS_AND_COLOR += "\n" + line.strip()
       if line.startswith("bitcoin.basefee"):
-        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
+        BASEFEE = line.strip()
       if line.startswith("bitcoin.feerate"):
         ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
       if line.startswith("minchansize"):
