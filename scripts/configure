@@ -12,7 +12,6 @@ import subprocess
 import json
 import shutil
 import yaml
-import shutil
 
 # Print an error if the user isn't running on Linux.
 if sys.platform != 'linux':
