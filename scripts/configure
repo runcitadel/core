@@ -24,12 +24,10 @@ if os.getuid() != 0:
   exit(1)
 
 # Check if the system is arm64 or amd64
-def is_arm64():
-  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'aarch64'
-def is_amd64():
-  return subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'x86_64'
+is_arm64 = subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'aarch64'
+is_amd64 = subprocess.check_output(['uname', '-m']).decode('utf-8').strip() == 'x86_64'
 
-if not is_arm64() and not is_amd64():
+if not is_arm64 and not is_amd64:
   print('Citadel only works on arm64 and amd64!')
   exit(1)
 
@@ -54,10 +52,10 @@ def download_docker_compose():
   subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
   if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc():
     return
-  if is_arm64():
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
-  elif is_amd64():
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  if is_arm64:
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+  elif is_amd64:
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
 
 
@@ -267,6 +265,8 @@ APPS_TOR_IP="10.21.21.12"
 APPS_2_TOR_IP="10.21.21.13"
 APPS_3_TOR_IP="10.21.21.14"
 REDIS_IP="10.21.21.15"
+
+# Ports
 BITCOIN_RPC_PORT="8332"
 BITCOIN_P2P_PORT="8333"
 BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
