@@ -1,6 +1,6 @@
 {
-    "version": "0.5.14",
-    "name": "Citadel 0.5.14",
+    "version": "0.5.15",
+    "name": "Citadel 0.5.15",
     "requires": ">=0.5.5",
-    "notes": "This update improves Lightning address support and sets the defaul base fee for Lightning to 0."
+    "notes": "This update just fixes some bugs and updates some apps. Nothing new yet, updates will be kinda boring until 2022."
 }
