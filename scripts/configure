@@ -12,6 +12,7 @@ import subprocess
 import json
 import shutil
 import yaml
+import shutil
 
 # Print an error if the user isn't running on Linux.
 if sys.platform != 'linux':
@@ -58,16 +59,11 @@ def download_docker_compose():
     subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
 
-
-try:
-    subprocess.check_call(['wget', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-except:
+if not shutil.which("wget"):
     print('Wget is not installed!')
     exit(1)
 
-try:
-    subprocess.check_call(['docker', '--version'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-except:
+if not shutil.which("docker"):
     print('Docker is not installed!')
     exit(1)
 
