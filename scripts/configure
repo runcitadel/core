@@ -33,10 +33,10 @@ if not is_arm64 and not is_amd64:
 
 # Check the output of "docker compose version", if it matches "Docker Compose version v2.0.0-rc.3", return true
 # Otherwise, return false
-def is_compose_rc():
+def is_compose_rc_or_outdated():
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
-    if output.decode('utf-8').strip() == 'Docker Compose version v2.0.0-rc.3':
+    if output.decode('utf-8').strip() == 'Docker Compose version v2.0.0-rc.3'or output.decode('utf-8').strip() == 'Docker Compose version v2.0.1':
       print("Using rc docker compose, updating...")
       return True
     else:
