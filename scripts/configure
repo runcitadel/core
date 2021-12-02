@@ -50,7 +50,7 @@ def is_compose_rc_or_outdated():
 def download_docker_compose():
   # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
   subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
-  if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc():
+  if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc_or_outdated():
     return
   if is_arm64:
     subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
