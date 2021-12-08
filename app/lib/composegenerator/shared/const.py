@@ -29,7 +29,7 @@ def permissions():
                 "BITCOIN_ZMQ_HASHBLOCK_PORT",
             ],
             "volumes": [
-                "${BITCOIN_DATA_DIR}:/bitcoin:ro"
+                "${BITCOIN_DATA_DIR}:/bitcoin"
             ]
         },
         "electrum": {
