@@ -6,7 +6,6 @@
 
 import sys
 import os
-from lib.rpcauth import get_data
 import re
 import subprocess
 import json
@@ -148,128 +147,12 @@ if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream
 
 NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 
-if reconfiguring:
-  if os.path.isfile('../.citadel'):
-    dotenv=parse_dotenv('../.env')
-  else:
-    dotenv=parse_dotenv('./.env')
-
-  BITCOIN_NETWORK=os.environ.get('OVERWRITE_NETWORK') or dotenv['BITCOIN_NETWORK']
-  # Check if network neither mainnet nor testnet nor regtest
-  if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
-      print('Error: Network must be either mainnet, testnet, or regtest!')
-      exit(1)
-  print("Using {} network".format(BITCOIN_NETWORK))
-  print()
-  BITCOIN_RPC_PORT=dotenv['BITCOIN_RPC_PORT']
-  BITCOIN_P2P_PORT=dotenv['BITCOIN_P2P_PORT']
-  BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
-  BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
-  BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
-  TOR_PASSWORD=dotenv['TOR_PASSWORD']
-  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
-  NGINX_PORT=dotenv['NGINX_PORT']
-else:
-  # Generate RPC credentials
-  print("Generating auth credentials")
-  print()
-  BITCOIN_RPC_USER="citadel"
-  BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
-  BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
-  BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
-
-  # Pull Tor image and generate Tor password
-  print("Generating Tor password")
-  print()
-  os.system('docker pull --quiet lncm/tor:0.4.6.8')
-  TOR_PASSWORD=get_data('itdoesntmatter')['password']
-
-  # run 'docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "$TOR_PASS"' and get its output
-  # this is the password that is used to connect to the Tor network
-  # the password is stored in the .env file
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.6.8 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
-
-BITCOIN_NODE="neutrino"
-ALIAS_AND_COLOR=""
-ADDITIONAL_BITCOIN_OPTIONS=""
-BOLT_DB_OPTIONS=""
-CHANNEL_LIMITATIONS=""
-BASEFEE = "bitcoin.basefee=0"
-
-if os.path.isfile("./lnd/lnd.conf"):
-  with open("./lnd/lnd.conf", 'r') as file:
-    # We generally don't want to allow changing lnd.conf, but we keep as many custom settings as possible
-    for line in file:
-      if line.startswith("bitcoin.node="):
-        BITCOIN_NODE = line.split("=")[1].strip()
-      if line.startswith("alias="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("color="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("bitcoin.basefee"):
-        BASEFEE = line.strip()
-      if line.startswith("bitcoin.feerate"):
-        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
-      if line.startswith("minchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxpendingchannels"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("db.bolt.auto-compact"):
-        BOLT_DB_OPTIONS += "\n" + line.strip()
-
-if BOLT_DB_OPTIONS != "":
-  BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
-
-if CHANNEL_LIMITATIONS == "":
-  CHANNEL_LIMITATIONS = "maxpendingchannels=3\nminchansize=10000"
-
-NEUTRINO_PEERS=""
-if BITCOIN_NETWORK == "mainnet":
-  BITCOIN_RPC_PORT=8332
-  BITCOIN_P2P_PORT=8333
-elif BITCOIN_NETWORK == "testnet":
-  BITCOIN_RPC_PORT=18332
-  BITCOIN_P2P_PORT=18333
-  NEUTRINO_PEERS='''
-[neutrino]
-neutrino.addpeer=testnet1-btcd.zaphq.io
-neutrino.addpeer=testnet2-btcd.zaphq.io
-  '''
-elif BITCOIN_NETWORK == "regtest":
-  BITCOIN_RPC_PORT=18334
-  BITCOIN_P2P_PORT=18335
-  BITCOIN_NODE="bitcoind"
-else:
-  exit(1)
-
 # IP addresses for services
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
-NGINX_IP="10.21.21.2"
-DASHBOARD_IP="10.21.21.3"
-MANAGER_IP="10.21.21.4"
-MIDDLEWARE_IP="10.21.21.5"
-NEUTRINO_SWITCHER_IP="10.21.21.6"
-BITCOIN_IP="10.21.21.8"
-LND_IP="10.21.21.9"
-ELECTRUM_IP="10.21.21.10"
 TOR_PROXY_IP="10.21.21.11"
-APPS_TOR_IP="10.21.21.12"
-APPS_2_TOR_IP="10.21.21.13"
-APPS_3_TOR_IP="10.21.21.14"
-REDIS_IP="10.21.21.15"
 
 # Ports
-BITCOIN_RPC_PORT="8332"
-BITCOIN_P2P_PORT="8333"
-BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
-BITCOIN_ZMQ_RAWTX_PORT="28333"
-BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
-LND_GRPC_PORT="10009"
-LND_REST_PORT="8080"
-ELECTRUM_PORT="50001"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
 
@@ -277,12 +160,6 @@ DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
 DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
 # Get the real path by following symlinks
 DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
-
-# Set LND fee URL for neutrino on mainnet
-LND_FEE_URL=""
-# If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
-if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
-   LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
 
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
@@ -309,13 +186,7 @@ def replace_vars(file_path):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
 templates_to_build = {
-  "./templates/torrc-empty": ["./tor/torrc-apps", "./tor/torrc-apps-2", "./tor/torrc-apps-3"],
   "./templates/torrc-core-sample": "./tor/torrc-core",
-  "./templates/lnd-sample.conf": "./lnd/lnd.conf",
-  "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
-  "./templates/.env-sample": "./.env",
-  "./templates/electrs-sample.toml": "./electrs/electrs.toml",
-  "./templates/nginx-sample.conf": "./nginx/nginx.conf"
 }
 
 print("Generating configuration files...")
