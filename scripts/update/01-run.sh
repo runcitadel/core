@@ -95,6 +95,15 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 pkill -f "\./karen" || true
 
+
+# Start updated containers
+echo "Sopping old containers"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 75, "description": "Stopping old containers", "updateTo": "$RELEASE"}
+EOF
+cd "$CITADEL_ROOT"
+./scripts/stop
+
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
@@ -108,7 +117,6 @@ rsync --archive \
 # Fix permissions
 echo "Fixing permissions"
 find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
-chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
 cd "$CITADEL_ROOT"
 echo "Updating installed apps"
@@ -124,12 +132,6 @@ for app in $("$CITADEL_ROOT/app/app-manager.py" ls-installed); do
 done
 wait
 
-# If CITADEL_ROOT doesn't contain services/installed.json, then put '["electrs"]' into it.
-# This is to ensure that the 0.5.0 update doesn't remove electrs.
-if [[ ! -f "${CITADEL_ROOT}/services/installed.json" ]]; then
-  echo '["electrs"]' > "${CITADEL_ROOT}/services/installed.json"
-fi
-
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
@@ -138,8 +140,9 @@ EOF
 cd "$CITADEL_ROOT"
 ./scripts/start
 
+
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
+{"state": "success", "progress": 90, "description": "Doing some cleanups", "updateTo": ""}
 EOF
 
 # Make Citadel OS specific post-update changes
@@ -148,3 +151,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
   echo "Deleting previous images"
   docker image prune --all --force
 fi
+
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
+EOF

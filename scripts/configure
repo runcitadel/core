@@ -10,7 +10,6 @@ import re
 import subprocess
 import json
 import shutil
-import yaml
 
 # Print an error if the user isn't running on Linux.
 if sys.platform != 'linux':
@@ -43,8 +42,8 @@ def is_compose_rc_or_outdated():
   except:
     return True
 
-# Download docker-compose from https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-aarch64
-# or https://github.com/docker/compose/releases/download/v2.0.1/docker-compose-linux-x86_64
+# Download docker-compose from https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-aarch64
+# or https://github.com/docker/compose/releases/download/v2.2.1/docker-compose-linux-x86_64
 # and put it in $HOME/.docker/cli-plugins/docker-compose
 def download_docker_compose():
   # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
@@ -76,16 +75,6 @@ if os.path.isfile('../.citadel'):
     status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
     updating = True
 
-# Configure for mainnet or testnet or regtest depending
-# upon the user-supplied value of $NETWORK
-# If the network is not specified, then use the mainnet
-BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
-
-# Check if network neither mainnet nor testnet nor regtest
-if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
-    print('Error: Network must be either mainnet, testnet, or regtest!')
-    exit(1)
-
 with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
   CITADEL_VERSION=json.load(file)['version']
 
@@ -101,13 +90,6 @@ else:
 print("============== CITADEL  ==============")
 print("======================================")
 print()
-
-if not reconfiguring:
-  print("Installing electrs...")
-  data = subprocess.run("\"{}\" install electrs".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
-
-print("Installing additional services")
-data = subprocess.run("\"{}\" setup".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
 
 # Parse a dotenv file
 # Values can either be KEY=VALUE or KEY="VALUE" or KEY='VALUE'
@@ -128,18 +110,6 @@ def parse_dotenv(file_path):
         print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
         exit(1)
   return envVars
-
-KNOTS_REINDEX_AUTO="reindex=auto"
-BITCOIN_CORE_IMAGE="lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507"
-if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream'):
-  KNOTS_REINDEX_AUTO=""
-  # Also, open the docker-compose file and replace the image of the bitcoin service 
-  # with the upstream version of bitcoin core
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'r') as file:
-    docker_compose_yml = yaml.safe_load(file)
-  docker_compose_yml['services']['bitcoin']['image'] = BITCOIN_CORE_IMAGE
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'w') as file:
-    yaml.dump(docker_compose_yml, file, sort_keys=False)
 
 ##########################################################
 ############ Generate configuration variables ############
@@ -186,7 +156,7 @@ def replace_vars(file_path):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
 templates_to_build = {
-  "./templates/torrc-core-sample": "./tor/torrc-core",
+  "./templates/.env-sample": "./.env",
 }
 
 print("Generating configuration files...")
