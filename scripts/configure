@@ -147,6 +147,7 @@ if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream
 ##########################################################
 
 NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
+UPDATE_CHANNEL="main"
 
 if reconfiguring:
   if os.path.isfile('../.citadel'):
@@ -169,6 +170,8 @@ if reconfiguring:
   TOR_PASSWORD=dotenv['TOR_PASSWORD']
   TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
   NGINX_PORT=dotenv['NGINX_PORT']
+  if 'UPDATE_CHANNEL' in dotenv:
+    UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
 else:
   # Generate RPC credentials
   print("Generating auth credentials")

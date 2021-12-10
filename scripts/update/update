@@ -22,6 +22,7 @@ check_dependencies () {
 check_dependencies jq curl rsync
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+[[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
 
 update_type=""
 if [[ "${1}" == "--ota" ]]; then
@@ -33,7 +34,7 @@ elif [[ "${1}" == "--repo" ]]; then
   update_type="repo"
   descriptor="${2}"
   if [[ "${descriptor}" != *"#"* ]]; then
-    descriptor="${descriptor}#main"
+    descriptor="${descriptor}#${UPDATE_CHANNEL:-"main"}"
   fi
   repo="${descriptor%%#*}"
   branch="${descriptor#*#}"
