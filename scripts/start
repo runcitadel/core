@@ -66,8 +66,8 @@ else
 fi
 
 # Whitelist device IP, hostname and hidden service for CORS
-DEVICE_IP=$(hostname -I | awk '{print $1}')
-DEVICE_HOSTNAME="$(hostname)"
+DEVICE_IP=$(hostname -I | awk '{print $1}') || DEVICE_IP="$(ip addr show $(ip route | awk '/default/ { print $5 }') | grep "inet" | head -n 1 | awk '/inet/ {print $2}' | cut -d'/' -f1)"
+DEVICE_HOSTNAME="$(hostname)" || DEVICE_HOSTNAME="$(cat /etc/hostname)"
 DEVICE_HOSTS="http://${DEVICE_IP},http://${DEVICE_HOSTNAME}.local,https://${DEVICE_HOSTNAME}.local,http://${DEVICE_HOSTNAME},https://${DEVICE_HOSTNAME}"
 if [[ -f "${CITADEL_ROOT}/tor/data/web/hostname" ]]; then
     hidden_service_url=$(cat "${CITADEL_ROOT}/tor/data/web/hostname")
