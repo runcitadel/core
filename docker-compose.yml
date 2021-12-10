@@ -102,7 +102,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:90e9bc55cbb13a1d3fd0c42d1d29240ab7b3d0f568691ce398750486315aedae
+    image: ghcr.io/runcitadel/dashboard:main@sha256:b8cf0492009f67762f76e95e81429f00b20ead9c9bcfc91a3c2fcf479809950a
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -174,7 +174,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:12870a6f6f0601cc7850e26613370b55d8b92a404ac7dcc88ab395051214882c
+    image: ghcr.io/runcitadel/middleware:main@sha256:0b844e5012454146e76145c066632e5356c0d027e3550b89ac75eb60d545c4e5
     depends_on:
     - manager
     - bitcoin
