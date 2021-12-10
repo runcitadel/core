@@ -224,7 +224,7 @@ services:
         ipv4_address: $NEUTRINO_SWITCHER_IP
   electrs:
     container_name: electrs
-    image: ghcr.io/runcitadel/electrs:v0.9.2@sha256:ab756976bceb1c209c89510db5c41b4540675eb3e65202fa843be95d0e6122b9
+    image: ghcr.io/runcitadel/electrs:v0.9.3@sha256:fd49202d1ddd3622415f81f4870bceccc77f7e0ce303ea3ac421c3366896b6a4
     working_dir: /data
     volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
