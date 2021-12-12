@@ -6,7 +6,6 @@
 # Please note: This file can't be changed, it will be overwritten.
 # A few modifications will be kept, including alias, color, channel size limitations and more if you contact us.
 
-verbose = 2
 network = "bitcoin"
 db_dir = "/data/db"
 daemon_dir = "/bitcoin"
