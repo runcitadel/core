@@ -58,6 +58,7 @@ services:
     stop_grace_period: 30s
     ports:
     - ${NGINX_PORT}:80
+    - 443:443
     networks:
       default:
         ipv4_address: $NGINX_IP
@@ -102,7 +103,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:32983c296aa09428d0bf4435ae097ebdc9c5b44cd010753f3106962ab23ce1a5
+    image: ghcr.io/runcitadel/dashboard:main@sha256:1650665649d093dd321f752097437feee198e9c7dc72a88a758f7badc979f139
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -110,7 +111,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:24c333bc948deb2134eaa2d847578f28bd8931c37260dee4533619da73effa25
+    image: ghcr.io/runcitadel/manager:main@sha256:b21cf3bd1224d4e1f7edb8e8a3941bca6b3f2c64c312809b5bbca4451cf580ea
     depends_on:
     - tor
     - redis
@@ -175,7 +176,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:0b844e5012454146e76145c066632e5356c0d027e3550b89ac75eb60d545c4e5
+    image: ghcr.io/runcitadel/middleware:main@sha256:9fdf357cad1638a998f54bd97aad505d42ad67d592cf43d8b415e519e8fa1733
     depends_on:
     - manager
     - bitcoin
