@@ -332,6 +332,8 @@ print()
 
 # Loop through templates_to_build and build them
 for template_path, output_path in templates_to_build.items():
+  if output_path == "./nginx/nginx.conf" and os.path.isfile(output_path):
+    continue
   data = replace_vars(template_path)
   # If output path is a list, then it is a list of output paths
   if isinstance(output_path, list):
