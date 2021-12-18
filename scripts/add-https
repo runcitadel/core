@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
-import crossplane
+try:
+    import crossplane
+except ImportError:
+    print("Crossplane not found. Please run 'sudo pip3 install crossplane'")
+    exit(1)
 import os
 import argparse
 import shutil
