@@ -12,7 +12,7 @@ from lib.composegenerator.v1.types import Container
 def getFreePort(networkingFile: str, appId: str):
     # Ports used currently in Citadel
     # TODO: Update this list, currently it's outdated
-    usedPorts = [80, 8333, 8332, 28332, 28333, 28334, 10009, 8080, 50001, 9050, 3002, 3000, 3300, 3001, 3004, 25441,
+    usedPorts = [80, 433, 443, 8333, 8332, 28332, 28333, 28334, 10009, 8080, 50001, 9050, 3002, 3000, 3300, 3001, 3004, 25441,
                  3003, 3007, 3006, 3009, 3005, 8898, 3008, 8081, 8082, 8083, 8085, 2222, 8086, 8087, 8008, 8088, 8089, 8091]
     networkingData = {}
     if os.path.isfile(networkingFile):
