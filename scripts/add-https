@@ -101,10 +101,6 @@ config = {
     "block": [
         {
             "directive": "listen",
-            "args": ["80"]
-        },
-        {
-            "directive": "listen",
             "args": ["443", "ssl", "http2"]
         },
         {
@@ -168,6 +164,25 @@ config = {
     ]
 }
 
+redirect_config = {
+    "directive": "server",
+    "args": [],
+    "block": [
+        {
+            "directive": "listen",
+            "args": ["433"]
+        },
+        {
+            "directive": "server_name",
+            "args": [domain]
+        },
+        {
+            "directive": "return",
+            "args": ["301", "https://$host$request_uri;"]
+        },
+    ]
+}
+
 # Now, copy the given certificate and key to the correct location
 newCertLocation = os.path.join(node_root, 'nginx', domain + '.pem')
 newKeyLocation = os.path.join(node_root, 'nginx', domain + '.key')
@@ -175,6 +190,7 @@ shutil.copy(cert, newCertLocation)
 shutil.copy(key, newKeyLocation)
 
 http_element["block"].append(config)
+http_element["block"].append(redirect_config)
 newConfig = crossplane.build(parsedConfig)
 # Write newConfig to nginx_config_file
 with open(nginx_config_file, 'w') as file:

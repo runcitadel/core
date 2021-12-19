@@ -10,3 +10,4 @@ logs/*
 app-data/*
 apps/networking.json
 use-core-upstream
+nginx/*
