@@ -86,7 +86,7 @@ else:
     print("Error: No port found for {}".format(service))
     exit(1)
 
-if service == "btcpay-server":
+if service == "btcpay-server" or service == "lnbits":
     port = 1234
 
 actual_url="http://{}:{}".format(ip, port)
