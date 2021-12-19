@@ -178,7 +178,7 @@ redirect_config = {
         },
         {
             "directive": "return",
-            "args": ["301", "https://$host$request_uri;"]
+            "args": ["301", "https://$host$request_uri"]
         },
     ]
 }
