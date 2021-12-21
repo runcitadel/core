@@ -58,6 +58,7 @@ services:
     stop_grace_period: 30s
     ports:
     - ${NGINX_PORT}:80
+    - 433:433
     - 443:443
     networks:
       default:
@@ -176,7 +177,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:b54161ff4dc5ff27e80cc6f17b8273cbc048c8d296942df742799ca789722aa6
+    image: ghcr.io/runcitadel/middleware:main@sha256:ab0bc5fcabc241388ca5ef57990c6e4c9b2dea1b0df235eec16cd219e42343b4
     depends_on:
     - manager
     - bitcoin
