@@ -89,6 +89,9 @@ else:
 if service == "btcpay-server" or service == "lnbits":
     port = 1234
 
+if service == "lnme":
+    port = 1323
+
 actual_url="http://{}:{}".format(ip, port)
 
 
