@@ -104,7 +104,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:921d2576fdd108783639525bbb163bcade3cfb6056c787b339fd1baf40266dc1
+    image: ghcr.io/runcitadel/dashboard:main@sha256:a07c84db6a19d6970527eb5bd8f0482239a8b09396fe7e9d6ef761a4f1e09bc5
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
