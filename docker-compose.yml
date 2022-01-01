@@ -177,7 +177,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:982a5ebecfdc1b3c82b0340ea2ed3867d4611204f5c9fa986967aaa6365e693d
+    image: ghcr.io/runcitadel/middleware:main@sha256:488daefc3eb26e53272107ae6a3045c16fa1138a9d277d92a67f18821df00a7e
     depends_on:
     - manager
     - bitcoin
@@ -228,7 +228,7 @@ services:
         ipv4_address: $NEUTRINO_SWITCHER_IP
   electrs:
     container_name: electrs
-    image: ghcr.io/runcitadel/electrs:v0.9.3@sha256:fd49202d1ddd3622415f81f4870bceccc77f7e0ce303ea3ac421c3366896b6a4
+    image: ghcr.io/runcitadel/electrs:v0.9.4@sha256:1a354c06f5f0e6b15a94a6a12b73e779d7e40e1e433100962f1481385c534fe9
     working_dir: /data
     volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
