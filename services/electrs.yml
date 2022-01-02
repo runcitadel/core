@@ -4,7 +4,7 @@
 
 electrs:
       container_name: electrs
-      image: ghcr.io/runcitadel/electrs:v0.9.3@sha256:fd49202d1ddd3622415f81f4870bceccc77f7e0ce303ea3ac421c3366896b6a4
+      image: ghcr.io/runcitadel/electrs:v0.9.4@sha256:e216736fa26ef8c8b9e9a0a1fb7bc759546f1a0b74ef5ef3022470495e68f3a1
       working_dir: /data
       volumes:
         - ${PWD}/bitcoin:/bitcoin:ro

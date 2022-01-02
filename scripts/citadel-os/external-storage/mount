@@ -287,6 +287,12 @@ main () {
   echo "Checking SD Card root is bind mounted at /sd-root..."
   df -h "/sd-root${CITADEL_ROOT}" | grep --quiet "/dev/root"
 
+  if [[ $block_device != nvme* ]]; then
+    echo "unknown" > "${CITADEL_ROOT}/statuses/external_storage"
+  else
+    echo "nvme" > "${CITADEL_ROOT}/statuses/external_storage"
+  fi
+
   echo "Starting external drive mount monitor..."
   echo
   ${CITADEL_ROOT}/scripts/citadel-os/external-storage/monitor ${block_device} ${MOUNT_POINT} &

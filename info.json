@@ -1,6 +1,6 @@
 {
-    "version": "0.5.15",
-    "name": "Citadel 0.5.15",
+    "version": "0.5.16",
+    "name": "Citadel 0.5.16",
     "requires": ">=0.5.5",
-    "notes": "This update just fixes some bugs and updates some apps. Nothing new yet, updates will be kinda boring until 2022."
+    "notes": "This update prepares Citadel for Alby integration. Soon, a connection to Citadel will be available there."
 }

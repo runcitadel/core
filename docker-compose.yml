@@ -58,6 +58,8 @@ services:
     stop_grace_period: 30s
     ports:
     - ${NGINX_PORT}:80
+    - 433:433
+    - 443:443
     networks:
       default:
         ipv4_address: $NGINX_IP
@@ -102,7 +104,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:9b5281968bb16109e17ec808fe6fe75e42c0e150a6a9667fd2c98ba4c472a5a2
+    image: ghcr.io/runcitadel/dashboard:main@sha256:a07c84db6a19d6970527eb5bd8f0482239a8b09396fe7e9d6ef761a4f1e09bc5
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -110,7 +112,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:26a021cff33d9f81217b1810a743024d5a7a03493abbec766dd88680720d7102
+    image: ghcr.io/runcitadel/manager:main@sha256:b21cf3bd1224d4e1f7edb8e8a3941bca6b3f2c64c312809b5bbca4451cf580ea
     depends_on:
     - tor
     - redis
@@ -155,7 +157,7 @@ services:
       SHUTDOWN_SIGNAL_FILE: /signals/shutdown
       REBOOT_SIGNAL_FILE: /signals/reboot
       GITHUB_REPO: runcitadel/core
-      GITHUB_BRANCH: main
+      GITHUB_BRANCH: ${UPDATE_CHANNEL:-"main"}
       VERSION_FILE: /info.json
       UPDATE_STATUS_FILE: /statuses/update-status.json
       UPDATE_SIGNAL_FILE: /signals/update
@@ -165,16 +167,17 @@ services:
       TOR_PROXY_IP: ${TOR_PROXY_IP}
       TOR_PROXY_PORT: ${TOR_PROXY_PORT}
       TOR_HIDDEN_SERVICE_DIR: /var/lib/tor
-      IS_CITADEL_OS: ${IS_CITADEL_OS:-"false"}
+      IS_CITADEL_OS: ${IS_CITADEL_OS:-"true"}
       REDIS_PASSWORD: freedom
       REDIS_IP: $REDIS_IP
       REDIS_PORT: 6379
+      UNSAFE_REMOVE_CORS_CHECK: true
     networks:
       default:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:12870a6f6f0601cc7850e26613370b55d8b92a404ac7dcc88ab395051214882c
+    image: ghcr.io/runcitadel/middleware:main@sha256:488daefc3eb26e53272107ae6a3045c16fa1138a9d277d92a67f18821df00a7e
     depends_on:
     - manager
     - bitcoin
@@ -199,6 +202,7 @@ services:
       LND_HOST: ${LND_IP}
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
+      UNSAFE_REMOVE_CORS_CHECK: true
     networks:
       default:
         ipv4_address: $MIDDLEWARE_IP
@@ -224,7 +228,7 @@ services:
         ipv4_address: $NEUTRINO_SWITCHER_IP
   electrs:
     container_name: electrs
-    image: ghcr.io/runcitadel/electrs:v0.9.3@sha256:fd49202d1ddd3622415f81f4870bceccc77f7e0ce303ea3ac421c3366896b6a4
+    image: ghcr.io/runcitadel/electrs:v0.9.4@sha256:e216736fa26ef8c8b9e9a0a1fb7bc759546f1a0b74ef5ef3022470495e68f3a1
     working_dir: /data
     volumes:
     - ${PWD}/bitcoin:/bitcoin:ro

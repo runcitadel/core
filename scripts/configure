@@ -147,6 +147,7 @@ if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream
 ##########################################################
 
 NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
+UPDATE_CHANNEL="main"
 
 if reconfiguring:
   if os.path.isfile('../.citadel'):
@@ -169,6 +170,8 @@ if reconfiguring:
   TOR_PASSWORD=dotenv['TOR_PASSWORD']
   TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
   NGINX_PORT=dotenv['NGINX_PORT']
+  if 'UPDATE_CHANNEL' in dotenv:
+    UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
 else:
   # Generate RPC credentials
   print("Generating auth credentials")
@@ -273,7 +276,13 @@ ELECTRUM_PORT="50001"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
 
-DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
+DEVICE_HOSTNAME=""
+try:
+  subprocess.check_output("hostname").decode("utf-8").strip()
+except:
+  # The content of /etc/hostname is the device's hostname
+  DEVICE_HOSTNAME=open("/etc/hostname").read().strip()
+
 DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
 # Get the real path by following symlinks
 DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
@@ -323,6 +332,8 @@ print()
 
 # Loop through templates_to_build and build them
 for template_path, output_path in templates_to_build.items():
+  if output_path == "./nginx/nginx.conf" and os.path.isfile(output_path):
+    continue
   data = replace_vars(template_path)
   # If output path is a list, then it is a list of output paths
   if isinstance(output_path, list):
