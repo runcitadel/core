@@ -95,6 +95,15 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 pkill -f "\./karen" || true
 
+# Start updated containers
+echo "Stopping old containers"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 67, "description": "Stopping old containers", "updateTo": "$RELEASE"}
+EOF
+cd "$CITADEL_ROOT"
+./scripts/stop
+
+
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
