@@ -1,6 +1,6 @@
 {
-    "version": "0.5.17",
-    "name": "Citadel 0.5.17",
+    "version": "0.5.18",
+    "name": "Citadel 0.5.18",
     "requires": ">=0.5.5",
-    "notes": "This update fixes some minor issues with the initial setup experience and the update process."
+    "notes": "Sorry about spamming updates recently, this update maes it possible to install app updates directly from the dashboard."
 }
