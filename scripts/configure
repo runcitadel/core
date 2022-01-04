@@ -356,10 +356,14 @@ print()
 print("Installing docker-compose...")
 print()
 download_docker_compose()
-if not updating:
+if not reconfiguring:
   print("Updating apps...")
   print()
   os.system('./app/app-manager.py --invoked-by-configure update-online')
+elif not updating:
+  print("Updating apps...")
+  print()
+  os.system('./app/app-manager.py --invoked-by-configure update')
 print("Configuring permissions")
 print()
 os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
