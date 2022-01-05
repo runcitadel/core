@@ -198,6 +198,9 @@ ADDITIONAL_BITCOIN_OPTIONS=""
 BOLT_DB_OPTIONS=""
 CHANNEL_LIMITATIONS=""
 BASEFEE = "bitcoin.basefee=0"
+EXTERNAL_IP = ""
+if os.path.isfile('./tor/data/bitcoin-p2p/hostname'):
+  EXTERNAL_IP="externalip=" + open('./tor/data/bitcoin-p2p/hostname').read()
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
