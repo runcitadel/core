@@ -5,7 +5,9 @@
 import re
 
 # Helper functions
-# Return a list of env vars in a string, supports both $NAM§ and ${NAME} format for the env var
+
+
+# Return a list of env vars in a string, supports both $NAME and ${NAME} format for the env var
 # This can potentially be used to get around permissions, so this check is critical for security
 # Please report any security vulnerabilities you find in this check to aaron.dewes@protonmail.com
 def getEnvVars(string: str):

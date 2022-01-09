@@ -67,7 +67,7 @@ fswatch -0 --event=PlatformSpecific $signal_dir | while read -d "" event; do
 
     # If the signal starts wih app-, the trigger is "$trigger_dir/app"
     # and the args are the rest of the signal
-    if [[ "$signal" =~ ^app- ]]; then
+    if [[ "$signal" =~ ^app- ]] && [[ "$signal" != "app-update" ]]; then
       trigger="$trigger_dir/app"
       args="${signal#"app-"}"
     fi
