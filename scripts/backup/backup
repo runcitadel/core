@@ -156,6 +156,8 @@ else
 fi
 echo
 
+~/citadel-backup-upload-hook "${BACKUP_FILE}" || true
+
 rm -rf "${BACKUP_ROOT}"
 
 # Update status file
