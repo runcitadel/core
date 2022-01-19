@@ -54,12 +54,12 @@ elif args.action == 'update':
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
-        os.system("docker compose stop app_tor")
-        os.system("docker compose start app_tor")
-        os.system("docker compose stop app_2_tor")
-        os.system("docker compose start app_2_tor")
-        os.system("docker compose stop app_3_tor")
-        os.system("docker compose start app_3_tor")
+        os.system("docker compose stop app-tor")
+        os.system("docker compose start app-tor")
+        os.system("docker compose stop app-2-tor")
+        os.system("docker compose start app-2-tor")
+        os.system("docker compose stop app-3-tor")
+        os.system("docker compose start app-3-tor")
     exit(0)
 elif args.action == 'update-online':
     updateRepos()
@@ -69,12 +69,12 @@ elif args.action == 'update-online':
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
-        os.system("docker compose stop app_tor")
-        os.system("docker compose start app_tor")
-        os.system("docker compose stop app_2_tor")
-        os.system("docker compose start app_2_tor")
-        os.system("docker compose stop app_3_tor")
-        os.system("docker compose start app_3_tor")
+        os.system("docker compose stop app-tor")
+        os.system("docker compose start app-tor")
+        os.system("docker compose stop app-2-tor")
+        os.system("docker compose start app-2-tor")
+        os.system("docker compose stop app-3-tor")
+        os.system("docker compose start app-3-tor")
     exit(0)
 elif args.action == 'ls-installed':
     # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps

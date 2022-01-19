@@ -95,7 +95,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 pkill -f "\./karen" || true
 
-# Start updated containers
+# Stop old containers
 echo "Stopping old containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 67, "description": "Stopping old containers", "updateTo": "$RELEASE"}

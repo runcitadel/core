@@ -13,8 +13,8 @@ services:
     networks:
       default:
         ipv4_address: $TOR_PROXY_IP
-  app_tor:
-    container_name: app_tor
+  app-tor:
+    container_name: app-tor
     image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
@@ -24,8 +24,8 @@ services:
     networks:
       default:
         ipv4_address: $APPS_TOR_IP
-  app_2_tor:
-    container_name: app_2_tor
+  app-2-tor:
+    container_name: app-2-tor
     image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
@@ -35,8 +35,8 @@ services:
     networks:
       default:
         ipv4_address: $APPS_2_TOR_IP
-  app_3_tor:
-    container_name: app_3_tor
+  app-3-tor:
+    container_name: app-3-tor
     image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
     user: toruser
     restart: on-failure
