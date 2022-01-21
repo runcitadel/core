@@ -4,7 +4,7 @@
 
 # SPDX-FileCopyrightText: 2015-2018 The Bitcoin Core developers
 #
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from argparse import ArgumentParser
 from base64 import urlsafe_b64encode

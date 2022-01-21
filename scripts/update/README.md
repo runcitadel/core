@@ -1,7 +1,7 @@
 <!--
 SPDX-FileCopyrightText: 2020 Umbrel. https://getumbrel.com
 
-SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-License-Identifier: GPL-3.0-or-later
 -->
 
 # Over-The-Air (OTA) Updates
