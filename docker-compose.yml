@@ -154,13 +154,10 @@ services:
       LND_GRPC_HIDDEN_SERVICE_FILE: /var/lib/tor/lnd-grpc/hostname
       LND_CERT_FILE: /lnd/tls.cert
       LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
-      SHUTDOWN_SIGNAL_FILE: /signals/shutdown
-      REBOOT_SIGNAL_FILE: /signals/reboot
       GITHUB_REPO: runcitadel/core
       GITHUB_BRANCH: ${UPDATE_CHANNEL:-"main"}
       VERSION_FILE: /info.json
       UPDATE_STATUS_FILE: /statuses/update-status.json
-      UPDATE_SIGNAL_FILE: /signals/update
       UPDATE_LOCK_FILE: /statuses/update-in-progress
       BACKUP_STATUS_FILE: /statuses/backup-status.json
       DEBUG_STATUS_FILE: /statuses/debug-status.json
