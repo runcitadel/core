@@ -112,7 +112,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:03175b59b8465b0e570e5082028281eb8d77edf27309bf604d7a0a9e2825aee1
+    image: ghcr.io/runcitadel/manager:main@sha256:26a1364b018c85a3fd46eb0e5e1e4f2ed3a1dc49c7a2ef5c3e15fe77afe3757e
     depends_on:
     - tor
     - redis
@@ -143,10 +143,7 @@ services:
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
       SEED_FILE: /db/citadel-seed/seed
-      DASHBOARD_HIDDEN_SERVICE_FILE: /var/lib/tor/web/hostname
-      BITCOIN_P2P_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-p2p/hostname
       BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
-      BITCOIN_RPC_HIDDEN_SERVICE_FILE: /var/lib/tor/bitcoin-rpc/hostname
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIN_RPC_USER: $BITCOIN_RPC_USER
       BITCOIN_RPC_PASSWORD: $BITCOIN_RPC_PASS
