@@ -138,7 +138,6 @@ services:
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       JWT_PRIVATE_KEY_FILE: /jwt-private-key/jwt.key
       JWT_EXPIRATION: '3600'
-      DOCKER_COMPOSE_DIRECTORY: $PWD
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
@@ -147,14 +146,11 @@ services:
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIN_RPC_USER: $BITCOIN_RPC_USER
       BITCOIN_RPC_PASSWORD: $BITCOIN_RPC_PASS
-      LND_REST_HIDDEN_SERVICE_FILE: /var/lib/tor/lnd-rest/hostname
-      LND_GRPC_HIDDEN_SERVICE_FILE: /var/lib/tor/lnd-grpc/hostname
       LND_CERT_FILE: /lnd/tls.cert
       LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
       GITHUB_REPO: runcitadel/core
       GITHUB_BRANCH: ${UPDATE_CHANNEL:-"main"}
       VERSION_FILE: /info.json
-      UPDATE_STATUS_FILE: /statuses/update-status.json
       UPDATE_LOCK_FILE: /statuses/update-in-progress
       BACKUP_STATUS_FILE: /statuses/backup-status.json
       DEBUG_STATUS_FILE: /statuses/debug-status.json
