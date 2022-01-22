@@ -48,7 +48,7 @@ services:
         ipv4_address: $APPS_3_TOR_IP
   nginx:
     container_name: nginx
-    image: nginx:1.21.3@sha256:644a70516a26004c97d0d85c7fe1d0c3a67ea8ab7ddf4aff193d9f301670cf36
+    image: nginx:1.21.5@sha256:0d17b565c37bcbd895e9d92315a05c1c3c9a29f762b011a10c54a66cd53c9b31
     depends_on:
     - dashboard
     - manager
