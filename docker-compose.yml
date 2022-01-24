@@ -120,7 +120,6 @@ services:
     init: true
     stop_grace_period: 5m30s
     volumes:
-    - ${PWD}:${PWD}
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
     - ${PWD}/events/signals:/signals
