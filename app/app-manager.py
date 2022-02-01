@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos
+from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos, download
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -25,7 +25,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "list", "download", "update", "update-online", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
+                    "list", "download", "generate", "update", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
 # Add the --invoked-by-configure option, which is hidden from the user in --help
 parser.add_argument('--invoked-by-configure',
                     action='store_true', help=argparse.SUPPRESS)
@@ -48,7 +48,7 @@ if args.action == 'list':
 elif args.action == 'download':
     updateRepos()
     exit(0)
-elif args.action == 'update':
+elif args.action == 'generate':
     if args.invoked_by_configure:
         update(args.app)
     else:
@@ -61,11 +61,15 @@ elif args.action == 'update':
         os.system("docker compose stop app-3-tor")
         os.system("docker compose start app-3-tor")
     exit(0)
-elif args.action == 'update-online':
-    updateRepos()
-    print("Downloaded all updates")
+elif args.action == 'update':
+    if args.app is None:
+        updateRepos()
+        print("Downloaded all updates")
+    else:
+        download(args.app)
+        print("Downloaded latest {} version".format(args.app))
     if args.invoked_by_configure:
-        update(args.app)
+        update(args.verbose)
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)

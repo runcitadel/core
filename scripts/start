@@ -126,7 +126,7 @@ fi
 echo
 echo "Starting installed apps..."
 echo
-./app/app-manager.py start installed
+./scripts/app start installed
 echo
 
 echo "Citadel is now accessible at"

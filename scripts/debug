@@ -153,7 +153,7 @@ if [[ "${1}" == "--run" ]]; then
     echo
     docker compose logs --tail=30 tor
     
-    installed_apps=$(./app/app-manager.py ls-installed)
+    installed_apps=$(./scripts/app ls-installed)
     if [[ ! -z "${installed_apps:-}" ]]; then
         echo
         echo "App logs"

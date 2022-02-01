@@ -50,25 +50,24 @@ def getArguments():
 
 
 def getAppYml(name):
-    url = 'https://raw.githubusercontent.com/runcitadel/core/main/apps/' + \
-        name + '/' + 'app.yml'
+    with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
+        sourceMap = json.load(f)
+    if not name in sourceMap:
+        print("Warning: App {} can't be updated because it is not in the source map".format(name))
+        return False
+    url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
     response = requests.get(url)
     if response.status_code == 200:
         return response.text
     else:
         return False
 
-
-def getAppYmlPath(app):
-    return os.path.join(appsDir, app, 'app.yml')
-
-
 def update(verbose: bool = False):
     apps = findAndValidateApps(appsDir)
     # The compose generation process updates the registry, so we need to get it set up with the basics before that
     registry = getAppRegistry(apps, appsDir)
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
-        json.dump(registry, f, indent=4, sort_keys=True)
+        json.dump(registry, f, sort_keys=True)
     print("Wrote registry to registry.json")
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
@@ -84,23 +83,13 @@ def update(verbose: bool = False):
     print("Generated configuration successfully")
 
 
-def download(app: str = None):
-    if app is None:
-        apps = findAndValidateApps(appsDir)
-        for app in apps:
-            data = getAppYml(app)
-            if data:
-                with open(getAppYmlPath(app), 'w') as f:
-                    f.write(data)
-            else:
-                print("Warning: Could not download " + app)
+def download(app: str):
+    data = getAppYml(app)
+    if data:
+        with open(os.path.join(appsDir, app, "app.yml"), 'w') as f:
+            f.write(data)
     else:
-        data = getAppYml(app)
-        if data:
-            with open(getAppYmlPath(app), 'w') as f:
-                f.write(data)
-        else:
-            print("Warning: Could not download " + app)
+        print("Warning: Could not download " + app)
 
 
 def getUserData():
@@ -273,6 +262,8 @@ def updateRepos():
     # For each repo, clone the repo to a temporary dir, checkout the branch,
     # and overwrite the current app dir with the contents of the temporary dir/apps/app
     alreadyInstalled = []
+    # A map of apps to their source repo
+    sourceMap = {}
     for repo in repos:
         repo = repo.strip()
         if repo == "":
@@ -298,6 +289,11 @@ def updateRepos():
             # if the app is already installed, don't overwrite it
             if app in alreadyInstalled:
                 continue
+            if gitUrl.startswith("https://github.com"):
+                sourceMap[app] = {
+                    "githubRepo": gitUrl.removeprefix("https://github.com/").removesuffix(".git").removesuffix("/"),
+                    "branch": branch,
+                }
             if os.path.isdir(os.path.join(appsDir, app)):
                 shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
             if os.path.isdir(os.path.join(tempDir, "apps", app)):
@@ -306,3 +302,5 @@ def updateRepos():
                 alreadyInstalled.append(app)
         # Remove the temporary dir
         shutil.rmtree(tempDir)
+    with open(os.path.join(appsDir, "sourceMap.json"), "w") as f:
+        json.dump(sourceMap, f)

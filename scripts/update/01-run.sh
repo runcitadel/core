@@ -124,11 +124,11 @@ echo "Updating installed apps"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 70, "description": "Updating installed apps", "updateTo": "$RELEASE"}
 EOF
-"${CITADEL_ROOT}/app/app-manager.py" update-online
-for app in $("$CITADEL_ROOT/app/app-manager.py" ls-installed); do
+"${CITADEL_ROOT}/scripts/app" --invoked-by-configure update
+for app in $("$CITADEL_ROOT/scripts/app" ls-installed); do
   if [[ "${app}" != "" ]]; then
     echo "${app}..."
-    "${CITADEL_ROOT}/app/app-manager.py" compose "${app}" pull
+    "${CITADEL_ROOT}/scripts/app" compose "${app}" pull
   fi
 done
 wait

@@ -6,5 +6,5 @@
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
-"${CITADEL_ROOT}/app/app-manager.py" update-online
-"${CITADEL_ROOT}/app/app-manager.py" start installed
+"${CITADEL_ROOT}/scripts/app" update
+"${CITADEL_ROOT}/scripts/app" start installed

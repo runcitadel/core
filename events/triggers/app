@@ -10,4 +10,4 @@ signal="${1}"
 command=${signal%%"-"*}
 app=${signal#*"-"}
 
-"${CITADEL_ROOT}/app/app-manager.py" "${command}" "${app}"
+"${CITADEL_ROOT}/scripts/app" "${command}" "${app}"

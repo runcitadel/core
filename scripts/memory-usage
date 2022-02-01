@@ -35,7 +35,7 @@ get_total_used_mem() {
 # To get the containers of the app, list every container whose name starts with the name of the app
 get_app_containers () {
   local app_name="$1"
-  "${CITADEL_ROOT}/app/app-manager.py" compose "${app_name}" ps | awk '{print $1}' | grep -v 'Name\|-----'
+  "${CITADEL_ROOT}/scripts/app" compose "${app_name}" ps | awk '{print $1}' | grep -v 'Name\|-----'
 }
 
 # Get the memory usage of the whole system, excluding docker containers
@@ -52,7 +52,7 @@ main() {
   for service in bitcoin lnd electrs tor; do
     echo "${service}: $(get_memory_usage "$service")%" &
   done
-  for app in $("${CITADEL_ROOT}/app/app-manager.py" ls-installed); do
+  for app in $("${CITADEL_ROOT}/scripts/app" ls-installed); do
     # For every container of the app, get the mem usage, save it, and at the end, print the total mem usage of the app
     local mem_usage=0
     for container in $(get_app_containers "$app"); do
