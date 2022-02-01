@@ -68,8 +68,6 @@ services:
     image: nolim1t/bitcoinknots:v22.0.knots20211108@sha256:a475da2b2ecda55fcc65ea23e1a36c58b2c10549f1c3d3bb3c31c7dda1127354
     depends_on:
     - tor
-    - manager
-    - nginx
     init: true
     volumes:
     - ${PWD}/bitcoin:/data/.bitcoin
@@ -86,7 +84,6 @@ services:
     user: 1000:1000
     depends_on:
     - tor
-    - manager
     - bitcoin
     volumes:
     - ${PWD}/lnd:/data/.lnd
