@@ -64,7 +64,7 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
 
     echo "source ~/citadel/setenv" | tee -a /home/citadel/.bashrc
 
-    sudo apt install -y python3-dacite
+    sudo apt install -y python3-dacite python3-semver
 fi
 
 # Help migration from earlier versions

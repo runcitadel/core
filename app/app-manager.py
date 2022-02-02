@@ -25,7 +25,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "list", "download", "generate", "update", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
+                    "list", "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
 # Add the --invoked-by-configure option, which is hidden from the user in --help
 parser.add_argument('--invoked-by-configure',
                     action='store_true', help=argparse.SUPPRESS)
@@ -43,6 +43,11 @@ if args.action is None:
 if args.action == 'list':
     apps = findAndValidateApps(appsDir)
     for app in apps:
+        print(app)
+    exit(0)
+elif args.action == "list-updates":
+    availableUpdates = getAvailableUpdates()
+    for app in availableUpdates:
         print(app)
     exit(0)
 elif args.action == 'download':

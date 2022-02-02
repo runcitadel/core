@@ -15,6 +15,16 @@ import shutil
 import json
 import yaml
 import subprocess
+try:
+    import semver
+except Exception:
+    print("Semver for python isn't installed")
+    print("On Debian/Ubuntu, you can install it using")
+    print("    sudo apt install -y python3-semver")
+    print("On other systems, please use")
+    print("     sudo pip3 install semver")
+    print("Continuing anyway, but some features won't be available")
+    print("Like checking for app updates")
 
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.validate import findAndValidateApps
@@ -99,9 +109,27 @@ def getUserData():
             userData = json.load(f)
     return userData
 
+def checkUpdateAvailable(name: str) -> bool:
+    latestAppYml = yaml.safe_load(getAppYml(name))
+    with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
+        originalAppYml = yaml.safe_load(f)
+    if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
+        print("App {} is not valid".format(name))
+        return False
+    return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
+
+def getAvailableUpdates():
+    availableUpdates = []
+    apps = findAndValidateApps(appsDir)
+    for app in apps:
+        try:
+            if checkUpdateAvailable(app):
+                availableUpdates.push(app)
+        except Exception:
+            print("Can't check app {} yet".format(app))
 
 def startInstalled():
-    # If userfile doen't exist, just do nothing
+    # If userfile doesn't exist, just do nothing
     userData = {}
     if os.path.isfile(userFile):
         with open(userFile, "r") as f:
@@ -118,7 +146,7 @@ def startInstalled():
 
 
 def stopInstalled():
-    # If userfile doen't exist, just do nothing
+    # If userfile doesn't exist, just do nothing
     userData = {}
     if os.path.isfile(userFile):
         with open(userFile, "r") as f:
@@ -282,7 +310,7 @@ def updateRepos():
         tempDir = tempfile.mkdtemp()
         print("Cloning the repository")
         # Git clone with a depth of 1 to avoid cloning the entire repo
-        # Dont print anything to stdout, as we don't want to see the git clone output
+        # Don't print anything to stdout, as we don't want to see the git clone output
         subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
         # Overwrite the current app dir with the contents of the temporary dir/apps/app
         for app in os.listdir(os.path.join(tempDir, "apps")):
