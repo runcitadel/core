@@ -109,7 +109,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:26a1364b018c85a3fd46eb0e5e1e4f2ed3a1dc49c7a2ef5c3e15fe77afe3757e
+    image: ghcr.io/runcitadel/manager:v0.0.3@sha256:73a32372ebe0c3dcb174f36c2c80b8d886e6e837a400ca1e66d46769e600d796
     depends_on:
     - tor
     - redis
