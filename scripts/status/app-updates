@@ -6,7 +6,4 @@
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
-OUTPUT_FILE="${CITADEL_ROOT}/statuses/available-updates.json"
-
-echo "false" > "${OUTPUT_FILE}"
-"${CITADEL_ROOT}/scripts/app" list-updates  > "${OUTPUT_FILE}"
+"${CITADEL_ROOT}/scripts/app" list-updates
