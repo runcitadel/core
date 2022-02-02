@@ -1,11 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "app.yml specification v1",
-  "description": "The app.yml format, cleaned up. This format should be used for new apps, but the autoconverter can only convert to v0, so v0 will be kept for some time.",
+  "title": "Citadel app.yml v1",
+  "description": "The first draft of Citadel's app.yml format",
   "type": "object",
   "properties": {
     "version": {
-      "type": ["string", "number"],
+      "type": [
+        "string",
+        "number"
+      ],
       "description": "The version of the app.yml format you're using."
     },
     "metadata": {
@@ -111,13 +114,22 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["lnd", "bitcoind", "electrum", "root", "hw"]
+              "enum": [
+                "lnd",
+                "bitcoind",
+                "electrum",
+                "root",
+                "hw"
+              ]
             }
           },
           "ports": {
             "type": "array",
             "items": {
-              "type": ["string", "number"]
+              "type": [
+                "string",
+                "number"
+              ]
             }
           },
           "port": {
@@ -125,7 +137,7 @@
             "description": "If this is the main container, the port inside the container which will be exposed to the outside as the port specified in metadata."
           },
           "environment": {
-            "type": ["object", "array"]
+            "type": "object"
           },
           "data": {
             "type": "array",
@@ -147,11 +159,21 @@
             "description": "The services the container depends on"
           },
           "entrypoint": {
-            "type": ["string", "array"],
+            "type": [
+              "string",
+              "array"
+            ],
             "description": "The entrypoint for the container"
           },
+          "bitcoin_mount_dir": {
+            "type": "string",
+            "description": "Where to mount the bitcoin dir"
+          },
           "command": {
-            "type": ["string", "array"],
+            "type": [
+              "string",
+              "array"
+            ],
             "description": "The command for the container"
           },
           "init": {
@@ -179,17 +201,30 @@
             "description": "Set this to a map of service names to hidden service ports if your container exposes multiple ports, and all of them should be hidden services.",
             "patternProperties": {
               "^[a-zA-Z0-9_]+$": {
-                "type": ["number", "array"]
+                "type": [
+                  "number",
+                  "array"
+                ]
               }
             }
+          },
+          "restart": {
+            "type": "string",
+            "description": "When the container should restart. Can be 'always' or 'on-failure'."
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "image"
+        ]
       },
-      "required": ["name", "image"],
       "additionalProperties": false
     }
   },
-  "required": ["metadata", "containers"],
+  "required": [
+    "metadata",
+    "containers"
+  ],
   "additionalProperties": false
 }

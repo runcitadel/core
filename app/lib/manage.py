@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import stat
+import sys
 import tempfile
 import threading
 from typing import List
@@ -124,9 +125,10 @@ def getAvailableUpdates():
     for app in apps:
         try:
             if checkUpdateAvailable(app):
-                availableUpdates.push(app)
+                availableUpdates.append(app)
         except Exception:
-            print("Can't check app {} yet".format(app))
+            print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
+    return availableUpdates
 
 def startInstalled():
     # If userfile doesn't exist, just do nothing

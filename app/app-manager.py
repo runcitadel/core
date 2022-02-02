@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos, download
+from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos, download, getAvailableUpdates
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -47,8 +47,7 @@ if args.action == 'list':
     exit(0)
 elif args.action == "list-updates":
     availableUpdates = getAvailableUpdates()
-    for app in availableUpdates:
-        print(app)
+    print(json.dumps(availableUpdates))
     exit(0)
 elif args.action == 'download':
     updateRepos()
