@@ -6,3 +6,4 @@ tor/torrc-apps-3
 tor/torrc-core
 electrs/electrs.toml
 apps/docker-compose.common.yml
+c-lightning/.gitkeep
