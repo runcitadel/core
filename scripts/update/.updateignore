@@ -12,3 +12,4 @@ apps/networking.json
 use-core-upstream
 nginx/*
 services/installed.json
+c-lightning/*
