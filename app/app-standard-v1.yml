@@ -99,6 +99,7 @@ properties:
           items:
             type: string
             enum:
+              - c-lightning
               - lnd
               - bitcoind
               - electrum

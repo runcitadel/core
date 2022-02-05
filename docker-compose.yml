@@ -224,6 +224,19 @@ services:
     networks:
       default:
         ipv4_address: $ELECTRUM_IP
+  c-lightning:
+    container_name: c-lightning
+    image: ghcr.io/runcitadel/c-lightning:main@sha256:e9abf6b551c31e1136e0b67825dcf26a3b63c5b1bb726d06eb7ab4ae6bdbcfbd
+    environment:
+      LIGHTNINGD_NETWORK: bitcoin
+      CL_REST_STATE_DIR: /data/.lightning
+    restart: on-failure
+    volumes:
+    - ${PWD}/c-lightning:/data/.lightning
+    - ${PWD}/bitcoin:/data/.bitcoin
+    networks:
+      default:
+        ipv4_address: $C_LIGHTNING_IP
   redis:
     container_name: redis
     image: redis:6.2.6-bullseye@sha256:0d9c9aed1eb385336db0bc9b976b6b49774aee3d2b9c2788a0d0d9e239986cb3

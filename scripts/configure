@@ -197,8 +197,11 @@ BOLT_DB_OPTIONS=""
 CHANNEL_LIMITATIONS=""
 BASEFEE = "bitcoin.basefee=0"
 EXTERNAL_IP = ""
+C_LIGHTNING_TOR_ADDR = ""
 if os.path.isfile('./tor/data/bitcoin-p2p/hostname'):
   EXTERNAL_IP="externalip=" + open('./tor/data/bitcoin-p2p/hostname').read()
+if os.path.isfile('./tor/data/c-lightning/hostname'):
+  C_LIGHTNING_TOR_ADDR = open('./tor/data/c-lightning/hostname').read().strip()
 
 if os.path.isfile("./lnd/lnd.conf"):
   with open("./lnd/lnd.conf", 'r') as file:
@@ -222,6 +225,16 @@ if os.path.isfile("./lnd/lnd.conf"):
         CHANNEL_LIMITATIONS += "\n" + line.strip()
       if line.startswith("db.bolt.auto-compact"):
         BOLT_DB_OPTIONS += "\n" + line.strip()
+
+C_LIGHTNING_ALIAS_AND_COLOR = ""
+if os.path.isfile("./c-lightning/config"):
+  with open("./c-lightning/config", 'r') as file:
+    for line in file:
+      if line.startswith("alias="):
+        C_LIGHTNING_ALIAS_AND_COLOR += "\n" + line.strip()
+      if line.startswith("rgb="):
+        C_LIGHTNING_ALIAS_AND_COLOR += "\n" + line.strip()
+
 
 if BOLT_DB_OPTIONS != "":
   BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
@@ -268,6 +281,7 @@ APPS_TOR_IP="10.21.21.12"
 APPS_2_TOR_IP="10.21.21.13"
 APPS_3_TOR_IP="10.21.21.14"
 REDIS_IP="10.21.21.15"
+C_LIGHTNING_IP="10.21.21.16"
 
 # Ports
 BITCOIN_RPC_PORT="8332"
@@ -333,7 +347,8 @@ templates_to_build = {
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
   "./templates/electrs-sample.toml": "./electrs/electrs.toml",
-  "./templates/nginx-sample.conf": "./nginx/nginx.conf"
+  "./templates/nginx-sample.conf": "./nginx/nginx.conf",
+  "./templates/c-lightning-sample.conf": "./c-lightning/config"
 }
 
 print("Generating configuration files...")

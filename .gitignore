@@ -49,3 +49,6 @@ db/citadel-seed/*
 services/installed.json
 
 use-core-upstream
+
+c-lightning/*
+!c-lightning/.gitkeep

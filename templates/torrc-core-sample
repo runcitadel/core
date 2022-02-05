@@ -32,5 +32,9 @@ HiddenServicePort <lnd-rest-port> <lnd-ip>:<lnd-rest-port>
 HiddenServiceDir /var/lib/tor/lnd-grpc
 HiddenServicePort <lnd-grpc-port> <lnd-ip>:<lnd-grpc-port>
 
+# c-lightning Hidden Service
+HiddenServiceDir /var/lib/tor/c-lightning
+HiddenServicePort 9735 <c-lightning-ip>:9735
+
 HashedControlPassword <tor-hashed-password>
 
