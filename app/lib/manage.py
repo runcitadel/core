@@ -28,6 +28,7 @@ except Exception:
     print("Like checking for app updates")
 
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
+from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
@@ -176,6 +177,8 @@ def getApp(appFile: str, appId: str):
 
     if 'version' in app and str(app['version']) == "1":
         return createComposeConfigFromV1(app, nodeRoot)
+    elif 'version' in app and str(app['version']) == "2":
+        return createComposeConfigFromV2(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
 

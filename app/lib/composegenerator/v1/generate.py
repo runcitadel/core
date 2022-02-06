@@ -10,10 +10,6 @@ from lib.citadelutils import classToDict
 import os
 
 def createComposeConfigFromV1(app: dict, nodeRoot: str):
-    if "version" in app:
-        if str(app['version']) != "1":
-            print("Warning: app version is not supported")
-            return False
     envFile = os.path.join(nodeRoot, ".env")
     networkingFile = os.path.join(nodeRoot, "apps", "networking.json")
 
