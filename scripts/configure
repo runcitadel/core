@@ -248,6 +248,10 @@ elif BITCOIN_NETWORK == "regtest":
 else:
   exit(1)
 
+NETWORK_SECTION=""
+if BITCOIN_NETWORK != "mainnet":
+  NETWORK_SECTION = "[{}]".format(BITCOIN_NETWORK)
+
 # IP addresses for services
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
