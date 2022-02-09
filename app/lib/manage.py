@@ -65,8 +65,13 @@ def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
         sourceMap = json.load(f)
     if not name in sourceMap:
-        print("Warning: App {} can't be updated because it is not in the source map".format(name))
-        return False
+        print("Warning: App {} is not in the source map".format(name))
+        sourceMap = {
+            name: {
+                "githubRepo": "runcitadel/core",
+                "branch": "v2"
+            }
+        }
     url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
     response = requests.get(url)
     if response.status_code == 200:
