@@ -39,8 +39,8 @@ def createComposeConfigFromV2(app: dict, nodeRoot: str):
 
     newApp: App = generateApp(app)
     newApp = convertContainerPermissions(newApp)
-    validateEnv(newApp)
-    newApp = convertDataDirToVolume(newApp)
+    newApp = validateEnv(newApp)
+    newApp = convertDataDirToVolumeGen2(newApp)
     newApp = configureIps(newApp, networkingFile, envFile)
     newApp = configureMainPort(newApp, nodeRoot)
     configureHiddenServices(newApp, nodeRoot)

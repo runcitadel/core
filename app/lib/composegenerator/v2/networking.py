@@ -34,8 +34,6 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
     else:
         raise Exception("Registry file not found")
 
-    dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
-
     mainContainer = getMainContainer(app)
 
     portDetails = assignPort(mainContainer, app.metadata.id, path.join(
@@ -68,12 +66,6 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
 
     mainContainer = assignIp(mainContainer, app.metadata.id, path.join(
         nodeRoot, "apps", "networking.json"), path.join(nodeRoot, ".env"))
-
-    # If the IP wasn't in dotenv before, now it should be
-    dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
-
-    containerIP = dotEnv['APP_{}_{}_IP'.format(app.metadata.id.upper().replace(
-        "-", "_"), mainContainer.name.upper().replace("-", "_"))]
 
     # Also set the port in metadata
     app.metadata.port = int(containerPort)
