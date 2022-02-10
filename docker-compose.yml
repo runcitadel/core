@@ -226,7 +226,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   redis:
     container_name: redis
-    image: redis:6.2@sha256:a89cb097693dd354de598d279c304a1c73ee550fbfff6d9ee515568e0c749cfe
+    image: redis:6.2.6-bullseye@sha256:0d9c9aed1eb385336db0bc9b976b6b49774aee3d2b9c2788a0d0d9e239986cb3
     working_dir: /data
     volumes:
     - ${PWD}/redis:/data
