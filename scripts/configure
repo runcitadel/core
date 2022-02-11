@@ -298,6 +298,10 @@ LND_FEE_URL=""
 if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
    LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
 
+BITCOIN_NETWORK_ELECTRS = BITCOIN_NETWORK
+if BITCOIN_NETWORK_ELECTRS == "mainnet":
+  BITCOIN_NETWORK_ELECTRS = "bitcoin"
+
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
 def get_var(var_name, other_locals, file_name):

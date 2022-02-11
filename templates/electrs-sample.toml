@@ -7,7 +7,7 @@
 # A few modifications will be kept, including alias, color, channel size limitations and more if you contact us.
 
 log_filters = "INFO"
-network = "bitcoin"
+network = "<bitcoin-network-electrs>"
 db_dir = "/data/db"
 daemon_dir = "/bitcoin"
 daemon_rpc_addr = "<bitcoin-ip>:<bitcoin-rpc-port>"
