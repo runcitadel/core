@@ -15,8 +15,6 @@ def getMainContainer(app: App) -> Container:
     if len(app.containers) == 1:
         return app.containers[0]
     else:
-        if not app.metadata.mainContainer:
-            app.metadata.mainContainer = 'main'
         for container in app.containers:
             # Main is recommended, support web for easier porting from Umbrel
             if container.name == 'main' or container.name == 'web':
