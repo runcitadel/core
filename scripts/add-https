@@ -8,6 +8,7 @@ except ImportError:
 import os
 import argparse
 import shutil
+import json
 
 
 def parse_dotenv(file_path):
@@ -46,6 +47,17 @@ key = args.key
 
 node_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 nginx_config_file = os.path.join(node_root, 'nginx', 'nginx.conf')
+registry_file = os.path.join(node_root, 'apps', 'apps.json')
+with open(registry_file) as file:
+    registry = json.load(file)
+
+port = None
+for app in registry:
+    if app['name'] == service:
+        if "internalPort" in app:
+            port = app['internalPort']
+        break
+
 original_config = crossplane.parse(nginx_config_file)
 parsedConfig = original_config["config"][0]["parsed"]
 
@@ -77,14 +89,14 @@ else:
     print("Error: No IP found for {}".format(service))
     exit(1)
 
-port=None
-if port_env_var in env:
-    port = env[port_env_var]
-elif port_alt_env_var in env:
-    port = env[port_alt_env_var]
-else:
-    print("Error: No port found for {}".format(service))
-    exit(1)
+if port == None:
+    if port_env_var in env:
+        port = env[port_env_var]
+    elif port_alt_env_var in env:
+        port = env[port_alt_env_var]
+    else:
+        print("Error: No port found for {}".format(service))
+        exit(1)
 
 if service == "btcpay-server" or service == "lnbits":
     port = 1234
