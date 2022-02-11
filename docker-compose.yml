@@ -161,7 +161,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:488daefc3eb26e53272107ae6a3045c16fa1138a9d277d92a67f18821df00a7e
+    image: ghcr.io/runcitadel/middleware:v0.0.2@sha256:221f0c8ae921169c6a22c1a00c5a7b9173fd3e0f52337219c0787dd66de4dbbf
     depends_on:
     - manager
     - bitcoin
