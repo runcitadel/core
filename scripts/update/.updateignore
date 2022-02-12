@@ -11,3 +11,4 @@ app-data/*
 apps/networking.json
 use-core-upstream
 nginx/*
+services/installed.json
