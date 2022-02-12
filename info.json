@@ -1,6 +1,6 @@
 {
-    "version": "0.5.20",
-    "name": "Citadel 0.5.20",
+    "version": "0.5.21",
+    "name": "Citadel 0.5.21",
     "requires": ">=0.5.5",
-    "notes": "This update fixes more bugs on the dashboard."
+    "notes": "Please note: This update is not suitable for notes running the c-lightning beta. This update includes a lot of internal improvements to the app system. This update also prepares for letting you to update individual apps instead of all at once."
 }
