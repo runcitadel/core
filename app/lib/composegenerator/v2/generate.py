@@ -43,7 +43,7 @@ def createComposeConfigFromV2(app: dict, nodeRoot: str):
     newApp = convertDataDirToVolumeGen2(newApp)
     newApp = configureIps(newApp, networkingFile, envFile)
     newApp = configureMainPort(newApp, nodeRoot)
-    configureHiddenServices(newApp, nodeRoot)
+    newApp = configureHiddenServices(newApp, nodeRoot)
     finalConfig: AppStage4 = convertContainersToServices(newApp)
     newApp = classToDict(finalConfig)
     del newApp['metadata']
