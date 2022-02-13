@@ -64,6 +64,10 @@ def getContainerHiddenService(
             hiddenServices = "# {} {} Hidden Service\nHiddenServiceDir /var/lib/tor/app-{}-{}\n".format(
                 metadata.name, container.name, metadata.id, container.name
             )
+            initialHiddenServices = "# {} {} Hidden Service\nHiddenServiceDir /var/lib/tor/app-{}-{}\n".format(
+                metadata.name, container.name, metadata.id, container.name
+            )
+            otherHiddenServices = ""
             for key, value in container.hiddenServicePorts.items():
                 if isinstance(key, int):
                     hiddenServices += "HiddenServicePort {} {}:{}".format(
@@ -73,19 +77,23 @@ def getContainerHiddenService(
                 else:
                     additionalHiddenServices[key] = value
             for key, value in additionalHiddenServices.items():
-                hiddenServices += "\n"
+                otherHiddenServices += "\n"
                 if isinstance(value, int):
-                    hiddenServices += "# {} {} {} Hidden Service\nHiddenServiceDir /var/lib/tor/app-{}-{}\n".format(
+                    otherHiddenServices += "# {} {} {} Hidden Service\nHiddenServiceDir /var/lib/tor/app-{}-{}\n".format(
                         metadata.name, container.name, key, metadata.id, container.name
                     )
-                    hiddenServices += "HiddenServicePort {} {}:{}".format(
+                    otherHiddenServices += "HiddenServicePort {} {}:{}".format(
                         key, containerIp, value
                     )
                 elif isinstance(value, list):
-                    hiddenServices += getHiddenServiceMultiPort(
-                        key, metadata.id, containerIp, value
+                    otherHiddenServices += getHiddenServiceMultiPort(
+                        "{} {}".format(metadata.name, key), "{}-{}".format(metadata.id, key), containerIp, value
                     )
-            return hiddenServices
+                
+            if hiddenServices == initialHiddenServices:
+                return otherHiddenServices
+            else :
+                return hiddenServices + "\n" + otherHiddenServices
         del container.hiddenServicePorts
 
     return ""
