@@ -98,7 +98,7 @@ if port == None:
         print("Error: No port found for {}".format(service))
         exit(1)
 
-if service == "btcpay-server" or service == "lnbits":
+if service == "btcpay-server":
     port = 1234
 
 if service == "lnme":
