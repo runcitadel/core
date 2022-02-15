@@ -140,6 +140,13 @@ cat <<EOF > ${BACKUP_STATUS_FILE}
 EOF
   exit
 fi
+if [[ $BITCOIN_NETWORK == "signet" ]]; then
+rm -rf "${BACKUP_ROOT}"
+cat <<EOF > ${BACKUP_STATUS_FILE}
+{"status": "skipped", "timestamp": $(date +%s000)}
+EOF
+  exit
+fi
 if [[ $BITCOIN_NETWORK == "regtest" ]]; then
 rm -rf "${BACKUP_ROOT}"
 cat <<EOF > ${BACKUP_STATUS_FILE}

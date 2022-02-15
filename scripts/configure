@@ -75,14 +75,14 @@ if os.path.isfile('../.citadel'):
     status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
     updating = True
 
-# Configure for mainnet or testnet or regtest depending
+# Configure for appropriate network depending
 # upon the user-supplied value of $NETWORK
 # If the network is not specified, then use the mainnet
 BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
 
 # Check if network neither mainnet nor testnet nor regtest
-if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
-    print('Error: Network must be either mainnet, testnet, or regtest!')
+if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
+    print('Error: Network must be either mainnet, testnet, signet or regtest!')
     exit(1)
 
 with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
@@ -155,8 +155,8 @@ if reconfiguring:
 
   BITCOIN_NETWORK=os.environ.get('OVERWRITE_NETWORK') or dotenv['BITCOIN_NETWORK']
   # Check if network neither mainnet nor testnet nor regtest
-  if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'regtest']:
-      print('Error: Network must be either mainnet, testnet, or regtest!')
+  if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
+      print('Error: Network must be either mainnet, testnet, signet or regtest!')
       exit(1)
   print("Using {} network".format(BITCOIN_NETWORK))
   print()
@@ -241,6 +241,14 @@ elif BITCOIN_NETWORK == "testnet":
 neutrino.addpeer=testnet1-btcd.zaphq.io
 neutrino.addpeer=testnet2-btcd.zaphq.io
   '''
+elif BITCOIN_NETWORK == "signet":
+  BITCOIN_RPC_PORT=38332
+  BITCOIN_P2P_PORT=38333
+  NEUTRINO_PEERS='''
+[neutrino]
+neutrino.addpeer=testnet1-btcd.zaphq.io
+neutrino.addpeer=testnet2-btcd.zaphq.io
+  '''
 elif BITCOIN_NETWORK == "regtest":
   BITCOIN_RPC_PORT=18334
   BITCOIN_P2P_PORT=18335
@@ -251,6 +259,8 @@ else:
 NETWORK_SECTION=""
 if BITCOIN_NETWORK != "mainnet":
   NETWORK_SECTION = "[{}]".format(BITCOIN_NETWORK)
+if BITCOIN_NETWORK == "testnet":
+  NETWORK_SECTION = "[test]"
 
 # IP addresses for services
 NETWORK_IP="10.21.21.0"
