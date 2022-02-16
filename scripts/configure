@@ -169,7 +169,9 @@ if reconfiguring:
   TOR_PASSWORD=dotenv['TOR_PASSWORD']
   TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
   NGINX_PORT=dotenv['NGINX_PORT']
-  NGINX_SSL_PORT=dotenv['NGINX_SSL_PORT']
+  NGINX_SSL_PORT="443"
+  if 'NGINX_SSL_PORT' in dotenv:
+    NGINX_SSL_PORT=dotenv['NGINX_SSL_PORT']
   if 'UPDATE_CHANNEL' in dotenv:
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
 else:
