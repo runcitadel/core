@@ -47,7 +47,7 @@ key = args.key
 
 node_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 nginx_config_file = os.path.join(node_root, 'nginx', 'nginx.conf')
-registry_file = os.path.join(node_root, 'apps', 'apps.json')
+registry_file = os.path.join(node_root, 'apps', 'registry.json')
 with open(registry_file) as file:
     registry = json.load(file)
 
