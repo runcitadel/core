@@ -194,7 +194,7 @@ def compose(app, arguments):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     commonComposeFile = os.path.join(appSystemDir, "docker-compose.common.yml")
     os.environ["APP_DOMAIN"] = subprocess.check_output(
-        "hostname -s 2>/dev/null || echo 'citadel'", shell=True).decode("utf-8") + ".local"
+        "hostname -s 2>/dev/null || echo 'citadel'", shell=True).decode("utf-8").strip() + ".local"
     os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
         os.path.join(nodeRoot, "tor", "data", "app-{}/hostname".format(app))), shell=True).decode("utf-8").strip()
     os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
