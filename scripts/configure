@@ -172,6 +172,8 @@ if reconfiguring:
   NGINX_SSL_PORT="443"
   if 'NGINX_SSL_PORT' in dotenv:
     NGINX_SSL_PORT=dotenv['NGINX_SSL_PORT']
+  if NGINX_SSL_PORT == "80" and NGINX_PORT == "80":
+    NGINX_SSL_PORT="443"
   if 'UPDATE_CHANNEL' in dotenv:
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
 else:
