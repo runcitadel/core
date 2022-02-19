@@ -144,7 +144,7 @@ def startInstalled():
             userData = json.load(f)
     #threads = []
     for app in userData["installedApps"]:
-        if not os.isdir(os.path.join(appsDir, app)):
+        if not os.path.isdir(os.path.join(appsDir, app)):
             print("Warning: App {} doesn't exist on Citadel".format(app))
             continue
         print("Starting app {}...".format(app))
@@ -164,7 +164,7 @@ def stopInstalled():
             userData = json.load(f)
     threads = []
     for app in userData["installedApps"]:
-        if not os.isdir(os.path.join(appsDir, app)):
+        if not os.path.isdir(os.path.join(appsDir, app)):
             print("Warning: App {} doesn't exist on Citadel".format(app))
             continue
         print("Stopping app {}...".format(app))
@@ -195,7 +195,7 @@ def getApp(appFile: str, appId: str):
 
 
 def compose(app, arguments):
-    if not os.isdir(os.path.join(appsDir, app)):
+    if not os.path.isdir(os.path.join(appsDir, app)):
         print("Warning: App {} doesn't exist on Citadel".format(app))
         return
     # Runs a compose command in the app dir
