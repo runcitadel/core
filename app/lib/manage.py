@@ -195,6 +195,9 @@ def getApp(appFile: str, appId: str):
 
 
 def compose(app, arguments):
+    if not os.isdir(os.path.join(appsDir, app)):
+        print("Warning: App {} doesn't exist on Citadel".format(app))
+        return
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
