@@ -47,7 +47,7 @@ key = args.key
 
 node_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 nginx_config_file = os.path.join(node_root, 'nginx', 'nginx.conf')
-registry_file = os.path.join(node_root, 'apps', 'apps.json')
+registry_file = os.path.join(node_root, 'apps', 'registry.json')
 with open(registry_file) as file:
     registry = json.load(file)
 
@@ -98,7 +98,7 @@ if port == None:
         print("Error: No port found for {}".format(service))
         exit(1)
 
-if service == "btcpay-server" or service == "lnbits":
+if service == "btcpay-server":
     port = 1234
 
 if service == "lnme":

@@ -100,7 +100,7 @@ def configureIps(app: AppStage2, networkingFile: str, envFile: str):
     return app
 
 
-def configureHiddenServices(app: AppStage3, nodeRoot: str) -> None:
+def configureHiddenServices(app: AppStage3, nodeRoot: str) -> AppStage3:
     dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
     hiddenServices = ""
 
@@ -113,8 +113,11 @@ def configureHiddenServices(app: AppStage3, nodeRoot: str) -> None:
         )
         hiddenServices += getContainerHiddenService(
             app.metadata, container, dotEnv[env_var], container.name == mainContainer.name)
+        if container.hiddenServicePorts:
+            del container.hiddenServicePorts
 
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
     with open(path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
         f.write(hiddenServices)
+    return app
