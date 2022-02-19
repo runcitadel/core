@@ -144,6 +144,9 @@ def startInstalled():
             userData = json.load(f)
     #threads = []
     for app in userData["installedApps"]:
+        if not os.isdir(os.path.join(appsDir, app)):
+            print("Warning: App {} doesn't exist on Citadel".format(app))
+            continue
         print("Starting app {}...".format(app))
         # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
         #thread = threading.Thread(target=compose, args=(app, "up --detach"))
@@ -161,6 +164,9 @@ def stopInstalled():
             userData = json.load(f)
     threads = []
     for app in userData["installedApps"]:
+        if not os.isdir(os.path.join(appsDir, app)):
+            print("Warning: App {} doesn't exist on Citadel".format(app))
+            continue
         print("Stopping app {}...".format(app))
         # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
         thread = threading.Thread(
