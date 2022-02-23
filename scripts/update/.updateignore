@@ -12,3 +12,5 @@ apps/networking.json
 use-core-upstream
 nginx/*
 services/installed.json
+apps/sourceMap.json
+apps/.updateignore

@@ -47,6 +47,7 @@ nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
 appSystemDir = os.path.join(nodeRoot, "app-system")
 sourcesList = os.path.join(appSystemDir, "sources.list")
+updateIgnore = os.path.join(appSystemDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
@@ -304,11 +305,16 @@ def getAppHiddenServices(app: str):
 def updateRepos():
     # Get the list of repos
     repos = []
+    ignoreApps = []
     with open(sourcesList) as f:
         repos = f.readlines()
+    with open(updateIgnore) as f:
+        ignoreApps = f.readlines()
     # For each repo, clone the repo to a temporary dir, checkout the branch,
     # and overwrite the current app dir with the contents of the temporary dir/apps/app
-    alreadyInstalled = []
+    # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
+    # but apps specified in updateignore have the highest priority
+    alreadyInstalled = ignoreApps
     # A map of apps to their source repo
     sourceMap = {}
     for repo in repos:
