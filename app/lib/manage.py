@@ -316,7 +316,7 @@ def updateRepos():
     # and overwrite the current app dir with the contents of the temporary dir/apps/app
     # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
     # but apps specified in updateignore have the highest priority
-    alreadyInstalled = ignoreApps
+    alreadyInstalled = [s.strip() for s in ignoreApps]
     # A map of apps to their source repo
     sourceMap = {}
     for repo in repos:
