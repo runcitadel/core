@@ -13,3 +13,5 @@ use-core-upstream
 nginx/*
 services/installed.json
 c-lightning/*
+apps/sourceMap.json
+apps/.updateignore

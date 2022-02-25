@@ -47,6 +47,7 @@ nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
 appSystemDir = os.path.join(nodeRoot, "app-system")
 sourcesList = os.path.join(appSystemDir, "sources.list")
+updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
@@ -144,7 +145,7 @@ def startInstalled():
             userData = json.load(f)
     #threads = []
     for app in userData["installedApps"]:
-        if not os.isdir(os.path.join(appsDir, app)):
+        if not os.path.isdir(os.path.join(appsDir, app)):
             print("Warning: App {} doesn't exist on Citadel".format(app))
             continue
         print("Starting app {}...".format(app))
@@ -164,7 +165,7 @@ def stopInstalled():
             userData = json.load(f)
     threads = []
     for app in userData["installedApps"]:
-        if not os.isdir(os.path.join(appsDir, app)):
+        if not os.path.isdir(os.path.join(appsDir, app)):
             print("Warning: App {} doesn't exist on Citadel".format(app))
             continue
         print("Stopping app {}...".format(app))
@@ -195,6 +196,9 @@ def getApp(appFile: str, appId: str):
 
 
 def compose(app, arguments):
+    if not os.path.isdir(os.path.join(appsDir, app)):
+        print("Warning: App {} doesn't exist on Citadel".format(app))
+        return
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
@@ -302,11 +306,18 @@ def getAppHiddenServices(app: str):
 def updateRepos():
     # Get the list of repos
     repos = []
+    ignoreApps = []
     with open(sourcesList) as f:
         repos = f.readlines()
+    try:
+        with open(updateIgnore) as f:
+            ignoreApps = f.readlines()
+    except: pass
     # For each repo, clone the repo to a temporary dir, checkout the branch,
     # and overwrite the current app dir with the contents of the temporary dir/apps/app
-    alreadyInstalled = []
+    # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
+    # but apps specified in updateignore have the highest priority
+    alreadyInstalled = [s.strip() for s in ignoreApps]
     # A map of apps to their source repo
     sourceMap = {}
     for repo in repos:
