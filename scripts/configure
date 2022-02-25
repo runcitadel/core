@@ -285,7 +285,7 @@ TOR_CONTROL_PORT="29051"
 
 DEVICE_HOSTNAME=""
 try:
-  subprocess.check_output("hostname").decode("utf-8").strip()
+  DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
 except:
   # The content of /etc/hostname is the device's hostname
   DEVICE_HOSTNAME=open("/etc/hostname").read().strip()

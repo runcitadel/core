@@ -26,6 +26,7 @@ fulcrumx/*
 nginx/*
 redis/*
 events/signals/*
+docker-compose.override.yml
 
 # Commit these empty directories
 !**/.gitkeep
