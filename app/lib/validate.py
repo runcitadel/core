@@ -82,7 +82,7 @@ def findAndValidateApps(dir: str):
         should_continue=True
         if appyml['metadata']['dependencies']:
             for dependency in appyml['metadata']['dependencies']:
-                if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
+                if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum", "c-lightning"]:
                     print("WARNING: App '{}' has unknown dependency '{}'".format(app, dependency))
                     apps.remove(app)
                     should_continue=False
