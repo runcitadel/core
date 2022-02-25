@@ -49,7 +49,11 @@ def download_docker_compose():
   # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
   subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
   if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc_or_outdated():
+    print("Found {}\n".format(subprocess.check_output(['docker', 'compose', 'version']).decode('utf-8').strip()))
     return
+
+  print("Installing docker-compose...\n")
+
   if is_arm64:
     subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   elif is_amd64:
@@ -88,8 +92,7 @@ if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
 with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
   CITADEL_VERSION=json.load(file)['version']
 
-print()
-print("======================================")
+print("\n======================================")
 if os.path.isfile(status_dir+'/configured'):
   print("=========== RECONFIGURING ============")
   reconfiguring=True
@@ -98,8 +101,7 @@ else:
   reconfiguring=False
 
 print("============== CITADEL  ==============")
-print("======================================")
-print()
+print("======================================\n")
 
 print("Installing additional services")
 data = subprocess.run("\"{}\" setup".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
@@ -143,8 +145,7 @@ if reconfiguring:
   if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
       print('Error: Network must be either mainnet, testnet, signet or regtest!')
       exit(1)
-  print("Using {} network".format(BITCOIN_NETWORK))
-  print()
+  print("Using {} network\n".format(BITCOIN_NETWORK))
   BITCOIN_RPC_PORT=dotenv['BITCOIN_RPC_PORT']
   BITCOIN_P2P_PORT=dotenv['BITCOIN_P2P_PORT']
   BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
@@ -162,16 +163,14 @@ if reconfiguring:
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
 else:
   # Generate RPC credentials
-  print("Generating auth credentials")
-  print()
+  print("Generating auth credentials\n")
   BITCOIN_RPC_USER="citadel"
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
 
   # Pull Tor image and generate Tor password
-  print("Generating Tor password")
-  print()
+  print("Generating Tor password\n")
   os.system('docker pull --quiet lncm/tor:0.4.6.8')
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
 
@@ -340,7 +339,6 @@ templates_to_build = {
 }
 
 print("Generating configuration files...")
-print()
 
 # Loop through templates_to_build and build them
 for template_path, output_path in templates_to_build.items():
@@ -362,26 +360,22 @@ for template_path, output_path in templates_to_build.items():
     with open(output_path, 'w') as file:
       file.write(data)
 
-print("Generated configuration files")
-print()
+print("Generated configuration files\n")
 
-print("Installing docker-compose...")
-print()
+print("Checking if docker compose is installed...")
 download_docker_compose()
+
 if not reconfiguring:
-  print("Updating apps...")
-  print()
+  print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure update')
 elif not updating:
-  print("Updating apps...")
-  print()
+  print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure generate')
-print("Configuring permissions")
-print()
+print("Configuring permissions...\n")
 os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
-print("Configuration successful")
+print("Configuration successful\n")
 print("You can now start Citadel by running:")
 print("  sudo ./scripts/start")
