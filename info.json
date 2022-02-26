@@ -1,6 +1,6 @@
 {
-    "version": "0.5.22",
-    "name": "Citadel 0.5.22",
+    "version": "0.5.23",
+    "name": "Citadel 0.5.23",
     "requires": ">=0.5.5",
-    "notes": "Please note: This update is not suitable for notes running the c-lightning beta. This update includes minor a few bug fixes."
+    "notes": "Please note: This update is not compatible with the c-lightning beta. This update introduces a new app in the app store: Tor Snowflake. With Snowflake, you can help people in countries which censor the internet."
 }
