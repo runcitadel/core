@@ -167,6 +167,7 @@ services:
     - bitcoin
     - lnd
     - redis
+    - c-lightning
     command:
     - ./wait-for-node-manager.sh
     - $MANAGER_IP
@@ -175,6 +176,7 @@ services:
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
+    - ${PWD}/c-lightning:/c-lightning
     - jwt-public-key:/jwt-public-key
     environment:
       PORT: '3005'
@@ -187,6 +189,7 @@ services:
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       UNSAFE_REMOVE_CORS_CHECK: true
+      LIGHTNING_IMPL: c-lightning
     networks:
       default:
         ipv4_address: $MIDDLEWARE_IP
