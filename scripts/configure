@@ -146,7 +146,7 @@ if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream
 
 NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
 NGINX_SSL_PORT=os.environ.get('NGINX_SSL_PORT') or "443"
-UPDATE_CHANNEL="stable"
+UPDATE_CHANNEL="migration"
 
 if reconfiguring:
   if os.path.isfile('../.citadel'):
