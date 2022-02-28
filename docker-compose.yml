@@ -143,7 +143,7 @@ services:
       LND_CERT_FILE: /lnd/tls.cert
       LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
       GITHUB_REPO: runcitadel/core
-      GITHUB_BRANCH: ${UPDATE_CHANNEL:-"migration"}
+      GITHUB_BRANCH: ${UPDATE_CHANNEL:-"stable"}
       VERSION_FILE: /info.json
       UPDATE_LOCK_FILE: /statuses/update-in-progress
       BACKUP_STATUS_FILE: /statuses/backup-status.json
