@@ -25,6 +25,12 @@ echo
 
 IS_MIGRATING=0
 
+# If ${CITADEL_ROOT}/c-lightning exists, fail
+if [[ -d "${CITADEL_ROOT}/c-lightning" ]]; then
+    echo "This update is not compatible with the c-lightning beta."
+    exit 1
+fi
+
 # Make Citadel OS specific updates
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo

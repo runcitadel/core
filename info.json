@@ -1,6 +1,6 @@
 {
-    "version": "0.5.22",
-    "name": "Citadel 0.5.22",
-    "requires": ">=0.5.5",
-    "notes": "Please note: This update is not suitable for notes running the c-lightning beta. This update includes minor a few bug fixes."
+    "version": "0.0.1",
+    "name": "Citadel 0.0.1",
+    "requires": ">=0.5.24",
+    "notes": "Please note: This update is not compatible with the c-lightning beta. We're resetting version numbers to 0.0.1. This update only contains one bug fix, but please install this update so you'll receive further updates."
 }

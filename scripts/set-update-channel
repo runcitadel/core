@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+NODE_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+# IN ${NODE_ROOT}/.env, change the UPDATE_CHANNEL to the desired channel ($1)
+# If $1 is not given, fail
+if [ -z "$1" ]; then
+    echo "Usage: $0 <channel>"
+    echo "Channel can currently either be 'stable' or 'beta'"
+    exit 1
+fi
+sed -i "s/UPDATE_CHANNEL=.*/UPDATE_CHANNEL=${1}/" "${NODE_ROOT}/.env"

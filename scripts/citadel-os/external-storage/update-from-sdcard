@@ -40,6 +40,11 @@ main () {
   local external_version=$(cat "${CITADEL_ROOT}/info.json" | jq -r .version | cut -d "-" -f "1")
   local sd_version=$(cat "${SD_CITADEL_ROOT}/info.json" | jq -r .version | cut -d "-" -f "1")
 
+  if [[ "${external_version}" == "0.5"* ]]; then
+    echo "External storage is on a pre version number reset version, updating to the latest version."
+    "${CITADEL_ROOT}/scripts/update/update" --path "${SD_CITADEL_ROOT}"
+  fi
+
   if ! check_semver_range ">${external_version}" "${sd_version}"; then
     echo "No, SD version is not newer, exiting."
     exit 0

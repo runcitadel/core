@@ -186,6 +186,8 @@ properties:
         restart:
           type: string
           description: When the container should restart. Can be 'always' or 'on-failure'.
+        network_mode:
+          type: string
       additionalProperties: false
       required:
         - name
