@@ -102,7 +102,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 67, "description": "Stopping old containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-./scripts/stop
+./scripts/stop || true
 
 
 # Overlay home dir structure with new dir tree
