@@ -350,6 +350,7 @@ templates_to_build = {
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
   "./templates/electrs-sample.toml": "./electrs/electrs.toml",
+  "./templates/fulcrumx-sample.conf": "./fulcrumx/fulcrum.conf",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf"
 }
 

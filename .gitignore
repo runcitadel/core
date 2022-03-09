@@ -22,6 +22,7 @@ statuses/*
 app-data
 apps
 electrs/*
+fulcrumx/*
 nginx/*
 redis/*
 events/signals/*
@@ -43,6 +44,7 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !redis/.gitkeep
+!fulcrumx/.gitkeep
 !events/signals/.gitkeep
 
 !**/*.license
