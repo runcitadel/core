@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-electrs:
-      container_name: electrs
+electrum:
+      container_name: electrum
       image: ghcr.io/runcitadel/electrs:v0.9.5@sha256:5fdd76415645de14f31c43844dc143b1477f86872d2f73a041c5005d469ed510
       working_dir: /data
       volumes:

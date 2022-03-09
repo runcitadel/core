@@ -49,5 +49,6 @@ db/citadel-seed/*
 
 !**/*.license
 services/installed.json
+services/installed.yaml
 
 use-core-upstream
