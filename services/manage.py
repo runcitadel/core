@@ -59,7 +59,7 @@ def setService(name, implementation):
 
 def uninstallService(name):
     # First check if a service yml definition exists to avoid uninstalling something that can't be installed or isn't supposed to be removed
-    if not os.path.isfile(os.path.join(nodeRoot, "services", name + ".yml")):
+    if not os.path.isdir(os.path.join(nodeRoot, "services", name)):
         print("Service definition not found, cannot uninstall")
         exit(1)
     # Read the main compose file
@@ -77,16 +77,16 @@ def uninstallService(name):
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed = []
+        installed = {}
     try:
-        installed.remove(name)
-    except ValueError:
+        del installed[name]
+    except KeyError:
         pass
-    with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
-        json.dump(list(set(installed)), stream, sort_keys=False)
+    with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'w') as stream:
+        yaml.dump(installed, stream, sort_keys=False)
 
 # install all services from installed.json
 def installServices():
