@@ -9,7 +9,7 @@ electrum:
   volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
     - ${PWD}/fulcrumx:/data
-  command: /data/fulcrumx.conf
+  command: /usr/bin/FulcrumX /data/fulcrumx.conf
   restart: on-failure
   stop_grace_period: 5m
   ports:
