@@ -85,6 +85,8 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
 
 def configureIps(app: AppStage2, networkingFile: str, envFile: str):
     for container in app.containers:
+        if container.network_mode and container.network_mode == "host":
+            continue
         if container.noNetwork:
             # Check if port is defined for the container
             if container.port:
@@ -107,6 +109,8 @@ def configureHiddenServices(app: AppStage3, nodeRoot: str) -> AppStage3:
     mainContainer = getMainContainer(app)
 
     for container in app.containers:
+        if container.network_mode and container.network_mode == "host":
+            continue
         env_var = "APP_{}_{}_IP".format(
             app.metadata.id.upper().replace("-", "_"),
             container.name.upper().replace("-", "_")
