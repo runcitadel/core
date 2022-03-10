@@ -91,12 +91,15 @@ def uninstallService(name):
 # install all services from installed.json
 def installServices():
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
-            installed: List[str] = yaml.safe_load(stream)
+        with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'r') as stream:
+            installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed: List[str] = []
-    for service in installed:
-        installService(service)
+        installed = {
+            "electrum": "electrs"
+        }
+    
+    for key, value in installed.items():
+        setService(key, value)
     
 
 

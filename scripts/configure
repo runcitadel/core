@@ -101,10 +101,6 @@ print("============== CITADEL  ==============")
 print("======================================")
 print()
 
-if not reconfiguring:
-  print("Installing electrs...")
-  data = subprocess.run("\"{}\" install electrs".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
-
 print("Installing additional services")
 data = subprocess.run("\"{}\" setup".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
 
