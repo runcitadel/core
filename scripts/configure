@@ -36,7 +36,7 @@ if not is_arm64 and not is_amd64:
 def is_compose_rc_or_outdated():
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
-    if output.decode('utf-8').strip() != 'Docker Compose version v2.2.3':
+    if output.decode('utf-8').strip() != 'Docker Compose version v2.3.3':
       print("Using outdated docker compose, updating...")
       return True
     else:
@@ -51,9 +51,9 @@ def download_docker_compose():
   if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc_or_outdated():
     return
   if is_arm64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   elif is_amd64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
 
 if not shutil.which("wget"):
