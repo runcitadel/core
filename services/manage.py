@@ -48,12 +48,16 @@ def setService(name, implementation):
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     # If the file doesn't exist, put [] in it, then run the code below
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed = {}
+        installed = {
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
+        }
     installed[name] = implementation
-    with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'w') as stream:
+    with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
         yaml.dump(installed, stream, sort_keys=False)
 
 
@@ -77,25 +81,31 @@ def uninstallService(name):
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed = {}
+        installed = {
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
+        }
     try:
         del installed[name]
     except KeyError:
         pass
-    with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'w') as stream:
+    with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
         yaml.dump(installed, stream, sort_keys=False)
 
 # install all services from installed.json
 def installServices():
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.yaml"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "electrum": "electrs"
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
         }
     
     for key, value in installed.items():

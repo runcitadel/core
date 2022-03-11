@@ -77,8 +77,8 @@ services:
     networks:
       default:
         ipv4_address: $BITCOIN_IP
-  lnd:
-    container_name: lnd
+  lightning:
+    container_name: lightning
     image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
     user: 1000:1000
     depends_on:

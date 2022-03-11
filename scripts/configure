@@ -124,18 +124,6 @@ def parse_dotenv(file_path):
         exit(1)
   return envVars
 
-KNOTS_REINDEX_AUTO="reindex=auto"
-BITCOIN_CORE_IMAGE="lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507"
-if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream'):
-  KNOTS_REINDEX_AUTO=""
-  # Also, open the docker-compose file and replace the image of the bitcoin service 
-  # with the upstream version of bitcoin core
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'r') as file:
-    docker_compose_yml = yaml.safe_load(file)
-  docker_compose_yml['services']['bitcoin']['image'] = BITCOIN_CORE_IMAGE
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'w') as file:
-    yaml.dump(docker_compose_yml, file, sort_keys=False)
-
 ##########################################################
 ############ Generate configuration variables ############
 ##########################################################
