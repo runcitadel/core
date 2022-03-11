@@ -4,7 +4,7 @@
 
 electrum:
   container_name: electrum
-  image: ghcr.io/runcitadel/fulcrumx:latest@sha256:43d5811c68d468c01d0880677fe395d5b7f414e17859185889f9040287146378
+  image: ghcr.io/runcitadel/fulcrumx:latest@sha256:557a54a5652b475b01c59eb6cffee3568f18b74d875c4cc125e5ac190c4b0706
   working_dir: /data
   volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
