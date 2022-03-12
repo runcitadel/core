@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout "${CITADEL_ROOT}/nginx/ssl.key" -out "${CITADEL_ROOT}/nginx/ssl.pem" <<EOF
+JP
+Satoshi
+Nakamoto
+Citadel
+Citadel dasbhoard
+citadel.local
+
+
+EOF

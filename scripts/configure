@@ -377,10 +377,15 @@ elif not updating:
   os.system('./scripts/app --invoked-by-configure generate')
 print("Configuring permissions")
 print()
-os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
-# Touch status_dir/configured
+#os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+if not os.path.isfile(os.path.join(CITADEL_ROOT, "nginx", "ssl.key")):
+  print("Generating SSL certificate")
+  print()
+  os.system("./scripts/generate-ssl")
+
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
+
 print("Configuration successful")
 print("You can now start Citadel by running:")
 print("  sudo ./scripts/start")
