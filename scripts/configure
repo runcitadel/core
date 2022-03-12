@@ -36,7 +36,7 @@ if not is_arm64 and not is_amd64:
 def is_compose_rc_or_outdated():
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
-    if output.decode('utf-8').strip() != 'Docker Compose version v2.2.3':
+    if output.decode('utf-8').strip() != 'Docker Compose version v2.3.3':
       print("Using outdated docker compose, updating...")
       return True
     else:
@@ -51,9 +51,9 @@ def download_docker_compose():
   if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc_or_outdated():
     return
   if is_arm64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   elif is_amd64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
   os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
 
 if not shutil.which("wget"):
@@ -101,10 +101,6 @@ print("============== CITADEL  ==============")
 print("======================================")
 print()
 
-if not reconfiguring:
-  print("Installing electrs...")
-  data = subprocess.run("\"{}\" install electrs".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
-
 print("Installing additional services")
 data = subprocess.run("\"{}\" setup".format(os.path.join(CITADEL_ROOT, "services", "manage.py")), shell=True)
 
@@ -127,18 +123,6 @@ def parse_dotenv(file_path):
         print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
         exit(1)
   return envVars
-
-KNOTS_REINDEX_AUTO="reindex=auto"
-BITCOIN_CORE_IMAGE="lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507"
-if os.path.isfile('../use-core-upstream') or os.path.isfile('./use-core-upstream'):
-  KNOTS_REINDEX_AUTO=""
-  # Also, open the docker-compose file and replace the image of the bitcoin service 
-  # with the upstream version of bitcoin core
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'r') as file:
-    docker_compose_yml = yaml.safe_load(file)
-  docker_compose_yml['services']['bitcoin']['image'] = BITCOIN_CORE_IMAGE
-  with open(os.path.join(CITADEL_ROOT, "docker-compose.yml"), 'w') as file:
-    yaml.dump(docker_compose_yml, file, sort_keys=False)
 
 ##########################################################
 ############ Generate configuration variables ############
@@ -365,7 +349,8 @@ templates_to_build = {
   "./templates/.env-sample": "./.env",
   "./templates/electrs-sample.toml": "./electrs/electrs.toml",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf",
-  "./templates/c-lightning-sample.conf": "./c-lightning/config"
+  "./templates/c-lightning-sample.conf": "./c-lightning/config",
+  "./templates/fulcrumx-sample.conf": "./fulcrumx/fulcrumx.conf"
 }
 
 print("Generating configuration files...")

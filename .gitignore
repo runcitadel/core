@@ -22,6 +22,7 @@ statuses/*
 app-data
 apps
 electrs/*
+fulcrumx/*
 nginx/*
 redis/*
 events/signals/*
@@ -43,12 +44,12 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !redis/.gitkeep
+!fulcrumx/.gitkeep
 !events/signals/.gitkeep
 
 !**/*.license
 services/installed.json
-
-use-core-upstream
+services/installed.yml
 
 c-lightning/*
 !c-lightning/.gitkeep

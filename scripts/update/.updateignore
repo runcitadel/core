@@ -9,9 +9,8 @@ events/signals
 logs/*
 app-data/*
 apps/networking.json
-use-core-upstream
 nginx/*
-services/installed.json
+services/installed.yml
 c-lightning/*
 apps/sourceMap.json
 apps/.updateignore
