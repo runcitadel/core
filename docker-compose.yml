@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.5@sha256:4430774d51e5731b5dc36606d7bef43f5ab2902c82cf4353ace59ebd590c2a40
+    image: ghcr.io/runcitadel/dashboard:v0.0.6@sha256:f64243ebf09798278a719e2af906beac937d0c02f25812ad1e3882a1e479c48b
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.7@sha256:ae8f84a09c6f2a722105d7dc83669a02666ecbad8bf5370bfb9783081b2e8445
+    image: ghcr.io/runcitadel/manager:v0.0.8@sha256:451e950d5d8b2fc12f1b54fe74a1cafaac769eecc14573124d38e47ea52282a0
     depends_on:
     - tor
     - redis
@@ -162,15 +162,13 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.7@sha256:5a66ef1491e2740c4469f3e412304dfdad4eb879a9164de03569e357ecb91024
+    image: ghcr.io/runcitadel/middleware:v0.0.8@sha256:f1e400cc4544a1c2a337f4a957693b328c6ee096bff8c06f0cdfb2eabcb2f4aa
     depends_on:
     - manager
     - bitcoin
     - lnd
     - redis
-    command:
-    - ./start.sh
-    - $MANAGER_IP
+    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
