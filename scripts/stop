@@ -32,13 +32,9 @@ export COMPOSE_HTTP_TIMEOUT=240
 
 echo "Stopping installed apps..."
 echo
-"${CITADEL_ROOT}/app/app-manager.py" stop installed &
+"${CITADEL_ROOT}/app/app-manager.py" stop installed
 echo
 
 echo "Stopping Docker services..."
 echo
-docker compose down &
-
-echo "Waiting for everything to finish"
-wait
-
+docker compose down
