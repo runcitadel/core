@@ -226,7 +226,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   c-lightning:
     container_name: c-lightning
-    image: ghcr.io/runcitadel/c-lightning:main@sha256:e9abf6b551c31e1136e0b67825dcf26a3b63c5b1bb726d06eb7ab4ae6bdbcfbd
+    image: ghcr.io/runcitadel/c-lightning:main@sha256:31727f7947a51d8a8e7fed92da57bc3381d854f937170ce1870b9df0cd019e1d
     environment:
       LIGHTNINGD_NETWORK: bitcoin
       CL_REST_STATE_DIR: /data/.lightning
