@@ -60,7 +60,6 @@ def setService(name, implementation):
     with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
         yaml.dump(installed, stream, sort_keys=False)
 
-
 def uninstallService(name):
     # First check if a service yml definition exists to avoid uninstalling something that can't be installed or isn't supposed to be removed
     if not os.path.isdir(os.path.join(nodeRoot, "services", name)):

@@ -1,6 +1,6 @@
 {
-    "version": "0.0.2-c-lightning.0",
-    "name": "c-lightning beta",
+    "version": "0.0.2-c-lightning.1",
+    "name": "Citadel 0.0.2 with c-lightning (Beta 2)",
     "requires": ">=0.0.1",
-    "notes": "This update turns your node into a c-lightning node."
+    "notes": "This update prepares for Fulcrum support and fixes a few bugs."
 }
