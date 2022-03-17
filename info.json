@@ -1,6 +1,6 @@
 {
-    "version": "0.0.1",
-    "name": "Citadel 0.0.1",
+    "version": "0.0.2-beta.1",
+    "name": "Citadel 0.0.2 beta 1",
     "requires": ">=0.0.1",
-    "notes": "Please note: This update is not compatible with the c-lightning beta. We're resetting version numbers to 0.0.1. This update only contains one bug fix, but please install this update so you'll receive further updates."
+    "notes": "Please note: This update is not compatible with the c-lightning beta. This update contains multiple bug fixes and prepares for Fulcrum integration."
 }
