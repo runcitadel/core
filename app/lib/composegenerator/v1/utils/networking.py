@@ -25,6 +25,8 @@ def getFreePort(networkingFile: str, appId: str):
         10009,
         # LND REST
         8080,
+        # Sparko
+        9737,
         # Electrum Server
         50001,
         # Tor Proxy

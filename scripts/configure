@@ -6,7 +6,7 @@
 
 import sys
 import os
-from lib.rpcauth import get_data
+from lib.rpcauth import get_data, generate_password
 import re
 import subprocess
 import json
@@ -161,6 +161,16 @@ if reconfiguring:
     NGINX_SSL_PORT="443"
   if 'UPDATE_CHANNEL' in dotenv and dotenv['UPDATE_CHANNEL'] != "main" and dotenv['UPDATE_CHANNEL'] != "migration":
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
+  if 'SPARKO_RPC_USER' in dotenv and 'SPARKO_RPC_PASS' in dotenv:
+    SPARKO_RPC_USER=dotenv['SPARKO_RPC_USER']
+    SPARKO_RPC_PASS=dotenv['SPARKO_RPC_PASS']
+  else:
+    SPARKO_RPC_USER="citadel"
+    SPARKO_RPC_PASS=generate_password()
+  if 'SPARKO_RPC_PORT' in dotenv:
+    SPARKO_RPC_PORT=dotenv['SPARKO_RPC_PORT']
+  else:
+    SPARKO_RPC_PORT=9737
 else:
   # Generate RPC credentials
   print("Generating auth credentials\n")
@@ -168,6 +178,10 @@ else:
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
+  SPARKO_RPC_USER="citadel"
+  SPARKO_RPC_PASS=generate_password()
+
+  SPARKO_RPC_PORT="9737"
 
   # Pull Tor image and generate Tor password
   print("Generating Tor password\n")
