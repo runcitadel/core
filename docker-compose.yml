@@ -166,7 +166,7 @@ services:
     depends_on:
     - manager
     - bitcoin
-    - lnd
+    - lightning
     - redis
     command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
     restart: on-failure
@@ -192,7 +192,7 @@ services:
     image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
     depends_on:
     - bitcoin
-    - lnd
+    - lightning
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
@@ -202,7 +202,7 @@ services:
       JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
       RPCUSER: $BITCOIN_RPC_USER
       RPCPASS: $BITCOIN_RPC_PASS
-      LND_CONTAINER_NAME: lnd
+      LND_CONTAINER_NAME: lightning
       SLEEPTIME: 3600
     networks:
       default:
