@@ -13,6 +13,14 @@ if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" 
     for app in "${@:2}"; do
         "${NODE_ROOT}/app/app-manager.py" "$1" "$app"
     done
+elif  [ "$1" == "update" ]; then
+    for app in "${@:2}"; do
+        "${NODE_ROOT}/app/app-manager.py" --invoked-by-configure update "$app"
+    done
+    "${NODE_ROOT}/app/app-manager.py" generate
+    for app in "${@:2}"; do
+        "${NODE_ROOT}/app/app-manager.py" start "$app"
+    done
 else
     "${NODE_ROOT}/app/app-manager.py" "$@"
 fi
