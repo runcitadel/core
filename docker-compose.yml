@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.7@sha256:f39aed518b87e9bbe04d8223cb531a090c1946b6f5b35ba857cee260d699fa45
+    image: ghcr.io/runcitadel/dashboard:v0.0.9@sha256:d5e523e0640daca7c75084e692bb8e91a8892666d6215af0111e174b285e72b6
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.9@sha256:f0ac20d5a484cd70fdc8435814dbe9fc43ece54b873475eb60bec43ad70cb563
+    image: ghcr.io/runcitadel/manager:v0.0.10@sha256:29b513831e8a48f9726b3b66be1a9d80e1e11acc9d384475d55adccb3c2faad3
     depends_on:
     - tor
     - redis
@@ -166,7 +166,7 @@ services:
     depends_on:
     - manager
     - bitcoin
-    - lnd
+    - lightning
     - redis
     - c-lightning
     command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
@@ -195,7 +195,7 @@ services:
     image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
     depends_on:
     - bitcoin
-    - lnd
+    - lightning
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
@@ -205,7 +205,7 @@ services:
       JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
       RPCUSER: $BITCOIN_RPC_USER
       RPCPASS: $BITCOIN_RPC_PASS
-      LND_CONTAINER_NAME: lnd
+      LND_CONTAINER_NAME: lightning
       SLEEPTIME: 3600
     networks:
       default:
