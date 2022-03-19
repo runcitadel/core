@@ -29,16 +29,12 @@ def getFreePort(networkingFile: str, appId: str):
         50001,
         # Tor Proxy
         9050,
-        3000,
-        3300,
-        3001,
-        3004,
+        # Soon hardcoded to Specter
         25441,
         3003,
         3007,
         3006,
         3009,
-        3010,
         3005,
         8898,
         3008,
