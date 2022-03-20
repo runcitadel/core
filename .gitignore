@@ -22,9 +22,11 @@ statuses/*
 app-data
 apps
 electrs/*
+fulcrumx/*
 nginx/*
 redis/*
 events/signals/*
+docker-compose.override.yml
 
 # Commit these empty directories
 !**/.gitkeep
@@ -43,9 +45,10 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !redis/.gitkeep
+!fulcrumx/.gitkeep
 !events/signals/.gitkeep
 
 !**/*.license
 services/installed.json
+services/installed.yml
 
-use-core-upstream

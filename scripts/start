@@ -88,6 +88,7 @@ echo
 ./karen &>> "${CITADEL_LOGS}/karen.log" &
 
 echo "Starting status monitors..."
+echo
 pkill -f ./scripts/status-monitor || true
 ./scripts/status-monitor memory 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
 ./scripts/status-monitor storage 60 &>> "${CITADEL_LOGS}/status-monitor.log" &
@@ -103,7 +104,6 @@ echo "Starting decoy backup trigger..."
 echo
 ./scripts/backup/decoy-trigger &>> "${CITADEL_LOGS}/backup-decoy-trigger.log" &
 
-echo
 echo "Resetting config files"
 echo
 ./scripts/configure

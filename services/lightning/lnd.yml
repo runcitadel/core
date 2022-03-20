@@ -1,0 +1,21 @@
+lightning:
+  container_name: lightning
+  image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
+  user: 1000:1000
+  depends_on:
+  - tor
+  - bitcoin
+  volumes:
+  - ${PWD}/lnd:/data/.lnd
+  - ${PWD}/walletpassword:/walletpassword
+  environment:
+    HOME: /data
+  restart: on-failure
+  stop_grace_period: 5m30s
+  ports:
+  - 9735:9735
+  - $LND_REST_PORT:$LND_REST_PORT
+  - $LND_GRPC_PORT:$LND_GRPC_PORT
+  networks:
+    default:
+      ipv4_address: $LND_IP

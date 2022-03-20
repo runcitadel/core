@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+bitcoin:
+  container_name: bitcoin
+  image: lncm/bitcoind:v22.0@sha256:37a1adb29b3abc9f972f0d981f45e41e5fca2e22816a023faa9fdc0084aa4507
+  depends_on:
+  - tor
+  volumes:
+  - ${PWD}/bitcoin:/data/.bitcoin
+  restart: on-failure
+  stop_grace_period: 1m
+  ports:
+  - $BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT
+  networks:
+    default:
+      ipv4_address: $BITCOIN_IP

@@ -20,17 +20,19 @@ scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..")
 
 parser = argparse.ArgumentParser(description="Manage services on your Citadel")
-parser.add_argument('action', help='What to do with the service.', choices=["install", "uninstall", "setup"])
+parser.add_argument('action', help='What to do with the service.', choices=["set", "uninstall", "setup"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
-    'app', help='The service to perform an action on.', nargs='?')
+    'service', help='The service to perform an action on.', nargs='?')
+parser.add_argument(
+    'implementation', help='The service to perform an action on.', nargs='?')
 args = parser.parse_args()
 
 # Function to install a service
 # To install it, read the service's YAML file (nodeRoot/services/name.yml) and add it to the main compose file (nodeRoot/docker-compose.yml)
-def installService(name):
+def setService(name, implementation):
     # Read the YAML file
-    with open(os.path.join(nodeRoot, "services", name + ".yml"), 'r') as stream:
+    with open(os.path.join(nodeRoot, "services", name, implementation + ".yml"), 'r') as stream:
         service = yaml.safe_load(stream)
 
     # Read the main compose file
@@ -46,18 +48,21 @@ def installService(name):
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     # If the file doesn't exist, put [] in it, then run the code below
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed = []
-    installed.append(name)
-    with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
-        json.dump(list(set(installed)), stream, sort_keys=False)
-
+        installed = {
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
+        }
+    installed[name] = implementation
+    with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
+        yaml.dump(installed, stream, sort_keys=False)
 
 def uninstallService(name):
     # First check if a service yml definition exists to avoid uninstalling something that can't be installed or isn't supposed to be removed
-    if not os.path.isfile(os.path.join(nodeRoot, "services", name + ".yml")):
+    if not os.path.isdir(os.path.join(nodeRoot, "services", name)):
         print("Service definition not found, cannot uninstall")
         exit(1)
     # Read the main compose file
@@ -75,33 +80,42 @@ def uninstallService(name):
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed = []
+        installed = {
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
+        }
     try:
-        installed.remove(name)
-    except ValueError:
+        del installed[name]
+    except KeyError:
         pass
-    with open(os.path.join(nodeRoot, "services", "installed.json"), 'w') as stream:
-        json.dump(list(set(installed)), stream, sort_keys=False)
+    with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
+        yaml.dump(installed, stream, sort_keys=False)
 
 # install all services from installed.json
 def installServices():
     try:
-        with open(os.path.join(nodeRoot, "services", "installed.json"), 'r') as stream:
-            installed: List[str] = yaml.safe_load(stream)
+        with open(os.path.join(nodeRoot, "services", "installed.yml"), 'r') as stream:
+            installed = yaml.safe_load(stream)
     except FileNotFoundError:
-        installed: List[str] = []
-    for service in installed:
-        installService(service)
+        installed = {
+            "electrum": "electrs",
+            "lightning": "lnd",
+            "bitcoin": "knots"
+        }
+    
+    for key, value in installed.items():
+        setService(key, value)
     
 
 
-if args.action == "install":
-    installService(args.app)
+if args.action == "set":
+    setService(args.service, args.implementation)
 elif args.action == "uninstall":
-    uninstallService(args.app)
+    uninstallService(args.service)
 elif args.action == "setup":
     installServices()
     

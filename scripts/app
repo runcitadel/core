@@ -6,4 +6,21 @@
 
 NODE_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 
-"${NODE_ROOT}/app/app-manager.py" "$@"
+# If the first argument is stop, start, install or uninstall, and there are multiple other arguments,
+# Run the "${NODE_ROOT}/app/app-manager.py" for each of the other arguments.
+# Otherwise, run the "${NODE_ROOT}/app/app-manager.py" with the first argument as the command.
+if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" == "uninstall" ]; then
+    for app in "${@:2}"; do
+        "${NODE_ROOT}/app/app-manager.py" "$1" "$app"
+    done
+elif  [ "$1" == "update" ]; then
+    for app in "${@:2}"; do
+        "${NODE_ROOT}/app/app-manager.py" --invoked-by-configure update "$app"
+    done
+    "${NODE_ROOT}/app/app-manager.py" generate
+    for app in "${@:2}"; do
+        "${NODE_ROOT}/app/app-manager.py" start "$app"
+    done
+else
+    "${NODE_ROOT}/app/app-manager.py" "$@"
+fi

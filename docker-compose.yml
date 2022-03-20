@@ -77,8 +77,8 @@ services:
     networks:
       default:
         ipv4_address: $BITCOIN_IP
-  lnd:
-    container_name: lnd
+  lightning:
+    container_name: lightning
     image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
     user: 1000:1000
     depends_on:
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.5@sha256:4430774d51e5731b5dc36606d7bef43f5ab2902c82cf4353ace59ebd590c2a40
+    image: ghcr.io/runcitadel/dashboard:v0.0.9@sha256:d5e523e0640daca7c75084e692bb8e91a8892666d6215af0111e174b285e72b6
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,10 +108,12 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.5@sha256:e7dc280dbeabfd4947f60676446dd69a46354f18a54e9cfb109afa98b114396c
+    image: ghcr.io/runcitadel/manager:v0.0.10@sha256:29b513831e8a48f9726b3b66be1a9d80e1e11acc9d384475d55adccb3c2faad3
     depends_on:
     - tor
     - redis
+    command:
+    - ./start.sh
     restart: on-failure
     init: true
     stop_grace_period: 5m30s
@@ -160,17 +162,13 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.3@sha256:860fc9b1d748ac1e738322b2dc209560dc206a101be6c135bfff9b4d4fbaf023
+    image: ghcr.io/runcitadel/middleware:v0.0.8@sha256:f1e400cc4544a1c2a337f4a957693b328c6ee096bff8c06f0cdfb2eabcb2f4aa
     depends_on:
     - manager
     - bitcoin
-    - lnd
+    - lightning
     - redis
-    command:
-    - ./wait-for-node-manager.sh
-    - $MANAGER_IP
-    - npm
-    - start
+    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
@@ -194,7 +192,7 @@ services:
     image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
     depends_on:
     - bitcoin
-    - lnd
+    - lightning
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
@@ -204,13 +202,13 @@ services:
       JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
       RPCUSER: $BITCOIN_RPC_USER
       RPCPASS: $BITCOIN_RPC_PASS
-      LND_CONTAINER_NAME: lnd
+      LND_CONTAINER_NAME: lightning
       SLEEPTIME: 3600
     networks:
       default:
         ipv4_address: $NEUTRINO_SWITCHER_IP
-  electrs:
-    container_name: electrs
+  electrum:
+    container_name: electrum
     image: ghcr.io/runcitadel/electrs:v0.9.5@sha256:5fdd76415645de14f31c43844dc143b1477f86872d2f73a041c5005d469ed510
     working_dir: /data
     volumes:

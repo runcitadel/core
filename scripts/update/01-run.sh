@@ -28,6 +28,9 @@ IS_MIGRATING=0
 # If ${CITADEL_ROOT}/c-lightning exists, fail
 if [[ -d "${CITADEL_ROOT}/c-lightning" ]]; then
     echo "This update is not compatible with the c-lightning beta."
+    cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 1, "description": "This update is not compatible with c-lightning", "updateTo": "$RELEASE"}
+EOF
     exit 1
 fi
 
@@ -97,16 +100,22 @@ docker compose pull
 # Stopping karen
 echo "Stopping background daemon"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 65, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
+{"state": "installing", "progress": 55, "description": "Stopping background daemon", "updateTo": "$RELEASE"}
 EOF
 pkill -f "\./karen" || true
+
+echo "Stopping installed apps"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 60, "description": "Stopping installed apps", "updateTo": "$RELEASE"}
+EOF
+cd "$CITADEL_ROOT"
+./scripts/app stop installed || true
 
 # Stop old containers
 echo "Stopping old containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 67, "description": "Stopping old containers", "updateTo": "$RELEASE"}
 EOF
-cd "$CITADEL_ROOT"
 ./scripts/stop || true
 
 
