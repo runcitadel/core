@@ -226,7 +226,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   c-lightning:
     container_name: c-lightning
-    image: ghcr.io/runcitadel/c-lightning:main@sha256:a63e07df9b966964a9cf6aafe65ab0023712852a740b02437a2754ffef9d450c
+    image: ghcr.io/runcitadel/c-lightning:main@sha256:69c2870f627fccd5df5b5df24f2e239c5309c444cf35d103969031e461509174
     environment:
       LIGHTNINGD_NETWORK: bitcoin
       CL_REST_STATE_DIR: /data/.lightning
@@ -235,7 +235,7 @@ services:
     - ${PWD}/c-lightning:/data/.lightning
     - ${PWD}/bitcoin:/data/.bitcoin
     ports:
-      - $SPARKO_RPC_PORT:$SPARKO_RPC_PORT
+    - $SPARKO_RPC_PORT:$SPARKO_RPC_PORT
     networks:
       default:
         ipv4_address: $C_LIGHTNING_IP
