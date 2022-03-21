@@ -1,6 +1,6 @@
 {
-    "version": "0.0.2-c-lightning.1",
-    "name": "Citadel 0.0.2 with c-lightning (Beta 2)",
+    "version": "0.0.3-c-lightning.1",
+    "name": "Citadel 0.0.3 with c-lightning (Beta 1)",
     "requires": ">=0.0.1",
-    "notes": "This update prepares for Fulcrum support and fixes a few bugs."
+    "notes": "This update fixes multiple bugs with c-lightning."
 }
