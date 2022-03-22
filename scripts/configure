@@ -310,6 +310,16 @@ ELECTRUM_PORT="50001"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
 
+# Hardcoded for now, they will be dynamic later
+LIQUID_IP="10.21.21.17"
+# TODO: Check the "standard ports here"
+LIQUID_P2P_PORT = 7042
+LIQUID_RPC_PORT = 7043
+LIQUID_RPC_USER="citadel"
+liquidRpcData=get_data(LIQUID_RPC_USER)
+LIQUID_RPC_AUTH=liquidRpcData['auth']
+LIQUID_RPC_PASS=liquidRpcData['password']
+
 DEVICE_HOSTNAME=""
 try:
   DEVICE_HOSTNAME=subprocess.check_output("hostname").decode("utf-8").strip()
@@ -364,7 +374,8 @@ templates_to_build = {
   "./templates/electrs-sample.toml": "./electrs/electrs.toml",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf",
   "./templates/c-lightning-sample.conf": "./c-lightning/config",
-  "./templates/fulcrumx-sample.conf": "./fulcrumx/fulcrumx.conf"
+  "./templates/fulcrumx-sample.conf": "./fulcrumx/fulcrumx.conf",
+  "./templates/elements-sample.conf": "./elements/elements.conf"
 }
 
 print("Generating configuration files...")
@@ -401,7 +412,7 @@ elif not updating:
   print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure generate')
 print("Configuring permissions...\n")
-os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+#os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')

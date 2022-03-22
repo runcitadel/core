@@ -26,6 +26,7 @@ fulcrumx/*
 nginx/*
 redis/*
 events/signals/*
+elements/*
 docker-compose.override.yml
 
 # Commit these empty directories
@@ -47,6 +48,7 @@ db/citadel-seed/*
 !redis/.gitkeep
 !fulcrumx/.gitkeep
 !events/signals/.gitkeep
+!elements/.gitkeep
 
 !**/*.license
 services/installed.json
