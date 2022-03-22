@@ -252,6 +252,17 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+  liquid:
+    container_name: liquid
+    image: ghcr.io/runcitadel/elements:master@sha256:63490f15b2b760fecab3d94bc7330f196b8688b9b520b7ec67caa76ce5e21018
+    volumes:
+    - ${PWD}/elements:/data/.elements
+    restart: on-failure
+    stop_grace_period: 1m
+    init: true
+    networks:
+      default:
+        ipv4_address: $LIQUID_IP
 networks:
   default:
     name: citadel_main_network
