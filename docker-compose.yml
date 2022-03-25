@@ -254,7 +254,7 @@ services:
         ipv4_address: $REDIS_IP
   liquid:
     container_name: liquid
-    image: ghcr.io/runcitadel/elements:master@sha256:3373fd1665de0536880fb3306bf8a9c14347875af7e4c2a8dd0ec9d2c5ec5f95
+    image: ghcr.io/runcitadel/elements:master@sha256:482dc0b3c0c777653fc17ab97c483aa9bfbd168606e2e3af8be026cdc4d2b847
     volumes:
     - ${PWD}/elements:/data/.elements
     restart: on-failure
