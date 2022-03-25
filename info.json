@@ -1,6 +1,6 @@
 {
-    "version": "0.0.2",
-    "name": "Citadel 0.0.2",
+    "version": "0.0.3-beta.0",
+    "name": "Citadel 0.0.3 Beta 0",
     "requires": ">=0.0.1",
-    "notes": "Please note: This update is not compatible with the c-lightning beta. This update includes a lot of bug fixes and UI improvements, and also prepares for Fulcrum integration and improves the CLI."
+    "notes": "This update updates the beta versions to be up-to-date with the latest 0.0.2, and also adds a new dark mode toggle."
 }
