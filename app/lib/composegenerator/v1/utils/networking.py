@@ -8,10 +8,8 @@ import random
 
 from lib.composegenerator.v1.types import Container
 
-
 def getFreePort(networkingFile: str, appId: str):
     # Ports used currently in Citadel
-    # TODO: Update this list, currently it's outdated
     usedPorts = [
         # Dashboard
         80,
@@ -29,26 +27,6 @@ def getFreePort(networkingFile: str, appId: str):
         50001,
         # Tor Proxy
         9050,
-        # Soon hardcoded to Specter
-        25441,
-        3003,
-        3007,
-        3006,
-        3009,
-        3005,
-        8898,
-        3008,
-        8081,
-        8082,
-        8083,
-        8085,
-        2222,
-        8086,
-        8087,
-        8008,
-        8088,
-        8089,
-        8091
     ]
     networkingData = {}
     if os.path.isfile(networkingFile):
