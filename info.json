@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3-beta.0",
-    "name": "Citadel 0.0.3 Beta 0",
+    "version": "0.0.3-beta.1",
+    "name": "Citadel 0.0.3 Beta 1",
     "requires": ">=0.0.1",
-    "notes": "This update updates the beta versions to be up-to-date with the latest 0.0.2, and also adds a new dark mode toggle."
+    "notes": "This update changes the app system to use a better system for port assignment, and cleans up the app definition files a bit. Please let us know if you experience any bugs in this release. Please note that installing this app will change the ports for all or at least most apps."
 }
