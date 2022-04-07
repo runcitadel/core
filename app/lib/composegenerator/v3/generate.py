@@ -53,7 +53,7 @@ def convertDataDirToVolumeGen3(app: App) -> AppStage2:
                     continue
                 # Also skip the container if container.lnd_mount_dir contains a :
                 if container.mounts.bitcoin.find(":") == -1:
-                    container.volumes.append('${LND_DATA_DIR}:' + container.mounts.bitcoin)
+                    container.volumes.append('${BITCOIN_DATA_DIR}:' + container.mounts.bitcoin)
             del container.mounts
                 
     return app
