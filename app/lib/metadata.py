@@ -103,7 +103,7 @@ def validatePort(appContainer, port, appId, priority: int, isDynamic = False):
             "dynamic": isDynamic,
         }
     else:
-        if port in citadelPorts or (appPorts[port]["app"] != appId and appPorts[port]["container"] != appContainer["name"]):
+        if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != appContainer["name"]:
             newPort = getNewPort(appPorts.keys())
             if port in appPorts and priority > appPorts[port]["priority"]:
                 #print("Prioritizing app {} over {}".format(appId, appPorts[port]["app"]))
