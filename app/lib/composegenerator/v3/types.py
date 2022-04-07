@@ -14,7 +14,7 @@ class Metadata:
     website: str
     repo: str
     support: str
-    gallery: List[str] = field(default_factory=list)
+    gallery: List[Union[list,str]] = field(default_factory=list)
     dependencies: List[str] = field(default_factory=list)
     updateContainer: Union[str, Union[list, None]] = field(default_factory=list)
     path: str = ""
@@ -26,21 +26,27 @@ class Metadata:
     internalPort: int = 0
 
 @dataclass
+class ContainerMounts:
+    bitcoin: Union[str, None] = None
+    lnd: Union[str, None] = None
+    c_lightning: Union[str, None] = None
+
+@dataclass
 class Container:
     name: str
     image: str
     permissions: list = field(default_factory=list)
-    ports: list = field(default_factory=list)
     port: Union[int, None] = None
+    requiredPorts: list = field(default_factory=list)
+    preferredOutsidePort: list = field(default_factory=list)
+    requiresPort: Union[bool, None] = None
     environment: Union[dict, None] = None
     data: list = field(default_factory=list)
     user: Union[str, None] = None
     stop_grace_period: str = '1m'
     depends_on: list = field(default_factory=list)
     entrypoint: Union[List[str], str] = field(default_factory=list)
-    bitcoin_mount_dir: Union[str, None] = None
-    lnd_mount_dir: Union[str, None] = None
-    c_lightning_mount_dir: Union[str, None] = None
+    mounts: Union[ContainerMounts, None] = None
     command: Union[List[str], str] = field(default_factory=list)
     init: Union[bool, None] = None
     stop_signal: Union[str, None] = None
@@ -51,6 +57,7 @@ class Container:
     # Only added later
     volumes: list = field(default_factory=list)
     restart: Union[str, None] = None
+    ports: list = field(default_factory=list)
 
 @dataclass
 class App:

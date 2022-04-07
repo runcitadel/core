@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 # SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
@@ -24,11 +22,12 @@ except Exception:
     print("    sudo apt install -y python3-semver")
     print("On other systems, please use")
     print("     sudo pip3 install semver")
-    print("Continuing anyway, but some features won't be available")
-    print("Like checking for app updates")
+    print("Continuing anyway, but some features won't be available,")
+    print("for example checking for app updates")
 
 from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.composegenerator.v2.generate import createComposeConfigFromV2
+from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
@@ -85,7 +84,9 @@ def update(verbose: bool = False):
     # The compose generation process updates the registry, so we need to get it set up with the basics before that
     registry = getAppRegistry(apps, appsDir)
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
-        json.dump(registry, f, sort_keys=True)
+        json.dump(registry["metadata"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "ports.json"), "w") as f:
+        json.dump(registry["ports"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
@@ -188,9 +189,13 @@ def getApp(appFile: str, appId: str):
     app["metadata"]["id"] = appId
 
     if 'version' in app and str(app['version']) == "1":
+        print("Warning: App {} uses version 1 of the app.yml format, which is scheduled for removal in Citadel 0.1.0".format(appId))
         return createComposeConfigFromV1(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "2":
+        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
+    elif 'version' in app and str(app['version']) == "3":
+        return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
 
@@ -341,8 +346,8 @@ def updateRepos():
         subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
         # Overwrite the current app dir with the contents of the temporary dir/apps/app
         for app in os.listdir(os.path.join(tempDir, "apps")):
-            # if the app is already installed, don't overwrite it
-            if app in alreadyInstalled:
+            # if the app is already installed (or a simple file instead of a valid app), skip it
+            if app in alreadyInstalled or not os.path.isdir(os.path.join(tempDir, "apps", app)):
                 continue
             if gitUrl.startswith("https://github.com"):
                 sourceMap[app] = {
