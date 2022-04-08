@@ -62,8 +62,15 @@ def convertDataDirToVolumeGen3(app: App) -> AppStage2:
                 # Also skip the container if container.lnd_mount_dir contains a :
                 if container.mounts.bitcoin.find(":") == -1:
                     container.volumes.append('${BITCOIN_DATA_DIR}:' + container.mounts.bitcoin)
-            del container.mounts
-                
+            if container.mounts.c_lightning:
+                if not 'c-lightning' in app.metadata.dependencies:
+                    print("Warning: container {} of app {} defines lnd mount dir but doesn't request lnd permission".format(container.name, app.metadata.name))
+                    # Skip this container
+                    continue
+                # Also skip the container if container.lnd_mount_dir contains a :
+                if container.mounts.c_lightning.find(":") == -1:
+                    container.volumes.append('${C_LIGHTNING_DATA_DIR}:' + container.mounts.bitcoin)
+            del container.mounts                
     return app
 
 def createComposeConfigFromV3(app: dict, nodeRoot: str):
