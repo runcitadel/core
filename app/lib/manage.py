@@ -69,7 +69,7 @@ def getAppYml(name):
         sourceMap = {
             name: {
                 "githubRepo": "runcitadel/core",
-                "branch": "v2"
+                "branch": "c-lightning-v3"
             }
         }
     url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
