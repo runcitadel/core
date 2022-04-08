@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # A collection of fully FLOSS app definitions and FLOSS apps for Citadel.
-https://github.com/runcitadel/apps c-lightning-v2
+https://github.com/runcitadel/apps c-lightning-v3
 
 # Some apps modified version of Umbrel apps, and their app definitions aren't FLOSS yet.
 # Include them anyway, but as a separate repo.
