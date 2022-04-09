@@ -31,12 +31,12 @@ properties:
       description:
         description: A longer description of the app
         type: string
-      developer:
+      developers:
         description: The awesome people behind the app
-        type: string
-      website:
-        description: Displayed version for the app
-        type: string
+        type: object
+        patternProperties:
+          "^.*$":
+            type: string
       dependencies:
         description: >-
           The services the app depends on.
@@ -49,7 +49,7 @@ properties:
             type: string
       repo:
         description: The development repository for your app
-        type: string
+        type: [string, object]
       support:
         description: A link to the app support wiki/chat/...
         type: string
@@ -75,15 +75,14 @@ properties:
         type:
           - string
           - array
-        description: The container(s) the developer system should automatically update.
+        description: The container(s) the automatic update system should automatically update.
     required:
       - name
       - version
       - category
       - tagline
       - description
-      - developer
-      - website
+      - developers
       - repo
       - support
       - gallery
@@ -186,6 +185,11 @@ properties:
         restart:
           type: string
           description: When the container should restart. Can be 'always' or 'on-failure'.
+        requires:
+          description: Dependencies this container requires, it is ignored without it.
+          type: array
+          items:
+            type: string
         network_mode:
           type: string
       additionalProperties: false

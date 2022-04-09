@@ -92,14 +92,25 @@ def findAndValidateApps(dir: str):
         should_continue=True
         if appyml['metadata']['dependencies']:
             for dependency in appyml['metadata']['dependencies']:
-                if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
-                    print("WARNING: App '{}' has unknown dependency '{}'".format(app, dependency))
-                    apps.remove(app)
-                    should_continue=False
-                if dependency == app:
-                    print("WARNING: App '{}' depends on itself".format(app))
-                    apps.remove(app)
-                    should_continue=False
+                if isinstance(dependency, str):
+                    if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
+                        print("WARNING: App '{}' has unknown dependency '{}'".format(app, dependency))
+                        apps.remove(app)
+                        should_continue=False
+                    if dependency == app:
+                        print("WARNING: App '{}' depends on itself".format(app))
+                        apps.remove(app)
+                        should_continue=False
+                else:
+                    for subDependency in dependency:
+                        if subDependency not in apps and subDependency not in ["bitcoind", "lnd", "electrum", "c-lightning"]:
+                            print("WARNING: App '{}' has unknown dependency '{}'".format(app, subDependency))
+                            apps.remove(app)
+                            should_continue=False
+                        if subDependency == app:
+                            print("WARNING: App '{}' depends on itself".format(app))
+                            apps.remove(app)
+                            should_continue=False
         if not should_continue:
             continue
         for container in appyml['containers']:

@@ -18,6 +18,10 @@ def getMainContainer(app: App) -> Container:
             # Main is recommended, support web for easier porting from Umbrel
             if container.name == 'main' or container.name == 'web':
                 return container
+        for container in app.containers:
+            # Also allow names to start with main
+            if container.name.startswith("main") and not container.ignored:
+                return container
     # Fallback to first container
     return app.containers[0]
 
