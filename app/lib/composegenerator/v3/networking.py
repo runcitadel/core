@@ -53,6 +53,8 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
 
     mainPort = False
 
+    containerPort = False
+
     if mainContainer.port:
         portToAppend = "${{{}}}:{}".format(portAsEnvVar, mainContainer.port)
         mainPort = mainContainer.port
@@ -83,15 +85,15 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
             nodeRoot, "apps", "networking.json"), path.join(nodeRoot, ".env"))
 
     # Also set the port in metadata
-    app.metadata.port = int(port["publicPort"])
+    app.metadata.port = int(containerPort)
     if mainPort:
         app.metadata.internalPort = int(mainPort)
     else:
-        app.metadata.internalPort = int(port["publicPort"])
+        app.metadata.internalPort = int(containerPort)
 
     for registryApp in registry:
         if registryApp['id'] == app.metadata.id:
-            registry[registry.index(registryApp)]['port'] = port["publicPort"]
+            registry[registry.index(registryApp)]['port'] = containerPort
             registry[registry.index(registryApp)]['internalPort'] = app.metadata.internalPort
             break
 
