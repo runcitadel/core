@@ -90,7 +90,7 @@ def findAndValidateApps(dir: str):
             continue
         # More security validation
         should_continue=True
-        if appyml['metadata']['dependencies']:
+        if 'dependencies' in appyml['metadata']:
             for dependency in appyml['metadata']['dependencies']:
                 if isinstance(dependency, str):
                     if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
