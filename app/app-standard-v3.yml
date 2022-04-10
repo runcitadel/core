@@ -153,7 +153,7 @@ properties:
             c_lightning:
               type: string
               description: Where to mount the c-lightning dir
-            additionalProperties: false
+          additionalProperties: false
         command:
           type:
             - string
