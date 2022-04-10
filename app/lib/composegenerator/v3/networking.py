@@ -87,7 +87,7 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
     if mainPort:
         app.metadata.internalPort = int(mainPort)
     else:
-        app.metadata.internalPort = int(containerPort)
+        app.metadata.internalPort = int(port["publicPort"])
 
     for registryApp in registry:
         if registryApp['id'] == app.metadata.id:
