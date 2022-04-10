@@ -48,8 +48,11 @@ properties:
           items:
             type: string
       repo:
-        description: The development repository for your app
+        description: "The development repository (or repositories) for your app, kif you have multiple, in the format human readable name: repo url"
         type: [string, object]
+        patternProperties:
+          "^.*$":
+            type: string
       support:
         description: A link to the app support wiki/chat/...
         type: string
