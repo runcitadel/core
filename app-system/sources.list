@@ -8,4 +8,4 @@ https://github.com/runcitadel/apps c-lightning-v3
 # Some apps modified version of Umbrel apps, and their app definitions aren't FLOSS yet.
 # Include them anyway, but as a separate repo.
 # Add a # to the line below to disable the repo and only use FLOSS apps.
-https://github.com/runcitadel/apps-nonfree main
+https://github.com/runcitadel/apps-nonfree v3-dev

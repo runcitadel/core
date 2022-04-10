@@ -22,14 +22,14 @@ def convertContainerPermissions(app: App) -> App:
                     container.environment_allow.extend(permissions()[permission]['environment_allow'])
                     container.volumes.extend(permissions()[permission]['volumes'])
                 else:
-                    print("Warning: app {} defines unknown permission {}".format(container.name, app.metadata.name, permission))
+                    print("Warning: app {} defines unknown permission {}".format(app.metadata.name, permission))
             else:
                 for subPermission in permission:
                     if subPermission in permissions():
                         container.environment_allow.extend(permissions()[subPermission]['environment_allow'])
                         container.volumes.extend(permissions()[subPermission]['volumes'])
                     else:
-                        print("Warning: app {} defines unknown permission {}".format(container.name, app.metadata.name, subPermission))
+                        print("Warning: app {} defines unknown permission {}".format(app.metadata.name, subPermission))
     return app
 
 def convertDataDirToVolumeGen3(app: App) -> AppStage2:
@@ -76,7 +76,7 @@ def convertDataDirToVolumeGen3(app: App) -> AppStage2:
 def createComposeConfigFromV3(app: dict, nodeRoot: str):
     envFile = os.path.join(nodeRoot, ".env")
     networkingFile = os.path.join(nodeRoot, "apps", "networking.json")
-
+    ignoredContainers = []
     newApp: App = generateApp(app)
     newApp = convertContainerPermissions(newApp)
     newApp = validateEnv(newApp)
@@ -87,10 +87,21 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     for container in newApp.containers:
         container.ports = container.requiredPorts
         del container.requiredPorts
+    for container in newApp.containers:
+        # TODO: Make this dynamic and not hardcoded
+        if container.requires and "lnd" in container.requires:
+            ignoredContainers.append(container.name)
+            container.ignored = True
+        elif container.requires:
+            del container.requires
     newApp = configureHiddenServices(newApp, nodeRoot)
+    for container in newApp.containers:
+        del container.ignored
     finalConfig: AppStage4 = convertContainersToServices(newApp)
     newApp = classToDict(finalConfig)
     del newApp['metadata']
+    for container in ignoredContainers:
+        del newApp['services'][container]
     if "version" in newApp:
         del newApp["version"]
     # Set version to 3.8 (current compose file version)

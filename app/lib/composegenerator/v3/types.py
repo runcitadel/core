@@ -10,12 +10,11 @@ class Metadata:
     category: str
     tagline: str
     description: str
-    developer: str
-    website: str
     repo: str
     support: str
+    developers: dict = field(default_factory=dict)
     gallery: List[Union[list,str]] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: List[Union[List[str], str]] = field(default_factory=list)
     updateContainer: Union[str, Union[list, None]] = field(default_factory=list)
     path: str = ""
     defaultPassword: str = ""
@@ -53,11 +52,13 @@ class Container:
     noNetwork: Union[bool, None] = None
     hiddenServicePorts: Union[dict, Union[int, Union[None, list]]] = field(default_factory=list)
     environment_allow: list = field(default_factory=list)
+    requires: list = field(default_factory=list)
     network_mode: Union[str, None] = None
     # Only added later
     volumes: list = field(default_factory=list)
     restart: Union[str, None] = None
     ports: list = field(default_factory=list)
+    ignored: bool = False
 
 @dataclass
 class App:
@@ -99,6 +100,7 @@ class ContainerStage2:
     networks: NetworkConfig = field(default_factory=NetworkConfig)
     restart: Union[str, None] = None
     network_mode: Union[str, None] = None
+    requires: Union[List[str], None] = field(default_factory=list)
 
 @dataclass
 class AppStage2:
