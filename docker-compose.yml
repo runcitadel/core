@@ -79,7 +79,7 @@ services:
         ipv4_address: $BITCOIN_IP
   lightning:
     container_name: lightning
-    image: lightninglabs/lnd:v0.14.2-beta@sha256:8318a24a3ad7319e424253eb56efcbf38e820ebc6d6b6edeec6a8a4e3e9314a0
+    image: lightninglabs/lnd:v0.14.3-beta@sha256:6a2234b0aad4caed3d993736816b198d6228f32c59b27ba2218d5ebf516ae905
     user: 1000:1000
     depends_on:
     - tor
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:085bdcd7e39ff9e7786bd2277dd8040a696ad1d8be32425ec73a7728634192e4
+    image: ghcr.io/runcitadel/dashboard:v0.0.10@sha256:8562b2a817ccb5939e1e0c977d7bbedf2bd1f3380026f5ff54100b10c453a004
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.10@sha256:29b513831e8a48f9726b3b66be1a9d80e1e11acc9d384475d55adccb3c2faad3
+    image: ghcr.io/runcitadel/manager:main@sha256:e9baebf90f5f941053c7c3f1fefb8e956256c0a5a8bda7d8aef4daace1b6701d
     depends_on:
     - tor
     - redis
@@ -162,7 +162,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:30c5fd993e83bb7f85439268920cd7407aac6fb4051ef42a8bcb8d71118461c0
+    image: ghcr.io/runcitadel/middleware:v0.0.9@sha256:6763b6006f0deeb746ccf6a5653cbc0401d03dd73e500bb869fb4c28ec258a1b
     depends_on:
     - manager
     - bitcoin
