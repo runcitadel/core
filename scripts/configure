@@ -37,7 +37,7 @@ def is_compose_rc_or_outdated():
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
     if output.decode('utf-8').strip() != 'Docker Compose version v2.3.3':
-      print("Using outdated docker compose, updating...")
+      print("Using outdated Docker Compose, updating...")
       return True
     else:
       return False
@@ -52,7 +52,7 @@ def download_docker_compose():
     print("Found {}\n".format(subprocess.check_output(['docker', 'compose', 'version']).decode('utf-8').strip()))
     return
 
-  print("Installing docker-compose...\n")
+  print("Installing Docker Compose...\n")
 
   if is_arm64:
     subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
@@ -362,7 +362,7 @@ for template_path, output_path in templates_to_build.items():
 
 print("Generated configuration files\n")
 
-print("Checking if docker compose is installed...")
+print("Checking if Docker Compose is installed...")
 download_docker_compose()
 
 if not reconfiguring:
