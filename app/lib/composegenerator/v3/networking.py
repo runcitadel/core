@@ -10,20 +10,20 @@ import random
 from lib.composegenerator.v1.networking import assignIp, assignPort
 
 
-def getMainContainer(app: App) -> Container:
+def getMainContainerIndex(app: App):
     if len(app.containers) == 1:
-        return app.containers[0]
+        return 0
     else:
-        for container in app.containers:
+        for index, container in enumerate(app.containers):
             # Main is recommended, support web for easier porting from Umbrel
-            if container.name == 'main' or container.name == 'web':
-                return container
-        for container in app.containers:
+            if (container.name == 'main' or container.name == 'web') and not container.ignored:
+                return index
+        for index, container in enumerate(app.containers):
             # Also allow names to start with main
             if container.name.startswith("main") and not container.ignored:
-                return container
+                return index
     # Fallback to first container
-    return app.containers[0]
+    return 0
 
 
 def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
@@ -43,7 +43,9 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
     else:
         raise Exception("Ports file not found")
 
-    mainContainer = getMainContainer(app)
+    mainContainerIndex = getMainContainerIndex(app)
+
+    mainContainer = app.containers[mainContainerIndex]
 
     portAsEnvVar = "APP_{}_{}_PORT".format(
         app.metadata.id.upper().replace("-", "_"),
@@ -52,8 +54,9 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
     portToAppend = portAsEnvVar
 
     mainPort = False
-    containerPort = False
 
+    containerPort = False
+    
     if mainContainer.port:
         portToAppend = "${{{}}}:{}".format(portAsEnvVar, mainContainer.port)
         mainPort = mainContainer.port
@@ -61,7 +64,7 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
             if str(port["internalPort"]) == str(mainPort):
                 containerPort = port["publicPort"]
         del mainContainer.port
-    elif not mainContainer.requiredPorts:
+    else:
         for port in ports[app.metadata.id][mainContainer.name]:
             if port["dynamic"]:
                 mainPort = port["internalPort"]
@@ -74,8 +77,6 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
         # If it doesn't contain a :, it's the port itself
         if mainPort == False:
             mainPort = mainContainer.ports[0]
-            if mainPort.find(":") != -1:
-                mainPort = mainPort.split(":")[1]
     else:
         mainContainer.ports = [portToAppend]
 
