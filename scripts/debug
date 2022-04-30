@@ -145,7 +145,7 @@ if [[ "${1}" == "--run" ]]; then
     echo "Lightning logs"
     echo "--------"
     echo
-    docker compose logs --tail=30 lightning
+    docker compose logs --tail=30 c-lightning
     
     echo
     echo "Tor logs"
