@@ -39,5 +39,5 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 wait
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 100, "description": "Update successful", "updateTo": "$RELEASE"}
+{"state": "success", "progress": 100, "description": "Update successful", "updateTo": "$RELEASE"}
 EOF
