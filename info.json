@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3-beta.1",
-    "name": "Citadel 0.0.3 Beta 1",
+    "version": "0.0.3-beta.2",
+    "name": "Citadel 0.0.3 Beta 2",
     "requires": ">=0.0.1",
-    "notes": "This update changes the app system to use a better system for port assignment, and cleans up the app definition files a bit. Please let us know if you experience any bugs in this release. Please note that installing this app will change the ports for all or at least most apps."
+    "notes": "This update includes a few more bug fixes and improvements."
 }
