@@ -44,6 +44,7 @@ def permissions():
             "environment_allow": [
                 "C_LIGHTNING_IP"
             ],
+            "volumes": []
         },
     }
 
