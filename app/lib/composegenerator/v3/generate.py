@@ -82,11 +82,11 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     newApp = validateEnv(newApp)
     newApp = convertDataDirToVolumeGen3(newApp)
     newApp = configureIps(newApp, networkingFile, envFile)
-    newApp = configureMainPort(newApp, nodeRoot)
     # This is validated earlier
     for container in newApp.containers:
         container.ports = container.requiredPorts
         del container.requiredPorts
+    newApp = configureMainPort(newApp, nodeRoot)
     for container in newApp.containers:
         # TODO: Make this dynamic and not hardcoded
         if container.requires and "lnd" in container.requires:
