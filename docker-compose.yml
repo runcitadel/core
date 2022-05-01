@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:97624ce064f1f12ddc9bb6fad8248e480d4a2951438d3db0a2e525f5c8ef808a
+    image: ghcr.io/runcitadel/dashboard:main@sha256:04a48cb40313e020e86864c9e5f30a9934c8e126d1a8e2f2ed68ad737224665a
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:e9baebf90f5f941053c7c3f1fefb8e956256c0a5a8bda7d8aef4daace1b6701d
+    image: ghcr.io/runcitadel/manager:main@sha256:139647074dc15328e06e74cce6f7009a695e1d361cf4c55eb5609b442f30f774
     depends_on:
     - tor
     - redis
