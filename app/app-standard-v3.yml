@@ -104,6 +104,10 @@ properties:
           type: array
           items:
             type: number
+        requiredUdpPorts:
+          type: array
+          items:
+            type: number
           description: Ports this container requires to be exposed to work properly
         port:
           type: number

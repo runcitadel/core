@@ -86,6 +86,10 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     for container in newApp.containers:
         container.ports = container.requiredPorts
         del container.requiredPorts
+    for container in newApp.containers:
+        for udpPort in container.requiredUdpPorts:
+            container.ports.append(udpPort)
+        del container.requiredUdpPorts
     newApp = configureMainPort(newApp, nodeRoot)
     for container in newApp.containers:
         # TODO: Make this dynamic and not hardcoded

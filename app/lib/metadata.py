@@ -149,9 +149,11 @@ def getPortsV3App(app, appId):
                 validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 1)
             else:
                 validatePort(appContainer, appContainer["port"], appId, 0)
-        elif "requiredPorts" not in appContainer:
+        elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
                 validatePort(appContainer, getNewPort(appPorts.keys()), appId, 0, True)
         if "requiredPorts" in appContainer:
             for port in appContainer["requiredPorts"]:
-                realPort = int(str(port).split(":")[0])
-                validatePort(appContainer, realPort, appId, 2)
+                validatePort(appContainer, port, appId, 2)
+        if "requiredUdpPorts" in appContainer:
+            for port in appContainer["requiredUdpPorts"]:
+                validatePort(appContainer, port, appId, 2)
