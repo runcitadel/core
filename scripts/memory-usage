@@ -49,7 +49,7 @@ get_system_memory_usage() {
 
 main() {
   echo "total: $(get_total_used_mem)%"&
-  for service in bitcoin lnd electrs tor; do
+  for service in bitcoin lightning electrum tor; do
     echo "${service}: $(get_memory_usage "$service")%" &
   done
   for app in $("${CITADEL_ROOT}/scripts/app" ls-installed); do

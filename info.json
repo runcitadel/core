@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3-c-lightning.1",
-    "name": "Citadel 0.0.3 with c-lightning (Beta 1)",
+    "version": "0.0.3-c-lightning.3",
+    "name": "Citadel 0.0.3 with c-lightning (Beta 3)",
     "requires": ">=0.0.1",
-    "notes": "This update fixes multiple bugs with c-lightning."
+    "notes": "This update includes the latest c-lightning, support for the new app.yml format v3 and multiple other improvements."
 }

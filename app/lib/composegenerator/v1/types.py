@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from dataclasses import dataclass, field
 from dacite import from_dict
 
@@ -14,8 +14,8 @@ class Metadata:
     website: str
     repo: str
     support: str
-    gallery: list[str] = field(default_factory=list)
-    dependencies: list[str] = field(default_factory=list)
+    gallery: List[str] = field(default_factory=list)
+    dependencies: List[str] = field(default_factory=list)
     mainContainer: Union[str, None] = None
     updateContainer: Union[str, None] = None
     path: str = ""
@@ -34,9 +34,9 @@ class Container:
     user: Union[str, None] = None
     stop_grace_period: str = '1m'
     depends_on: list = field(default_factory=list)
-    entrypoint: Union[list[str], str] = field(default_factory=list)
+    entrypoint: Union[List[str], str] = field(default_factory=list)
     bitcoin_mount_dir: Union[str, None] = None
-    command: Union[list[str], str] = field(default_factory=list)
+    command: Union[List[str], str] = field(default_factory=list)
     init: Union[bool, None] = None
     stop_signal: Union[str, None] = None
     noNetwork: Union[bool, None] = None
@@ -52,7 +52,7 @@ class Container:
 class App:
     version: Union[str, int]
     metadata: Metadata
-    containers: list[Container]
+    containers: List[Container]
 
 # Generate an app instance from an app dict
 def generateApp(appDict):
@@ -72,21 +72,21 @@ class ContainerStage2:
     id: str
     name: str
     image: str
-    permissions: list[str] = field(default_factory=list)
+    permissions: List[str] = field(default_factory=list)
     ports: list = field(default_factory=list)
     environment: Union[dict, None] = None
     user: Union[str, None] = None
     stop_grace_period: str = '1m'
-    depends_on: list[str] = field(default_factory=list)
-    entrypoint: Union[list[str], str] = field(default_factory=list)
-    command: Union[list[str], str] = field(default_factory=list)
+    depends_on: List[str] = field(default_factory=list)
+    entrypoint: Union[List[str], str] = field(default_factory=list)
+    command: Union[List[str], str] = field(default_factory=list)
     init: Union[bool, None] = None
     stop_signal: Union[str, None] = None
     noNetwork: Union[bool, None] = None
     needsHiddenService: Union[bool, None] = None
     hiddenServicePort: Union[int, None] = None
     hiddenServicePorts: Union[dict, None] = None
-    volumes: list[str] = field(default_factory=list)
+    volumes: List[str] = field(default_factory=list)
     networks: NetworkConfig = field(default_factory=NetworkConfig)
     restart: Union[str, None] = None
 
@@ -94,7 +94,7 @@ class ContainerStage2:
 class AppStage2:
     version: Union[str, int]
     metadata: Metadata
-    containers: list[ContainerStage2]
+    containers: List[ContainerStage2]
 
 @dataclass
 class MetadataStage3:
@@ -106,10 +106,10 @@ class MetadataStage3:
     description: str
     developer: str
     website: str
-    dependencies: list[str]
+    dependencies: List[str]
     repo: str
     support: str
-    gallery: list[str]
+    gallery: List[str]
     mainContainer: Union[str, None] = None
     updateContainer: Union[str, None] = None
     path: str = ""
@@ -120,7 +120,7 @@ class MetadataStage3:
 class AppStage3:
     version: Union[str, int]
     metadata: MetadataStage3
-    containers: list[ContainerStage2]
+    containers: List[ContainerStage2]
 
 @dataclass
 class ContainerStage4:
@@ -131,16 +131,16 @@ class ContainerStage4:
     environment: Union[dict, None] = None
     user: Union[str, None] = None
     stop_grace_period: str = '1m'
-    depends_on: list[str] = field(default_factory=list)
-    entrypoint: Union[list[str], str] = field(default_factory=list)
-    command: Union[list[str], str] = field(default_factory=list)
+    depends_on: List[str] = field(default_factory=list)
+    entrypoint: Union[List[str], str] = field(default_factory=list)
+    command: Union[List[str], str] = field(default_factory=list)
     init: Union[bool, None] = None
     stop_signal: Union[str, None] = None
     noNetwork: Union[bool, None] = None
     needsHiddenService: Union[bool, None] = None
     hiddenServicePort: Union[int, None] = None
     hiddenServicePorts: Union[dict, None] = None
-    volumes: list[str] = field(default_factory=list)
+    volumes: List[str] = field(default_factory=list)
     networks: NetworkConfig = field(default_factory=NetworkConfig)
     restart: Union[str, None] = None
 
@@ -148,4 +148,4 @@ class ContainerStage4:
 class AppStage4:
     version: Union[str, int]
     metadata: MetadataStage3
-    services: list[ContainerStage4]
+    services: List[ContainerStage4]
