@@ -7,6 +7,7 @@ def permissions():
         "lnd": {
             "environment_allow": [
                 "LND_IP",
+                "LND_IP6",
                 "LND_GRPC_PORT",
                 "LND_REST_PORT",
                 "BITCOIN_NETWORK"
@@ -18,6 +19,7 @@ def permissions():
         "bitcoind": {
             "environment_allow": [
                 "BITCOIN_IP",
+                "BITCOIN_IP6",
                 "BITCOIN_NETWORK",
                 "BITCOIN_P2P_PORT",
                 "BITCOIN_RPC_PORT",
@@ -36,18 +38,20 @@ def permissions():
         "electrum": {
             "environment_allow": [
                 "ELECTRUM_IP",
+                "ELECTRUM_IP6",
                 "ELECTRUM_PORT",
             ],
             "volumes": []
         },
         "c-lightning": {
             "environment_allow": [
-                "C_LIGHTNING_IP"
+                "C_LIGHTNING_IP",
+                "C_LIGHTNING_IP6"
             ],
             "volumes": []
         },
     }
 
 # Vars which are always allowed without permissions
-always_allowed_env = ["TOR_PROXY_IP", "TOR_PROXY_PORT",
+always_allowed_env = ["TOR_PROXY_IP","TOR_PROXY_IP6", "TOR_PROXY_PORT",
                       "APP_DOMAIN", "APP_HIDDEN_SERVICE", "BITCOIN_NETWORK"]

@@ -9,9 +9,11 @@ import json
 from os import path
 import random
 from lib.composegenerator.v1.utils.networking import getContainerHiddenService, getFreePort, getHiddenService
+import ipaddress
 
 
 def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFile: str) -> ContainerStage2:
+    ipv6Net = ipaddress.ip_network("fd9e:4a81::/32")
     # Strip leading/trailing whitespace from container.name
     container.name = container.name.strip()
     # If the name still contains a newline, throw an error
@@ -21,9 +23,16 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
         appId.upper().replace("-", "_"),
         container.name.upper().replace("-", "_")
     )
+    ipv6_env_var = "APP_{}_{}_IP6".format(
+        appId.upper().replace("-", "_"),
+        container.name.upper().replace("-", "_")
+    )
     # Write a list of used IPs to the usedIpFile as JSON, and read that file to check if an IP
     # can be used
     usedIps = []
+    usedIpv6 = []
+    # The first 100000 addresses are reserved for Citadel
+    ip6Offset = 100000
     networkingData = {}
     if path.isfile(networkingFile):
         with open(networkingFile, 'r') as f:
@@ -33,7 +42,15 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
         usedIps = list(networkingData['ip_addresses'].values())
     else:
         networkingData['ip_addresses'] = {}
-    # An IP 10.21.21.xx, with x being a random number above 40 is asigned to the container
+    if 'ip6_addresses' in networkingData:
+        usedIpv6 = list(networkingData['ip6_addresses'].values())
+    else:
+        networkingData['i6p_addresses'] = {}
+    if 'ip6Offset' in networkingData:
+        ip6Offset = int(networkingData['ip6Offset'])
+    else:
+        networkingData['ip6Offset'] = 100000
+    # An IP 10.21.21.xx, with x being a random number above 40 is assigned to the container
     # If the IP is already in use, it will be tried again until it's not in use
     # If it's not in use, it will be added to the usedIps list and written to the usedIpFile
     # If the usedIpsFile contains all IPs between  10.21.21.20 and  10.21.21.255 (inclusive),
@@ -51,18 +68,29 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
                 networkingData['ip_addresses']["{}-{}".format(
                     appId, container.name)] = ip
                 break
+    if "{}-{}".format(appId, container.name) in networkingData['ip6_addresses']:
+        ip6 = networkingData['ip_addresses']["{}-{}".format(
+            appId, container.name)]
+    else:
+        networkingData['ip6Offset'] += 1
+        ip6 = ipv6Net[networkingData['ip6Offset']]
     container.networks = from_dict(data_class=NetworkConfig, data={'default': {
-        'ipv4_address': "$" + env_var}})
+        'ipv4_address': "$" + env_var}, 'ipv6': {
+        'ipv6_address': "$" + ipv6_env_var}})
 
     dotEnv = parse_dotenv(envFile)
-    if env_var in dotEnv and str(dotEnv[env_var]) == str(ip):
-        return container
-
-    # Now append a new line  with APP_{app_name}_{container_name}_IP=${IP} to the envFile
-    with open(envFile, 'a') as f:
-        f.write("{}={}\n".format(env_var, ip))
-    with open(networkingFile, 'w') as f:
-        json.dump(networkingData, f)
+    if not (env_var in dotEnv and str(dotEnv[env_var]) == str(ip)):
+        # Now append a new line  with APP_{app_name}_{container_name}_IP=${IP} to the envFile
+        with open(envFile, 'a') as f:
+            f.write("{}={}\n".format(env_var, ip))
+        with open(networkingFile, 'w') as f:
+            json.dump(networkingData, f)
+    if not (ipv6_env_var in dotEnv and str(dotEnv[ipv6_env_var]) == str(ipv6_ip)):
+        # Now append a new line  with APP_{app_name}_{container_name}_IP=${IP} to the envFile
+        with open(envFile, 'a') as f:
+            f.write("{}={}\n".format(ipv6_env_var, ip6))
+        with open(networkingFile, 'w') as f:
+            json.dump(networkingData, f)
     return container
 
 

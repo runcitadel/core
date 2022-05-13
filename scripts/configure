@@ -269,6 +269,23 @@ APPS_2_TOR_IP="10.21.21.13"
 APPS_3_TOR_IP="10.21.21.14"
 REDIS_IP="10.21.21.15"
 
+IP6_SUBNET="fd9e:4a81::/32"
+IP6_GATEWAY="fd9e:4a81::1"
+NGINX_IP6="fd9e:4a81::2"
+DASHBOARD_IP6="fd9e:4a81::3"
+MANAGER_IP6="fd9e:4a81::4"
+MIDDLEWARE_IP6="fd9e:4a81::5"
+NEUTRINO_SWITCHER_IP6="fd9e:4a81::6"
+DASHBOARD_NEW_IP6="fd9e:4a81::7"
+BITCOIN_IP6="fd9e:4a81::8"
+LND_IP6="fd9e:4a81::9"
+ELECTRUM_IP6="fd9e:4a81::10"
+TOR_PROXY_IP6="fd9e:4a81::11"
+APPS_TOR_IP6="fd9e:4a81::12"
+APPS_2_TOR_IP6="fd9e:4a81::13"
+APPS_3_TOR_IP6="fd9e:4a81::14"
+REDIS_IP6="fd9e:4a81::15"
+
 # Ports
 BITCOIN_RPC_PORT="8332"
 BITCOIN_P2P_PORT="8333"
@@ -364,6 +381,20 @@ print("Generated configuration files\n")
 
 print("Checking if Docker Compose is installed...")
 download_docker_compose()
+
+dockerIp6Config = json.dumps({
+  "ipv6": True,
+  "fixed-cidr-v6": "fd9e:4a81::/32"
+})
+
+print("Updating docker config")
+if(os.path.isfile("/etc/docker/daemon.json")):
+  print("Docker config already present, not changing anything")
+else:
+  print("Configuring Docker for IPv6")
+  with open("/etc/docker/daemon.json", "w") as file:
+    file.write(dockerIp6Config)
+
 
 if not reconfiguring:
   print("Updating apps...\n")

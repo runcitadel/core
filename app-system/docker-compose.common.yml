@@ -8,3 +8,7 @@ networks:
   default:
     name: citadel_main_network
     external: true
+  ipv6:
+    name: citadel_ip6_network
+    external: true
+
