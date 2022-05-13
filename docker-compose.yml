@@ -149,7 +149,7 @@ services:
       JWT_EXPIRATION: '3600'
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
-      MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
+      MIDDLEWARE_API_URL: http://[$MIDDLEWARE_IP6]
       SEED_FILE: /db/citadel-seed/seed
       BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
