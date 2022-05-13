@@ -27,7 +27,7 @@ services:
       default:
         ipv4_address: $APPS_TOR_IP
       ipv6:
-        ipv6_address: $APPS_TOR_IP_IP6
+        ipv6_address: $APPS_TOR_IP6
   app-2-tor:
     container_name: app-2-tor
     image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
