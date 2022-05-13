@@ -45,7 +45,7 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
     if 'ip6_addresses' in networkingData:
         usedIpv6 = list(networkingData['ip6_addresses'].values())
     else:
-        networkingData['i6p_addresses'] = {}
+        networkingData['ip6_addresses'] = {}
     if 'ip6Offset' in networkingData:
         ip6Offset = int(networkingData['ip6Offset'])
     else:
@@ -69,7 +69,7 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
                     appId, container.name)] = ip
                 break
     if "{}-{}".format(appId, container.name) in networkingData['ip6_addresses']:
-        ip6 = networkingData['ip_addresses']["{}-{}".format(
+        ip6 = networkingData['ip6_addresses']["{}-{}".format(
             appId, container.name)]
     else:
         networkingData['ip6Offset'] += 1
