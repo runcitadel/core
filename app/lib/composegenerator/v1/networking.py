@@ -85,7 +85,7 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
             f.write("{}={}\n".format(env_var, ip))
         with open(networkingFile, 'w') as f:
             json.dump(networkingData, f)
-    if not (ipv6_env_var in dotEnv and str(dotEnv[ipv6_env_var]) == str(ipv6_ip)):
+    if not (ipv6_env_var in dotEnv and str(dotEnv[ipv6_env_var]) == str(ip6)):
         # Now append a new line  with APP_{app_name}_{container_name}_IP=${IP} to the envFile
         with open(envFile, 'a') as f:
             f.write("{}={}\n".format(ipv6_env_var, ip6))
