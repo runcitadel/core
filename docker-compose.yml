@@ -118,8 +118,6 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
-      default:
-        ipv4_address: $DASHBOARD_IP
       ipv6:
         ipv6_address: $DASHBOARD_IP6
   manager:
