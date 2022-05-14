@@ -359,6 +359,11 @@ print("Generating configuration files...")
 # Loop through templates_to_build and build them
 for template_path, output_path in templates_to_build.items():
   if output_path == "./nginx/nginx.conf" and os.path.isfile(output_path):
+    with open("./nginx/nginx.conf", "r") as file:
+      originalNginx = file.readall().decode("utf-8")
+    newNginx = originalNginx.replace("10.21.21.3", "[{}]".format(DASHBOARD_IP6))
+    with open("./nginx/nginx.conf", "w") as file:
+      file.write(newNginx)
     continue
   data = replace_vars(template_path)
   # If output path is a list, then it is a list of output paths

@@ -267,6 +267,7 @@ networks:
       - subnet: $NETWORK_IP/24
   ipv6:
     name: citadel_ip6_network
+    enable_ipv6: true
     ipam:
       config:
         - subnet: fd9e:4a81::/32
