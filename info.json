@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3-beta.4",
-    "name": "Citadel 0.0.3 Beta 4",
+    "version": "0.0.3-beta.5",
+    "name": "Citadel 0.0.3 Beta 5",
     "requires": ">=0.0.1",
-    "notes": "This update includes a few more bug fixes and improvements."
+    "notes": "This update is the last beta before the 0.0.3 release and fixes a few more bugs."
 }
