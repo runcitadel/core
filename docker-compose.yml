@@ -114,6 +114,7 @@ services:
         ipv6_address: $LND_IP6
   dashboard:
     container_name: dashboard
+    command: serve -l 'tcp://[$DASHBOARD_IP6]:80' --single /dist
     image: ghcr.io/runcitadel/dashboard:v0.0.11@sha256:a1aac1c2fe3dc5a9604e5ec1ab9db0cc8f21d6c2b90f12898750bcb2c3b835f3
     restart: on-failure
     stop_grace_period: 1m30s
