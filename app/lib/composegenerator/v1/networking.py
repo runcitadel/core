@@ -13,7 +13,7 @@ import ipaddress
 
 
 def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFile: str) -> ContainerStage2:
-    ipv6Net = ipaddress.ip_network("fd9e:4a81::/32")
+    ipv6Net = ipaddress.ip_network("fdc1:7ad3:1234::/48")
     # Strip leading/trailing whitespace from container.name
     container.name = container.name.strip()
     # If the name still contains a newline, throw an error

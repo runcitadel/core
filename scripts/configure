@@ -268,22 +268,22 @@ APPS_2_TOR_IP="10.21.21.13"
 APPS_3_TOR_IP="10.21.21.14"
 REDIS_IP="10.21.21.15"
 
-IP6_SUBNET="fd9e:4a81::/32"
-IP6_GATEWAY="fd9e:4a81::1"
-NGINX_IP6="fd9e:4a81::2"
-DASHBOARD_IP6="fd9e:4a81::3"
-MANAGER_IP6="fd9e:4a81::4"
-MIDDLEWARE_IP6="fd9e:4a81::5"
-NEUTRINO_SWITCHER_IP6="fd9e:4a81::6"
-DASHBOARD_NEW_IP6="fd9e:4a81::7"
-BITCOIN_IP6="fd9e:4a81::8"
-LND_IP6="fd9e:4a81::9"
-ELECTRUM_IP6="fd9e:4a81::10"
-TOR_PROXY_IP6="fd9e:4a81::11"
-APPS_TOR_IP6="fd9e:4a81::12"
-APPS_2_TOR_IP6="fd9e:4a81::13"
-APPS_3_TOR_IP6="fd9e:4a81::14"
-REDIS_IP6="fd9e:4a81::15"
+IP6_SUBNET="fdc1:7ad3:1234::/48"
+IP6_GATEWAY="fdc1:7ad3:1234::1"
+NGINX_IP6="fdc1:7ad3:1234::2"
+DASHBOARD_IP6="fdc1:7ad3:1234::3"
+MANAGER_IP6="fdc1:7ad3:1234::4"
+MIDDLEWARE_IP6="fdc1:7ad3:1234::5"
+NEUTRINO_SWITCHER_IP6="fdc1:7ad3:1234::6"
+DASHBOARD_NEW_IP6="fdc1:7ad3:1234::7"
+BITCOIN_IP6="fdc1:7ad3:1234::8"
+LND_IP6="fdc1:7ad3:1234::9"
+ELECTRUM_IP6="fdc1:7ad3:1234::10"
+TOR_PROXY_IP6="fdc1:7ad3:1234::11"
+APPS_TOR_IP6="fdc1:7ad3:1234::12"
+APPS_2_TOR_IP6="fdc1:7ad3:1234::13"
+APPS_3_TOR_IP6="fdc1:7ad3:1234::14"
+REDIS_IP6="fdc1:7ad3:1234::15"
 
 # Ports
 BITCOIN_RPC_PORT="8332"
@@ -388,7 +388,7 @@ download_docker_compose()
 
 dockerIp6Config = json.dumps({
   "ipv6": True,
-  "fixed-cidr-v6": "fd9e:4a81::/32"
+  "fixed-cidr-v6": "fdc1:7ad3:1234::/48"
 })
 
 print("Updating docker config")

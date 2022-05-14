@@ -270,8 +270,8 @@ networks:
     enable_ipv6: true
     ipam:
       config:
-        - subnet: fd9e:4a81::/32
-          gateway: fd9e:4a81::1
+        - subnet: $IP6_SUBNET
+          gateway: $IP6_GATEWAY
 volumes:
   jwt-public-key: null
   jwt-private-key: null
