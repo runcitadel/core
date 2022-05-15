@@ -16,6 +16,8 @@ def validateApp(app: dict):
         schemaVersion1 = yaml.safe_load(f)
     with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
         schemaVersion2 = yaml.safe_load(f)
+    with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
+        schemaVersion3 = yaml.safe_load(f)
 
     if 'version' in app and str(app['version']) == "1":
         try:
@@ -28,6 +30,14 @@ def validateApp(app: dict):
     elif 'version' in app and str(app['version']) == "2":
         try:
             validate(app, schemaVersion2)
+            return True
+        # Catch and log any errors, and return false
+        except Exception as e:
+            print(e)
+            return False
+    elif 'version' in app and str(app['version']) == "3":
+        try:
+            validate(app, schemaVersion3)
             return True
         # Catch and log any errors, and return false
         except Exception as e:
@@ -80,16 +90,27 @@ def findAndValidateApps(dir: str):
             continue
         # More security validation
         should_continue=True
-        if appyml['metadata']['dependencies']:
+        if 'dependencies' in appyml['metadata']:
             for dependency in appyml['metadata']['dependencies']:
-                if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
-                    print("WARNING: App '{}' has unknown dependency '{}'".format(app, dependency))
-                    apps.remove(app)
-                    should_continue=False
-                if dependency == app:
-                    print("WARNING: App '{}' depends on itself".format(app))
-                    apps.remove(app)
-                    should_continue=False
+                if isinstance(dependency, str):
+                    if dependency not in apps and dependency not in ["bitcoind", "lnd", "electrum"]:
+                        print("WARNING: App '{}' has unknown dependency '{}'".format(app, dependency))
+                        apps.remove(app)
+                        should_continue=False
+                    if dependency == app:
+                        print("WARNING: App '{}' depends on itself".format(app))
+                        apps.remove(app)
+                        should_continue=False
+                else:
+                    for subDependency in dependency:
+                        if subDependency not in apps and subDependency not in ["bitcoind", "lnd", "electrum", "c-lightning"]:
+                            print("WARNING: App '{}' has unknown dependency '{}'".format(app, subDependency))
+                            apps.remove(app)
+                            should_continue=False
+                        if subDependency == app:
+                            print("WARNING: App '{}' depends on itself".format(app))
+                            apps.remove(app)
+                            should_continue=False
         if not should_continue:
             continue
         for container in appyml['containers']:

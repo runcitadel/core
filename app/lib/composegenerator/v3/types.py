@@ -10,12 +10,11 @@ class Metadata:
     category: str
     tagline: str
     description: str
-    developer: str
-    website: str
     repo: str
     support: str
-    gallery: List[str] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list)
+    developers: dict = field(default_factory=dict)
+    gallery: List[Union[list,str]] = field(default_factory=list)
+    dependencies: List[Union[List[str], str]] = field(default_factory=list)
     updateContainer: Union[str, Union[list, None]] = field(default_factory=list)
     path: str = ""
     defaultPassword: str = ""
@@ -26,31 +25,41 @@ class Metadata:
     internalPort: int = 0
 
 @dataclass
+class ContainerMounts:
+    bitcoin: Union[str, None] = None
+    lnd: Union[str, None] = None
+    c_lightning: Union[str, None] = None
+
+@dataclass
 class Container:
     name: str
     image: str
     permissions: list = field(default_factory=list)
-    ports: list = field(default_factory=list)
     port: Union[int, None] = None
+    requiredPorts: list = field(default_factory=list)
+    requiredUdpPorts: list = field(default_factory=list)
+    preferredOutsidePort: Union[int, None] = None
+    requiresPort: Union[bool, None] = None
     environment: Union[dict, None] = None
     data: list = field(default_factory=list)
     user: Union[str, None] = None
     stop_grace_period: str = '1m'
     depends_on: list = field(default_factory=list)
     entrypoint: Union[List[str], str] = field(default_factory=list)
-    bitcoin_mount_dir: Union[str, None] = None
-    lnd_mount_dir: Union[str, None] = None
-    c_lightning_mount_dir: Union[str, None] = None
+    mounts: Union[ContainerMounts, None] = None
     command: Union[List[str], str] = field(default_factory=list)
     init: Union[bool, None] = None
     stop_signal: Union[str, None] = None
     noNetwork: Union[bool, None] = None
     hiddenServicePorts: Union[dict, Union[int, Union[None, list]]] = field(default_factory=list)
     environment_allow: list = field(default_factory=list)
+    requires: list = field(default_factory=list)
     network_mode: Union[str, None] = None
     # Only added later
     volumes: list = field(default_factory=list)
     restart: Union[str, None] = None
+    ports: list = field(default_factory=list)
+    ignored: bool = False
 
 @dataclass
 class App:
@@ -92,6 +101,7 @@ class ContainerStage2:
     networks: NetworkConfig = field(default_factory=NetworkConfig)
     restart: Union[str, None] = None
     network_mode: Union[str, None] = None
+    requires: Union[List[str], None] = field(default_factory=list)
 
 @dataclass
 class AppStage2:

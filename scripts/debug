@@ -142,10 +142,10 @@ if [[ "${1}" == "--run" ]]; then
     docker compose logs --tail=30 bitcoin
     
     echo
-    echo "LND logs"
+    echo "Lightning logs"
     echo "--------"
     echo
-    docker compose logs --tail=30 lnd
+    docker compose logs --tail=30 lightning
     
     echo
     echo "Tor logs"

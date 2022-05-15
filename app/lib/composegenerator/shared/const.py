@@ -39,7 +39,13 @@ def permissions():
                 "ELECTRUM_PORT",
             ],
             "volumes": []
-        }
+        },
+        "c-lightning": {
+            "environment_allow": [
+                "C_LIGHTNING_IP"
+            ],
+            "volumes": []
+        },
     }
 
 # Vars which are always allowed without permissions
