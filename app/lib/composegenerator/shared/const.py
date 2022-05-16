@@ -15,14 +15,6 @@ def permissions():
                 '${LND_DATA_DIR}:/lnd:ro'
             ]
         },
-        "c-lightning": {
-            "environment_allow": [
-                "C_LIGHTNING_IP"
-            ],
-            "volumes": [
-                '${C_LIGHTNING_DATA_DIR}:/c-lightning:ro'
-            ]
-        },
         "bitcoind": {
             "environment_allow": [
                 "BITCOIN_IP",
@@ -47,7 +39,15 @@ def permissions():
                 "ELECTRUM_PORT",
             ],
             "volumes": []
-        }
+        },
+        "c-lightning": {
+            "environment_allow": [
+                "C_LIGHTNING_IP"
+            ],
+            "volumes": [
+                '${C_LIGHTNING_DATA_DIR}:/c-lightning:ro'
+            ]
+        },
     }
 
 # Vars which are always allowed without permissions

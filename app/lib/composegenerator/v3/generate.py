@@ -78,6 +78,13 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     networkingFile = os.path.join(nodeRoot, "apps", "networking.json")
     ignoredContainers = []
     newApp: App = generateApp(app)
+    for container in newApp.containers:
+        # TODO: Make this dynamic and not hardcoded
+        if container.requires and "lnd" in container.requires:
+            ignoredContainers.append(container.name)
+            container.ignored = True
+        elif container.requires:
+            del container.requires
     newApp = convertContainerPermissions(newApp)
     newApp = validateEnv(newApp)
     newApp = convertDataDirToVolumeGen3(newApp)
@@ -88,16 +95,9 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
         del container.requiredPorts
     for container in newApp.containers:
         for udpPort in container.requiredUdpPorts:
-            container.ports.append(udpPort)
+            container.ports.append("{}/udp".format(udpPort))
         del container.requiredUdpPorts
     newApp = configureMainPort(newApp, nodeRoot)
-    for container in newApp.containers:
-        # TODO: Make this dynamic and not hardcoded
-        if container.requires and "lnd" in container.requires:
-            ignoredContainers.append(container.name)
-            container.ignored = True
-        elif container.requires:
-            del container.requires
     newApp = configureHiddenServices(newApp, nodeRoot)
     for container in newApp.containers:
         del container.ignored
