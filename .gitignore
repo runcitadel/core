@@ -52,3 +52,4 @@ db/citadel-seed/*
 services/installed.json
 services/installed.yml
 
+events/karen
