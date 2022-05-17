@@ -110,9 +110,12 @@ elif args.action == 'uninstall':
         print("App {} is not installed".format(args.app))
         exit(1)
     print("Stopping app {}...".format(args.app))
-    compose(args.app, "rm --force --stop")
-    print("Deleting data...")
-    deleteData(args.app)
+    try:
+        compose(args.app, "rm --force --stop")
+        print("Deleting data...")
+        deleteData(args.app)
+    except:
+        pass
     print("Removing from the list of installed apps...")
     setRemoved(args.app)
 elif args.action == 'stop':
