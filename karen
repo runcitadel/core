@@ -24,6 +24,5 @@ while True:
         trigger = instructions[1]
         instructions.pop(0)
         instructions.pop(0)
-        print("Executing trigger {} with arguments {}".format(trigger, " ".join(instructions)))
         os.system("events/triggers/{} {}".format(trigger, " ".join(instructions)))
     conn.close()
