@@ -2,7 +2,6 @@
 
 import socket
 import os
-import time
 
 rootDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(rootDir)
