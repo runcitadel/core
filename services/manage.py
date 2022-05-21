@@ -52,9 +52,7 @@ def setService(name, implementation):
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "electrum": "electrs",
-            "lightning": "lnd",
-            "bitcoin": "knots"
+            "lightning": "lnd"
         }
     installed[name] = implementation
     with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
@@ -84,9 +82,7 @@ def uninstallService(name):
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "electrum": "electrs",
-            "lightning": "lnd",
-            "bitcoin": "knots"
+            "lightning": "lnd"
         }
     try:
         del installed[name]
@@ -102,9 +98,7 @@ def installServices():
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "electrum": "electrs",
-            "lightning": "lnd",
-            "bitcoin": "knots"
+            "lightning": "lnd"
         }
     
     for key, value in installed.items():

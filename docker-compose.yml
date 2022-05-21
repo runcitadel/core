@@ -63,27 +63,12 @@ services:
     networks:
       default:
         ipv4_address: $NGINX_IP
-  bitcoin:
-    container_name: bitcoin
-    image: nolim1t/bitcoinknots:v22.0.knots20211108@sha256:a475da2b2ecda55fcc65ea23e1a36c58b2c10549f1c3d3bb3c31c7dda1127354
-    depends_on:
-    - tor
-    volumes:
-    - ${PWD}/bitcoin:/data/.bitcoin
-    restart: on-failure
-    stop_grace_period: 1m
-    ports:
-    - $BITCOIN_P2P_PORT:$BITCOIN_P2P_PORT
-    networks:
-      default:
-        ipv4_address: $BITCOIN_IP
   lightning:
     container_name: lightning
     image: lightninglabs/lnd:v0.14.3-beta@sha256:6a2234b0aad4caed3d993736816b198d6228f32c59b27ba2218d5ebf516ae905
     user: 1000:1000
     depends_on:
     - tor
-    - bitcoin
     volumes:
     - ${PWD}/lnd:/data/.lnd
     - ${PWD}/walletpassword:/walletpassword
@@ -158,6 +143,7 @@ services:
       REDIS_IP: $REDIS_IP
       REDIS_PORT: 6379
       UNSAFE_REMOVE_CORS_CHECK: true
+      IS_BITCOIN_CORE_INSTALLED: "false"
     networks:
       default:
         ipv4_address: $MANAGER_IP
@@ -188,40 +174,6 @@ services:
     networks:
       default:
         ipv4_address: $MIDDLEWARE_IP
-  neutrino-switcher:
-    container_name: neutrino-switcher
-    image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
-    depends_on:
-    - bitcoin
-    - lightning
-    restart: on-failure
-    volumes:
-    - ${PWD}/lnd:/lnd
-    - ${PWD}/statuses:/statuses
-    - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
-      RPCUSER: $BITCOIN_RPC_USER
-      RPCPASS: $BITCOIN_RPC_PASS
-      LND_CONTAINER_NAME: lightning
-      SLEEPTIME: 3600
-    networks:
-      default:
-        ipv4_address: $NEUTRINO_SWITCHER_IP
-  electrum:
-    container_name: electrum
-    image: ghcr.io/runcitadel/electrs:v0.9.6@sha256:cf08513b8aa6f081e42ea92c5903d520db2caedbc20aaccf70f844663bbc8646
-    working_dir: /data
-    volumes:
-    - ${PWD}/bitcoin:/bitcoin:ro
-    - ${PWD}/electrs:/data
-    restart: on-failure
-    stop_grace_period: 5m
-    ports:
-    - $ELECTRUM_PORT:$ELECTRUM_PORT
-    networks:
-      default:
-        ipv4_address: $ELECTRUM_IP
   redis:
     container_name: redis
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
