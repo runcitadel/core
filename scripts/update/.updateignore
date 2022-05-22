@@ -13,3 +13,4 @@ nginx/*
 services/installed.yml
 apps/sourceMap.json
 apps/.updateignore
+fulcrumx/*

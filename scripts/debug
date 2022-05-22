@@ -143,15 +143,24 @@ if [[ "${1}" == "--run" ]]; then
     
     echo
     echo "Lightning logs"
-    echo "--------"
+    echo "--------------"
     echo
     docker compose logs --tail=30 lightning
-    
+
+    echo
+    echo "Electrum logs"
+    echo "-------------"
+    echo
+    docker compose logs --tail=30 electrum
+
     echo
     echo "Tor logs"
     echo "--------"
     echo
     docker compose logs --tail=30 tor
+    docker compose logs --tail=30 app-tor
+    docker compose logs --tail=30 app-2-tor
+    docker compose logs --tail=30 app-3-tor
     
     installed_apps=$(./scripts/app ls-installed)
     if [[ ! -z "${installed_apps:-}" ]]; then
