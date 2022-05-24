@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:d042a2eb7a6433cc42d267cf689bd4606e8c2fbf4081256c965ba9a1118c4f6d
+    image: ghcr.io/runcitadel/dashboard:v0.0.12@sha256:102a44b938765be8224c63785949b90bf796670f01aef4e282d58a4c26a42595
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:139647074dc15328e06e74cce6f7009a695e1d361cf4c55eb5609b442f30f774
+    image: ghcr.io/runcitadel/manager:v0.0.13@sha256:3ced2643e12253fea46abb48a69dcd999d69d3d86ed9956ae0298d4f6be4f06d
     depends_on:
     - tor
     - redis
@@ -121,6 +121,7 @@ services:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
     - ${PWD}/events/signals:/signals
+    - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
@@ -162,7 +163,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.9@sha256:6763b6006f0deeb746ccf6a5653cbc0401d03dd73e500bb869fb4c28ec258a1b
+    image: ghcr.io/runcitadel/middleware:v0.0.10@sha256:afd6e2b6f5ba27cde32f6f6d630ddc6dd46d1072871f7834d7424d0554d0f53d
     depends_on:
     - manager
     - bitcoin
@@ -212,7 +213,7 @@ services:
         ipv4_address: $NEUTRINO_SWITCHER_IP
   electrum:
     container_name: electrum
-    image: ghcr.io/runcitadel/electrs:v0.9.5@sha256:5fdd76415645de14f31c43844dc143b1477f86872d2f73a041c5005d469ed510
+    image: ghcr.io/runcitadel/electrs:v0.9.6@sha256:cf08513b8aa6f081e42ea92c5903d520db2caedbc20aaccf70f844663bbc8646
     working_dir: /data
     volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
@@ -241,7 +242,7 @@ services:
         ipv4_address: $C_LIGHTNING_IP
   redis:
     container_name: redis
-    image: redis:6.2.6-bullseye@sha256:0d9c9aed1eb385336db0bc9b976b6b49774aee3d2b9c2788a0d0d9e239986cb3
+    image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:
     - ${PWD}/redis:/data

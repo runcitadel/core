@@ -40,13 +40,14 @@ def validateEnvStringOrListorDict(env: Union[str, Union[list, dict]], existingEn
 def validateEnv(app: App):
     # For every container of the app, check if all env vars in the strings in environment are defined in env
     for container in app.containers:
-        if container.environment_allow:
-            existingEnv = container.environment_allow
-            del container.environment_allow
-        else:
-            existingEnv = []
-        if container.environment:
-            validateEnvStringOrListorDict(container.command, existingEnv, app.metadata.id, container.name)
-            validateEnvStringOrListorDict(container.entrypoint, existingEnv, app.metadata.id, container.name)
-            validateEnvStringOrListorDict(container.environment, existingEnv, app.metadata.id, container.name)
+        if container is not None:
+            if container.environment_allow:
+                existingEnv = container.environment_allow
+                del container.environment_allow
+            else:
+                existingEnv = []
+            if container.environment:
+                validateEnvStringOrListorDict(container.command, existingEnv, app.metadata.id, container.name)
+                validateEnvStringOrListorDict(container.entrypoint, existingEnv, app.metadata.id, container.name)
+                validateEnvStringOrListorDict(container.environment, existingEnv, app.metadata.id, container.name)
     return app

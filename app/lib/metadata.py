@@ -5,6 +5,7 @@
 import os
 import yaml
 
+from lib.composegenerator.next.stage1 import createCleanConfigFromV3
 from lib.composegenerator.v2.networking import getMainContainer
 from lib.composegenerator.v1.networking import getFreePort
 from lib.entropy import deriveEntropy
@@ -40,6 +41,7 @@ def getAppRegistry(apps, app_path):
     app_metadata = []
     for app in apps:
         app_yml_path = os.path.join(app_path, app, 'app.yml')
+        app_cache_path = os.path.join(app_path, app, 'app.cache.json')
         if os.path.isfile(app_yml_path):
             try:
                 with open(app_yml_path, 'r') as f:
@@ -57,6 +59,8 @@ def getAppRegistry(apps, app_path):
                     getPortsOldApp(app_yml, app)
                 else:
                     getPortsV3App(app_yml, app)
+                    with open(app_cache_path, 'w') as f:
+                        json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
             except Exception as e:
                 print(e)
                 print("App {} is invalid!".format(app))
@@ -142,7 +146,7 @@ def getPortsOldApp(app, appId):
 def getPortsV3App(app, appId):
     for appContainer in app["containers"]:
         if "port" in appContainer:
-            if "preferredOutsidePort" in appContainer and "requirsesPort" in appContainer and appContainer["requiresPort"]:
+            if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
                 validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 2)
             elif "preferredOutsidePort" in appContainer:
             

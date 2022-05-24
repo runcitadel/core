@@ -83,7 +83,7 @@ def getContainerHiddenService(
                         metadata.name, container.name, key, metadata.id, container.name
                     )
                     otherHiddenServices += "HiddenServicePort {} {}:{}".format(
-                        key, containerIp, value
+                        value, containerIp, value
                     )
                 elif isinstance(value, list):
                     otherHiddenServices += getHiddenServiceMultiPort(

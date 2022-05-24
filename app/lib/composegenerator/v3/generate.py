@@ -16,20 +16,21 @@ from lib.composegenerator.shared.const import permissions
 
 def convertContainerPermissions(app: App) -> App:
     for container in app.containers:
-        for permission in app.metadata.dependencies:
-            if isinstance(permission, str):
-                if permission in permissions():
-                    container.environment_allow.extend(permissions()[permission]['environment_allow'])
-                    container.volumes.extend(permissions()[permission]['volumes'])
-                else:
-                    print("Warning: app {} defines unknown permission {}".format(app.metadata.name, permission))
-            else:
-                for subPermission in permission:
-                    if subPermission in permissions():
-                        container.environment_allow.extend(permissions()[subPermission]['environment_allow'])
-                        container.volumes.extend(permissions()[subPermission]['volumes'])
+        if container is not None:
+            for permission in app.metadata.dependencies:
+                if isinstance(permission, str):
+                    if permission in permissions():
+                        container.environment_allow.extend(permissions()[permission]['environment_allow'])
+                        container.volumes.extend(permissions()[permission]['volumes'])
                     else:
-                        print("Warning: app {} defines unknown permission {}".format(app.metadata.name, subPermission))
+                        print("Warning: app {} defines unknown permission {}".format(app.metadata.name, permission))
+                else:
+                    for subPermission in permission:
+                        if subPermission in permissions():
+                            container.environment_allow.extend(permissions()[subPermission]['environment_allow'])
+                            container.volumes.extend(permissions()[subPermission]['volumes'])
+                        else:
+                            print("Warning: app {} defines unknown permission {}".format(app.metadata.name, subPermission))
     return app
 
 def convertDataDirToVolumeGen3(app: App) -> AppStage2:
@@ -78,6 +79,13 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     networkingFile = os.path.join(nodeRoot, "apps", "networking.json")
     ignoredContainers = []
     newApp: App = generateApp(app)
+    for container in newApp.containers:
+        # TODO: Make this dynamic and not hardcoded
+        if container.requires and "c-lightning" in container.requires:
+            ignoredContainers.append(container.name)
+            container.ignored = True
+        elif container.requires:
+            del container.requires
     newApp = convertContainerPermissions(newApp)
     newApp = validateEnv(newApp)
     newApp = convertDataDirToVolumeGen3(newApp)
@@ -88,16 +96,9 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
         del container.requiredPorts
     for container in newApp.containers:
         for udpPort in container.requiredUdpPorts:
-            container.ports.append(udpPort)
+            container.ports.append("{}/udp".format(udpPort))
         del container.requiredUdpPorts
     newApp = configureMainPort(newApp, nodeRoot)
-    for container in newApp.containers:
-        # TODO: Make this dynamic and not hardcoded
-        if container.requires and "lnd" in container.requires:
-            ignoredContainers.append(container.name)
-            container.ignored = True
-        elif container.requires:
-            del container.requires
     newApp = configureHiddenServices(newApp, nodeRoot)
     for container in newApp.containers:
         del container.ignored
