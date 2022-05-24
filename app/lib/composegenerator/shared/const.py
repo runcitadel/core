@@ -15,14 +15,6 @@ def permissions():
                 '${LND_DATA_DIR}:/lnd:ro'
             ]
         },
-        "c-lightning": {
-            "environment_allow": [
-                "C_LIGHTNING_IP"
-            ],
-            "volumes": [
-                '${C_LIGHTNING_DATA_DIR}:/c-lightning:ro'
-            ]
-        },
         "bitcoind": {
             "environment_allow": [
                 "BITCOIN_IP",
@@ -52,7 +44,9 @@ def permissions():
             "environment_allow": [
                 "C_LIGHTNING_IP"
             ],
-            "volumes": []
+            "volumes": [
+                '${C_LIGHTNING_DATA_DIR}:/c-lightning:ro'
+            ]
         },
     }
 
