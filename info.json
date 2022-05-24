@@ -1,6 +1,6 @@
 {
-    "version": "0.0.3",
-    "name": "Citadel 0.0.3",
+    "version": "0.0.4",
+    "name": "Citadel 0.0.4",
     "requires": ">=0.0.1",
-    "notes": "This update fixes multiple bugs on the dashboard and contains a rewritten app system to prepare for Core Lightning compatibility. We also added a new dark mode toggle and updated the instructions to get a Lightning address."
+    "notes": "This update fixes multiple bugs in the 0.0.3 release."
 }

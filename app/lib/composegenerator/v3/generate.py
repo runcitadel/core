@@ -16,20 +16,21 @@ from lib.composegenerator.shared.const import permissions
 
 def convertContainerPermissions(app: App) -> App:
     for container in app.containers:
-        for permission in app.metadata.dependencies:
-            if isinstance(permission, str):
-                if permission in permissions():
-                    container.environment_allow.extend(permissions()[permission]['environment_allow'])
-                    container.volumes.extend(permissions()[permission]['volumes'])
-                else:
-                    print("Warning: app {} defines unknown permission {}".format(app.metadata.name, permission))
-            else:
-                for subPermission in permission:
-                    if subPermission in permissions():
-                        container.environment_allow.extend(permissions()[subPermission]['environment_allow'])
-                        container.volumes.extend(permissions()[subPermission]['volumes'])
+        if container is not None:
+            for permission in app.metadata.dependencies:
+                if isinstance(permission, str):
+                    if permission in permissions():
+                        container.environment_allow.extend(permissions()[permission]['environment_allow'])
+                        container.volumes.extend(permissions()[permission]['volumes'])
                     else:
-                        print("Warning: app {} defines unknown permission {}".format(app.metadata.name, subPermission))
+                        print("Warning: app {} defines unknown permission {}".format(app.metadata.name, permission))
+                else:
+                    for subPermission in permission:
+                        if subPermission in permissions():
+                            container.environment_allow.extend(permissions()[subPermission]['environment_allow'])
+                            container.volumes.extend(permissions()[subPermission]['volumes'])
+                        else:
+                            print("Warning: app {} defines unknown permission {}".format(app.metadata.name, subPermission))
     return app
 
 def convertDataDirToVolumeGen3(app: App) -> AppStage2:
