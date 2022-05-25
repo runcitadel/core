@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+set -euo pipefail
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CLI_NAME="$(basename $0)"
+CLI_VERSION="0.0.1"
+
+if [ -z ${1+x} ]; then
+  command=""
+else
+  command="$1"
+fi
+
+show_help() {
+  cat <<EOF
+${CLI_NAME}-cli v${CLI_VERSION}
+Automatically initialize and manage isolated Citadel instances.
+
+Usage: ${CLI_NAME} <command> [options]
+
+Flags:
+    -h, --help                         Show this help message
+    -v, --version                      Show version information for this CLI
+
+Commands:
+    debug                              View logs for troubleshooting
+EOF
+}
+
+# Debug Citadel
+if [[ "$command" = "debug" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/debug $@
+  exit
+fi
+
+# Update Citadel
+if [[ "$command" = "update" ]]; then
+  POSITIONAL_ARGS=()
+
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  force=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -b | --branch)
+      branch="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --force)
+      force=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  if $force; then
+    sudo rm -f $CITADEL_ROOT/statuses/update-in-progress $CITADEL_ROOT/statuses/update-status.json
+  fi
+
+  sudo $CITADEL_ROOT/scripts/update/update --repo runcitadel/core#$branch
+
+  exit
+fi
+
+# Reboot the system
+if [[ "$command" = "reboot" ]]; then
+  sudo reboot
+  exit
+fi
+
+# Shutdown the system
+if [[ "$command" = "shutdown" ]]; then
+  sudo shutdown now
+  exit
+fi
+
+# App commands
+if [[ "$command" = "app" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/app $@
+  exit
+fi
+
+# Edit common app configuration files
+if [[ "$command" = "configure" ]]; then
+  if [ -z ${2+x} ]; then
+    echo "Specify an app or service to configure."
+    echo "Usage: \`$CLI_NAME configure <service>\`"
+    exit 1
+  fi
+
+  # TODO: check which implementation is running
+
+  if [[ "$2" = "bitcoin" ]]; then
+    sudo nano $CITADEL_ROOT/bitcoin/bitcoin.conf
+    exit
+  fi
+
+  if [[ "$2" = "lnd" ]]; then
+    sudo nano $CITADEL_ROOT/lnd/lnd.conf
+    exit
+  fi
+
+  if [[ "$2" = "electrs" ]]; then
+    sudo nano $CITADEL_ROOT/electrs/electrs.toml
+    exit
+  fi
+
+  if [[ "$2" = "fulcrumx" ]]; then
+    sudo nano $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+    exit
+  fi
+
+  # TODO: check if app is installed
+  installed=$($CLI_NAME app ls-installed)
+
+  if [[ "$2" = "nextcloud" ]]; then
+    sudo nano $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    exit
+  fi
+
+  echo "No service or app \"$2\" not found."
+  exit 1
+fi
+
+# App commands
+if [[ "$command" = "app" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/app $@
+  exit
+fi
+
+# Show version information for this CLI
+if [[ "$command" = "--version" ]] || [[ "$command" = "-v" ]]; then
+  echo "$CLI_NAME v$CLI_VERSION"
+  exit
+fi
+
+# Show usage information for this CLI
+if [[ "$command" = "--help" ]] || [[ "$command" = "-h" ]]; then
+  show_help
+  exit
+fi
+
+# If we get here it means no valid command was supplied
+# Show help and exit
+show_help
+exit
