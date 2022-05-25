@@ -14,3 +14,4 @@ services/installed.yml
 c-lightning/*
 apps/sourceMap.json
 apps/.updateignore
+fulcrumx/*

@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.12@sha256:de97eeb6e8caae5d1a8aeb045213621cf8e6e928177236bb0b3c25e76f6cd041
+    image: ghcr.io/runcitadel/manager:feat-karen-v2@sha256:61dfc6a23bb6603096673e517ec058730ca7e1fbe251df38760c2860d03b1dd0
     depends_on:
     - tor
     - redis
@@ -121,6 +121,7 @@ services:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
     - ${PWD}/events/signals:/signals
+    - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
@@ -212,7 +213,7 @@ services:
         ipv4_address: $NEUTRINO_SWITCHER_IP
   electrum:
     container_name: electrum
-    image: ghcr.io/runcitadel/electrs:v0.9.5@sha256:5fdd76415645de14f31c43844dc143b1477f86872d2f73a041c5005d469ed510
+    image: ghcr.io/runcitadel/electrs:v0.9.6@sha256:cf08513b8aa6f081e42ea92c5903d520db2caedbc20aaccf70f844663bbc8646
     working_dir: /data
     volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
