@@ -54,3 +54,4 @@ services/installed.yml
 
 c-lightning/*
 !c-lightning/.gitkeep
+events/karen
