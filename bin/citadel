@@ -20,7 +20,7 @@ fi
 show_help() {
   cat <<EOF
 ${CLI_NAME}-cli v${CLI_VERSION}
-Automatically initialize and manage isolated Citadel instances.
+Manage your Citadel.
 
 Usage: ${CLI_NAME} <command> [options]
 
@@ -58,7 +58,7 @@ fi
 if [[ "$command" = "update" ]]; then
   POSITIONAL_ARGS=()
 
-  branch=$(git rev-parse --abbrev-ref HEAD)
+  branch=$(git branch --show-current)
   force=false
 
   while [[ $# -gt 0 ]]; do
@@ -86,7 +86,7 @@ if [[ "$command" = "update" ]]; then
   set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
   if $force; then
-    sudo rm -f $CITADEL_ROOT/statuses/update-in-progress $CITADEL_ROOT/statuses/update-status.json
+    sudo rm -f $CITADEL_ROOT/statuses/update-in-progress
   fi
 
   sudo $CITADEL_ROOT/scripts/update/update --repo runcitadel/core#$branch
@@ -96,12 +96,14 @@ fi
 
 # Reboot the system
 if [[ "$command" = "reboot" ]]; then
+  $CITADEL_ROOT/scripts/stop || true
   sudo reboot
   exit
 fi
 
 # Shutdown the system
 if [[ "$command" = "shutdown" ]]; then
+  $CITADEL_ROOT/scripts/stop || true
   sudo shutdown now
   exit
 fi
