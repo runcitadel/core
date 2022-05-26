@@ -9,6 +9,7 @@ set -euo pipefail
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 CLI_NAME="$(basename $0)"
 CLI_VERSION="0.0.1"
+EDITOR="${EDITOR:-micro}"
 
 if [ -z ${1+x} ]; then
   command=""
@@ -30,6 +31,20 @@ Flags:
 Commands:
     debug                              View logs for troubleshooting
 EOF
+}
+
+edit_file() {
+  if [[ ! -f $1 ]]; then
+    echo "File not found."
+    exit 1
+  fi
+
+  if [[ -w $1 ]]; then
+    $EDITOR $1
+  else
+    # TODO: add open with sudo
+    echo "write permission denied"
+  fi
 }
 
 # Debug Citadel
@@ -109,32 +124,36 @@ if [[ "$command" = "configure" ]]; then
   # TODO: check which implementation is running
 
   if [[ "$2" = "bitcoin" ]]; then
-    sudo nano $CITADEL_ROOT/bitcoin/bitcoin.conf
+    edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
     exit
   fi
 
   if [[ "$2" = "lnd" ]]; then
-    sudo nano $CITADEL_ROOT/lnd/lnd.conf
+    edit_file $CITADEL_ROOT/lnd/lnd.conf
     exit
   fi
 
   if [[ "$2" = "electrs" ]]; then
-    sudo nano $CITADEL_ROOT/electrs/electrs.toml
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
     exit
   fi
 
   if [[ "$2" = "fulcrumx" ]]; then
-    sudo nano $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+    edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
     exit
   fi
 
-  # TODO: check if app is installed
-  installed=$($CLI_NAME app ls-installed)
+  if [[ "$2" = "nginx" ]]; then
+    edit_file $CITADEL_ROOT/nginx/nginx.conf
+    exit
+  fi
 
   if [[ "$2" = "nextcloud" ]]; then
-    sudo nano $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    edit_file $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
     exit
   fi
+
+  # TODO: add more apps
 
   echo "No service or app \"$2\" not found."
   exit 1
