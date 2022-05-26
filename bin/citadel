@@ -30,20 +30,39 @@ Flags:
 
 Commands:
     debug                              View logs for troubleshooting
+    restart                            Restart the Citadel service
+    reboot                             Reboot the system
+    shutdown                           Shutdown the system
+    app <command>                      Install, update or restart apps
+    configure <service>                Edit service & app configuration files
 EOF
 }
 
 edit_file() {
-  if [[ ! -f $1 ]]; then
-    echo "File not found."
-    exit 1
-  fi
+  if [[ $1 = "--priviledged" ]]; then
+    echo "Editing this file requires elevated priviledges."
 
-  if [[ -w $1 ]]; then
-    $EDITOR $1
+    if ! sudo test -f $2; then
+      echo "File not found."
+      exit 1
+    fi
+
+    if sudo test -w $2; then
+      sudo $EDITOR $2
+    else
+      echo "File not writable."
+    fi
   else
-    # TODO: add open with sudo
-    echo "write permission denied"
+    if ! test -f $1; then
+      echo "File not found."
+      exit 1
+    fi
+
+    if test -w $1; then
+      $EDITOR $1
+    else
+      echo "File not writable."
+    fi
   fi
 }
 
@@ -94,16 +113,23 @@ if [[ "$command" = "update" ]]; then
   exit
 fi
 
+# Restart Citadel
+if [[ "$command" = "restart" ]]; then
+  sudo $CITADEL_ROOT/scripts/stop
+  sudo $CITADEL_ROOT/scripts/start
+  exit
+fi
+
 # Reboot the system
 if [[ "$command" = "reboot" ]]; then
-  $CITADEL_ROOT/scripts/stop || true
+  sudo $CITADEL_ROOT/scripts/stop || true
   sudo reboot
   exit
 fi
 
 # Shutdown the system
 if [[ "$command" = "shutdown" ]]; then
-  $CITADEL_ROOT/scripts/stop || true
+  sudo $CITADEL_ROOT/scripts/stop || true
   sudo shutdown now
   exit
 fi
@@ -123,49 +149,106 @@ if [[ "$command" = "configure" ]]; then
     exit 1
   fi
 
-  # TODO: check which implementation is running
+  POSITIONAL_ARGS=()
 
-  if [[ "$2" = "bitcoin" ]]; then
-    edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
-    exit
-  fi
+  persist=false
 
-  if [[ "$2" = "lnd" ]]; then
-    edit_file $CITADEL_ROOT/lnd/lnd.conf
-    exit
-  fi
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    --persist)
+      persist=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
 
-  if [[ "$2" = "electrs" ]]; then
-    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
-    exit
-  fi
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-  if [[ "$2" = "fulcrumx" ]]; then
-    edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
-    exit
-  fi
-
-  if [[ "$2" = "nginx" ]]; then
-    edit_file $CITADEL_ROOT/nginx/nginx.conf
-    exit
-  fi
-
+  # Apps
   if [[ "$2" = "nextcloud" ]]; then
-    edit_file $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    edit_file --priviledged $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
     exit
   fi
 
   # TODO: add more apps
 
+  # Services
+  if $persist; then
+    echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
+  else
+    echo "NOTE: Changes to this configuration file will be overwritten the next time you start Citadel."
+    echo "To persist changes run the command again with \`$CLI_NAME configure <service> --persist\`"
+  fi
+
+  read -p "Continue? [Y/n] " should_continue
+  echo
+  if [[ $should_continue =~ [Nn]$ ]]; then
+    exit
+  fi
+
+  # TODO: check which implementation is running
+  # and do "bitcoin" / "lightning" / "electrum"
+
+  if [[ "$2" = "bitcoin" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/bitcoin-sample.conf
+      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    else
+      edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
+      echo "To apply the changes, restart Bitcoin service with \`docker restart bitcoin\`."
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "lnd" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/lnd-sample.conf
+      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    else
+      edit_file $CITADEL_ROOT/lnd/lnd.conf
+      echo "To apply the changes, restart LND service with \`docker restart lightning\`."
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "electrs" ]]; then
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
+    echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    exit
+  fi
+
+  if [[ "$2" = "fulcrumx" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/fulcrumx-sample.conf
+      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    else
+      edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+      echo "To apply the changes, restart FulcrumX service with \`docker restart electrum\`."
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "nginx" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/nginx-sample.conf
+      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    else
+      edit_file $CITADEL_ROOT/nginx/nginx.conf
+      echo "To apply the changes, restart Nginx service with \`docker restart nginx\`."
+    fi
+    exit
+  fi
+
   echo "No service or app \"$2\" not found."
   exit 1
-fi
-
-# App commands
-if [[ "$command" = "app" ]]; then
-  shift
-  sudo $CITADEL_ROOT/scripts/app $@
-  exit
 fi
 
 # Show version information for this CLI
