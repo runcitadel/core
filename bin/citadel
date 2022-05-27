@@ -184,19 +184,24 @@ if [[ "$command" = "configure" ]]; then
 
   set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-  # Apps
+  # These service and app configs are already persisted
+  # TODO: add more apps
+
   if [[ "$2" = "nextcloud" ]]; then
     edit_file --priviledged $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
     exit
   fi
 
-  # TODO: add more apps
+  if [[ "$2" = "nginx" ]]; then
+    edit_file $CITADEL_ROOT/nginx/nginx.conf
+    echo "To apply the changes, restart Nginx service with \`docker restart nginx\`."
+    exit
+  fi
 
-  # Services
   if $persist; then
     echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
   else
-    echo "NOTE: Changes to this configuration file will be overwritten the next time you start Citadel."
+    echo "NOTE: Some changes to this configuration file may be overwritten the next time you start Citadel."
     echo "To persist changes run the command again with \`$CLI_NAME configure <service> --persist\`"
   fi
 
@@ -206,6 +211,7 @@ if [[ "$command" = "configure" ]]; then
     exit
   fi
 
+  # Service and app configs below may be overwritten
   # TODO: check which implementation is running
   # and do "bitcoin" / "lightning" / "electrum"
 
@@ -244,17 +250,6 @@ if [[ "$command" = "configure" ]]; then
     else
       edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
       echo "To apply the changes, restart FulcrumX service with \`docker restart electrum\`."
-    fi
-    exit
-  fi
-
-  if [[ "$2" = "nginx" ]]; then
-    if $persist; then
-      edit_file $CITADEL_ROOT/templates/nginx-sample.conf
-      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
-    else
-      edit_file $CITADEL_ROOT/nginx/nginx.conf
-      echo "To apply the changes, restart Nginx service with \`docker restart nginx\`."
     fi
     exit
   fi
