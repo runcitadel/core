@@ -33,6 +33,7 @@ Commands:
     restart                            Restart the Citadel service
     reboot                             Reboot the system
     shutdown                           Shutdown the system
+    update                             Update Citadel
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
 EOF
@@ -198,11 +199,18 @@ if [[ "$command" = "configure" ]]; then
     exit
   fi
 
+  if [[ "$2" = "electrs" ]]; then
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
+    echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    exit
+  fi
+
   if $persist; then
     echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
   else
     echo "NOTE: Some changes to this configuration file may be overwritten the next time you start Citadel."
     echo "To persist changes run the command again with \`$CLI_NAME configure <service> --persist\`"
+    echo "For more information regarding what changes will be overwritten, please read the comment at the top of the file."
   fi
 
   read -p "Continue? [Y/n] " should_continue
@@ -234,12 +242,6 @@ if [[ "$command" = "configure" ]]; then
       edit_file $CITADEL_ROOT/lnd/lnd.conf
       echo "To apply the changes, restart LND service with \`docker restart lightning\`."
     fi
-    exit
-  fi
-
-  if [[ "$2" = "electrs" ]]; then
-    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
-    echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
     exit
   fi
 
