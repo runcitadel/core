@@ -48,10 +48,10 @@ monitor_file () {
       sleep 1
     done
     echo "$file_path created! Triggering backup..."
-    touch "${CITADEL_ROOT}/events/signals/backup"
+    "${CITADEL_ROOT}/scripts/backup/backup"
   fi
 
-  fswatch -0 --event Updated $file_path | xargs -0 -n 1 -I {} touch "${CITADEL_ROOT}/events/signals/backup"
+  fswatch -0 --event Updated $file_path | xargs -0 -n 1 -I {} "${CITADEL_ROOT}/scripts/backup/backup"
 }
 
 if [[ ! -d "${CITADEL_ROOT}" ]]; then
