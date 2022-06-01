@@ -170,6 +170,36 @@ if [[ "$command" = "shutdown" ]]; then
   exit
 fi
 
+# Switch update channel
+if [[ "$command" = "set-channel" ]]; then
+  if [ -z ${2+x} ]; then
+    echo "Specify an update channel to switch to."
+    echo "Usage: \`$CLI_NAME $command <stable|beta|c-lightning>\`"
+    exit 1
+  fi
+
+  case $2 in "stable" | "beta" | "c-lightning")
+    # continue
+    ;;
+  *)
+    echo "Not a valid update channel: \"$2\""
+    exit 1
+    ;;
+  esac
+
+  sudo $CITADEL_ROOT/scripts/set-update-channel $2
+  $CLI_NAME update
+  exit
+fi
+
+# Switch Bitcoin/Electrum implementation
+if [[ "$command" = "set-impl" ]]; then
+  shift
+  sudo $CITADEL_ROOT/services/manage.py set $@
+  $CLI_NAME restart
+  exit
+fi
+
 # App commands
 if [[ "$command" = "app" ]]; then
   shift
@@ -181,7 +211,7 @@ fi
 if [[ "$command" = "configure" ]]; then
   if [ -z ${2+x} ]; then
     echo "Specify an app or service to configure."
-    echo "Usage: \`$CLI_NAME configure <service>\`"
+    echo "Usage: \`$CLI_NAME $command <service>\`"
     exit 1
   fi
 
