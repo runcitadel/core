@@ -79,6 +79,29 @@ get_update_channel() {
   fi
 }
 
+prompt_apply_config() {
+  service=$1
+  persisted=$2
+
+  read -p "Do you want to apply the changes now? [y/N] " should_restart
+  echo
+  if [[ $should_restart =~ [Yy]$ ]]; then
+    if $persisted; then
+      sudo $CITADEL_ROOT/scripts/configure
+    fi
+
+    printf "\nRestarting service \"$service\"...\n"
+    docker restart $service
+    echo "Done."
+  else
+    if $persisted; then
+      echo "To apply the changes, restart Citadel by running \`$CLI_NAME restart\`."
+    else
+      echo "To apply the changes, restart service \"$service\" by running \`docker restart $service\`."
+    fi
+  fi
+}
+
 # Debug Citadel
 if [[ "$command" = "debug" ]]; then
   shift
@@ -190,18 +213,13 @@ if [[ "$command" = "configure" ]]; then
 
   if [[ "$2" = "nextcloud" ]]; then
     edit_file --priviledged $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    prompt_apply_config nextcloud-web-1 false
     exit
   fi
 
   if [[ "$2" = "nginx" ]]; then
     edit_file $CITADEL_ROOT/nginx/nginx.conf
-    echo "To apply the changes, restart Nginx service with \`docker restart nginx\`."
-    exit
-  fi
-
-  if [[ "$2" = "electrs" ]]; then
-    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
-    echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+    prompt_apply_config nginx false
     exit
   fi
 
@@ -209,8 +227,7 @@ if [[ "$command" = "configure" ]]; then
     echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
   else
     echo "NOTE: Some changes to this configuration file may be overwritten the next time you start Citadel."
-    echo "To persist changes run the command again with \`$CLI_NAME configure <service> --persist\`"
-    echo "For more information regarding what changes will be overwritten, please read the comment at the top of the file."
+    echo "To persist the changes run the command again with \`$CLI_NAME configure $2 --persist\`"
   fi
 
   read -p "Continue? [Y/n] " should_continue
@@ -226,10 +243,10 @@ if [[ "$command" = "configure" ]]; then
   if [[ "$2" = "bitcoin" ]]; then
     if $persist; then
       edit_file $CITADEL_ROOT/templates/bitcoin-sample.conf
-      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+      prompt_apply_config bitcoin true
     else
       edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
-      echo "To apply the changes, restart Bitcoin service with \`docker restart bitcoin\`."
+      prompt_apply_config bitcoin false
     fi
     exit
   fi
@@ -237,21 +254,27 @@ if [[ "$command" = "configure" ]]; then
   if [[ "$2" = "lnd" ]]; then
     if $persist; then
       edit_file $CITADEL_ROOT/templates/lnd-sample.conf
-      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+      prompt_apply_config lightning true
     else
       edit_file $CITADEL_ROOT/lnd/lnd.conf
-      echo "To apply the changes, restart LND service with \`docker restart lightning\`."
+      prompt_apply_config lightning false
     fi
+    exit
+  fi
+
+  if [[ "$2" = "electrs" ]]; then
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
+    prompt_apply_config electrum true
     exit
   fi
 
   if [[ "$2" = "fulcrumx" ]]; then
     if $persist; then
       edit_file $CITADEL_ROOT/templates/fulcrumx-sample.conf
-      echo "To apply the changes, restart Citadel with \`$CLI_NAME restart\`."
+      prompt_apply_config electrum true
     else
       edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
-      echo "To apply the changes, restart FulcrumX service with \`docker restart electrum\`."
+      prompt_apply_config electrum false
     fi
     exit
   fi
