@@ -39,7 +39,7 @@ main () {
     echo "Sleeping for ${delay} seconds..."
     sleep $delay
     echo "Triggering decoy backup..."
-    touch "${CITADEL_ROOT}/events/signals/backup"
+    "${CITADEL_ROOT}/scripts/backup/backup"
   done
 }
 
