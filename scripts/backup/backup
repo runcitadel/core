@@ -98,39 +98,19 @@ tar \
 #   --verbose \
 #   --gzip
 
-# Check if a file exists on Firebase by checking if
-# "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F<THE_FILE_NAME>?alt=media"
-# returns a 200 response code.
-#
-check_if_exists() {
-  curl -s -o /dev/null -w "%{http_code}" \
-    -X GET \
-    "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F${1}?alt=media"
-}
-
-# Upload a file to Firebase Cloud Storage by uloading its name + a random ID.
-# Before uploading, we need to check if a file with the same name already exists, and if it does, change the random ID.
-# For example, if we want to upload a file named "<THE_FILE_NAME>" with the content AA, we'd use this command to upload:
-# curl -X POST "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F<THE_FILE_NAME>?alt=media" -d "AA" -H "Content-Type: text/plain"
-# To check if a file exists, we can check if this endpoint returns an error 404:
-# curl "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F<THE_FILE_NAME>?alt=media"
-# To download a file, we can the same endpoint
 upload_file() {
   local file_to_send="${1}"
-  local file_name="${2}"
-  # A random ID to avoid collisions
-  local random_id="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 60 ; echo '')"
-  # Check if the file already exists
-  # While a file with the same name exists, we'll try to upload it with a different ID
-  while [[ $(check_if_exists "${file_name}-${random_id}") == "200" ]]; do
-    random_id="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 60 ; echo '')"
-  done
-  # Upload the file
+  local backup_id="${2}"
+  local upload_data=$(jq --null-input \
+  --arg name "$backup_id" \
+  --arg data "$(base64 $file_to_send)" \
+  '{"name": $name, "data": $data}')
+    echo $upload_data
   curl -X POST \
-  "https://firebasestorage.googleapis.com/v0/b/citadel-user-backups.appspot.com/o/backups%2F${file_name}-${random_id}?alt=media" \
-  -d @"${file_to_send}" \
-  -H "Content-Type: application/octet-stream" \
-  > /dev/null
+    "https://account.runcitadel.space/api/upload" \
+    -d "${upload_data}" \
+    -H "Content-Type: application/json" \
+    > /dev/null
 }
 
 if [[ $BITCOIN_NETWORK == "testnet" ]]; then
