@@ -47,7 +47,7 @@ def getContainerHiddenService(
         if isinstance(container.hiddenServicePorts, int):
             return getHiddenServiceString(
                 "{} {}".format(metadata.name, container.name),
-                metadata.id,
+                metadata.id if isMainContainer else "{}-{}".format(metadata.id, container.name),
                 container.hiddenServicePorts,
                 containerIp,
                 container.hiddenServicePorts,
@@ -55,7 +55,7 @@ def getContainerHiddenService(
         elif isinstance(container.hiddenServicePorts, list):
             return getHiddenServiceMultiPort(
                 "{} {}".format(metadata.name, container.name),
-                metadata.id,
+                metadata.id if isMainContainer else "{}-{}".format(metadata.id, container.name),
                 containerIp,
                 container.hiddenServicePorts,
             )
@@ -77,14 +77,14 @@ def getContainerHiddenService(
                 else:
                     additionalHiddenServices[key] = value
             for key, value in additionalHiddenServices.items():
-                otherHiddenServices += "\n"
                 if isinstance(value, int):
                     otherHiddenServices += "# {} {} {} Hidden Service\nHiddenServiceDir /var/lib/tor/app-{}-{}\n".format(
-                        metadata.name, container.name, key, metadata.id, container.name
+                        metadata.name, container.name, key, metadata.id, key
                     )
                     otherHiddenServices += "HiddenServicePort {} {}:{}".format(
                         value, containerIp, value
                     )
+                    otherHiddenServices += "\n"
                 elif isinstance(value, list):
                     otherHiddenServices += getHiddenServiceMultiPort(
                         "{} {}".format(metadata.name, key), "{}-{}".format(metadata.id, key), containerIp, value
