@@ -34,7 +34,7 @@ Commands:
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel
-    backup                             Create a Secure Channels Backup and upload it to Citadel backup server (encrypted)
+    backup                             Create a Static Channel Backup and upload it to Citadel backup server (encrypted)
     set <command>                      Configure Citadel
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
