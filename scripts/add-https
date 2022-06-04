@@ -53,7 +53,7 @@ with open(registry_file) as file:
 
 port = None
 for app in registry:
-    if app['name'] == service:
+    if app['id'] == service:
         if "internalPort" in app:
             port = app['internalPort']
         else:
