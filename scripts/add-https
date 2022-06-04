@@ -56,7 +56,13 @@ for app in registry:
     if app['name'] == service:
         if "internalPort" in app:
             port = app['internalPort']
+        else:
+            port = app['port']
         break
+
+if port is None:
+    print("No port found!")
+    exit(1)
 
 original_config = crossplane.parse(nginx_config_file)
 parsedConfig = original_config["config"][0]["parsed"]
@@ -70,14 +76,6 @@ ip_alt_env_var = "APP_{}_MAIN_IP".format(
     service.upper().replace("-", "_")
 )
 
-port_env_var = "APP_{}_WEB_PORT".format(
-    service.upper().replace("-", "_")
-)
-
-port_alt_env_var = "APP_{}_MAIN_PORT".format(
-    service.upper().replace("-", "_")
-)
-
 env = parse_dotenv(os.path.join(node_root, '.env'))
 
 ip=None
@@ -88,21 +86,6 @@ elif ip_alt_env_var in env:
 else:
     print("Error: No IP found for {}".format(service))
     exit(1)
-
-if port == None:
-    if port_env_var in env:
-        port = env[port_env_var]
-    elif port_alt_env_var in env:
-        port = env[port_alt_env_var]
-    else:
-        print("Error: No port found for {}".format(service))
-        exit(1)
-
-if service == "btcpay-server":
-    port = 1234
-
-if service == "lnme":
-    port = 1323
 
 actual_url="http://{}:{}".format(ip, port)
 
