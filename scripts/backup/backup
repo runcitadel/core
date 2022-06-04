@@ -106,7 +106,6 @@ upload_file() {
   --arg name "$backup_id" \
   --arg data "$(base64 $file_to_send)" \
   '{"name": $name, "data": $data}')
-    echo $upload_data
   curl -X POST \
     "https://account.runcitadel.space/api/upload" \
     -d "${upload_data}" \
