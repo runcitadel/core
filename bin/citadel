@@ -34,6 +34,8 @@ Commands:
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel
+    backup                             Create a Secure Channels Backup and upload it to Citadel backup server (encrypted)
+    set <command>                      Configure Citadel
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
 EOF
@@ -170,33 +172,80 @@ if [[ "$command" = "shutdown" ]]; then
   exit
 fi
 
-# Switch update channel
-if [[ "$command" = "set-channel" ]]; then
-  if [ -z ${2+x} ]; then
-    echo "Specify an update channel to switch to."
-    echo "Usage: \`$CLI_NAME $command <stable|beta|c-lightning>\`"
+# Configure Citadel
+if [[ "$command" = "set" ]]; then
+  shift
+
+  if [ -z ${1+x} ]; then
+    echo "Missing subcommand."
+    echo "Usage: \`$CLI_NAME $command <subcommand>\`"
     exit 1
+  else
+    subcommand="$1"
   fi
 
-  case $2 in "stable" | "beta" | "c-lightning")
-    # continue
-    ;;
-  *)
-    echo "Not a valid update channel: \"$2\""
-    exit 1
-    ;;
-  esac
+  # Switch update channel
+  if [[ "$subcommand" = "update-channel" ]]; then
+    if [ -z ${2+x} ]; then
+      echo "Specify an update channel to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <stable|beta|c-lightning>\`"
+      exit 1
+    fi
 
-  sudo $CITADEL_ROOT/scripts/set-update-channel $2
-  $CLI_NAME update
-  exit
+    case $2 in "stable" | "beta" | "c-lightning")
+      # continue
+      ;;
+    *)
+      echo "Not a valid update channel: \"$2\""
+      exit 1
+      ;;
+    esac
+
+    sudo $CITADEL_ROOT/scripts/set-update-channel $2
+    $CLI_NAME update
+    exit
+  fi
+
+  # Switch Bitcoin/Electrum implementation
+  if [[ "$subcommand" = "implementation" ]] || [[ "$subcommand" = "impl" ]]; then
+    shift
+    sudo $CITADEL_ROOT/services/manage.py set $@
+    $CLI_NAME restart
+    exit
+  fi
+
+  # Switch Bitcoin network
+  if [[ "$subcommand" = "network" ]]; then
+    shift
+
+    if [ -z ${1+x} ]; then
+      echo "Specify a network to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <mainnet|signet|testnet|regtest>\`"
+    else
+      case $1 in
+      "mainnet" | "testnet" | "signet" | "regtest")
+        sudo $CITADEL_ROOT/scripts/stop
+        sudo OVERWRITE_NETWORK=$1 $CITADEL_ROOT/scripts/configure
+        sudo $CITADEL_ROOT/scripts/start
+        ;;
+      *)
+        echo "Not a valid value for network"
+        exit 1
+        ;;
+      esac
+    fi
+
+    exit
+  fi
+
+  echo "\"$subcommand\" is not a valid subcommand."
+  exit 1
 fi
 
-# Switch Bitcoin/Electrum implementation
-if [[ "$command" = "set-impl" ]]; then
+# Create SCB and upload it to Citadel backup server
+if [[ "$command" = "backup" ]]; then
   shift
-  sudo $CITADEL_ROOT/services/manage.py set $@
-  $CLI_NAME restart
+  sudo $CITADEL_ROOT/scripts/backup/backup
   exit
 fi
 
