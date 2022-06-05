@@ -165,6 +165,12 @@ fi
 if [[ "$command" = "backup" ]]; then
   shift
 
+  if [ -z ${2+x} ]; then
+    echo "Specify a path."
+    echo "Usage: \`$CLI_NAME $command <path>\`"
+    exit 1
+  fi
+
   # Get Bitcoin network
   [[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
   BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
@@ -203,6 +209,7 @@ if [[ "$command" = "backup" ]]; then
 
   # TODO: start services again
   # TODO: add instructions on how to restore these backups
+  # TODO: copy backup over ssh
 
   exit
 fi
