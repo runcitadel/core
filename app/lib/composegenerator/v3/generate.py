@@ -85,11 +85,12 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
     newApp = configureIps(newApp, networkingFile, envFile)
     # This is validated earlier
     for container in newApp.containers:
-        container.ports = container.requiredPorts
+        for tcpPort in container.requiredPorts:
+            container.ports.append("{}:{}".format(tcpPort, tcpPort))
         del container.requiredPorts
     for container in newApp.containers:
         for udpPort in container.requiredUdpPorts:
-            container.ports.append("{}/udp".format(udpPort))
+            container.ports.append("{}/udp:{}/udp".format(udpPort, udpPort))
         del container.requiredUdpPorts
     newApp = configureMainPort(newApp, nodeRoot)
     newApp = configureHiddenServices(newApp, nodeRoot)
