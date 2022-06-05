@@ -1,0 +1,322 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+set -euo pipefail
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CLI_NAME="$(basename $0)"
+CLI_VERSION="0.0.1"
+CLI_DIR="$(dirname "$(readlink -f "$0")")"
+EDITOR="${EDITOR:-micro}"
+
+source $CLI_DIR/utils/functions.sh
+source $CLI_DIR/utils/multiselect.sh
+source $CLI_DIR/utils/spinner.sh
+source $CLI_DIR/utils/helpers.sh
+
+if [ -z ${1+x} ]; then
+  command=""
+else
+  command="$1"
+fi
+
+# Debug Citadel
+if [[ "$command" = "debug" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/debug $@
+  exit
+fi
+
+# Update Citadel
+if [[ "$command" = "update" ]]; then
+  POSITIONAL_ARGS=()
+
+  branch=$(get_update_channel)
+  force=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -b | --branch)
+      branch="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --force)
+      force=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  if $force; then
+    sudo rm -f $CITADEL_ROOT/statuses/update-in-progress
+  fi
+
+  sudo $CITADEL_ROOT/scripts/update/update --repo runcitadel/core#$branch
+
+  exit
+fi
+
+# Restart Citadel
+if [[ "$command" = "restart" ]]; then
+  sudo $CITADEL_ROOT/scripts/stop
+  sudo $CITADEL_ROOT/scripts/start
+  exit
+fi
+
+# Reboot the system
+if [[ "$command" = "reboot" ]]; then
+  sudo $CITADEL_ROOT/scripts/stop || true
+  sudo reboot
+  exit
+fi
+
+# Shutdown the system
+if [[ "$command" = "shutdown" ]]; then
+  sudo $CITADEL_ROOT/scripts/stop || true
+  sudo shutdown now
+  exit
+fi
+
+# Configure Citadel
+if [[ "$command" = "set" ]]; then
+  shift
+
+  if [ -z ${1+x} ]; then
+    echo "Missing subcommand."
+    echo "Usage: \`$CLI_NAME $command <subcommand>\`"
+    exit 1
+  else
+    subcommand="$1"
+  fi
+
+  # Switch update channel
+  if [[ "$subcommand" = "update-channel" ]]; then
+    if [ -z ${2+x} ]; then
+      echo "Specify an update channel to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <stable|beta|c-lightning>\`"
+      exit 1
+    fi
+
+    case $2 in "stable" | "beta" | "c-lightning")
+      # continue
+      ;;
+    *)
+      echo "Not a valid update channel: \"$2\""
+      exit 1
+      ;;
+    esac
+
+    sudo $CITADEL_ROOT/scripts/set-update-channel $2
+    $CLI_NAME update
+    exit
+  fi
+
+  # Switch Bitcoin/Electrum implementation
+  if [[ "$subcommand" = "implementation" ]] || [[ "$subcommand" = "impl" ]]; then
+    shift
+    sudo $CITADEL_ROOT/services/manage.py set $@
+    $CLI_NAME restart
+    exit
+  fi
+
+  # Switch Bitcoin network
+  if [[ "$subcommand" = "network" ]]; then
+    shift
+
+    if [ -z ${1+x} ]; then
+      echo "Specify a network to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <mainnet|signet|testnet|regtest>\`"
+    else
+      case $1 in
+      "mainnet" | "testnet" | "signet" | "regtest")
+        sudo $CITADEL_ROOT/scripts/stop
+        sudo OVERWRITE_NETWORK=$1 $CITADEL_ROOT/scripts/configure
+        sudo $CITADEL_ROOT/scripts/start
+        ;;
+      *)
+        echo "Not a valid value for network"
+        exit 1
+        ;;
+      esac
+    fi
+
+    exit
+  fi
+
+  echo "\"$subcommand\" is not a valid subcommand."
+  exit 1
+fi
+
+# Backup a choice of files and folders
+if [[ "$command" = "backup" ]]; then
+  # TODO: add some options
+  shift
+
+  BACKUP_FOLDER_PATH=$2
+
+  mkdir -p "${BACKUP_FOLDER_PATH}"
+  mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
+  mkdir -p "${BACKUP_FOLDER_PATH}/bitcoin"
+
+  # TODO: add a readme to backup folder
+
+  [[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
+  BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
+
+  # TODO: just copy channel.backup somewhere
+  cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/lnd/channel.backup"
+
+  # TODO: copy wallet.db & channel.db (?)
+  cp --archive "${CITADEL_ROOT}/lnd/data/graph/${BITCOIN_NETWORK}/channel.db" "${BACKUP_FOLDER_PATH}/lnd/channel.db"
+  cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/wallet.db" "${BACKUP_FOLDER_PATH}/lnd/wallet.db"
+
+  # TODO: copy blockchain data
+  cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/blocks" "${BACKUP_FOLDER_PATH}/bitcoin/blocks"
+  cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/chainstate" "${BACKUP_FOLDER_PATH}/bitcoin/chainstate"
+
+  exit
+fi
+
+# App commands
+if [[ "$command" = "app" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/app $@
+  exit
+fi
+
+# Edit common app configuration files
+if [[ "$command" = "configure" ]]; then
+  if [ -z ${2+x} ]; then
+    echo "Specify an app or service to configure."
+    echo "Usage: \`$CLI_NAME $command <service>\`"
+    exit 1
+  fi
+
+  POSITIONAL_ARGS=()
+
+  persist=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    --persist)
+      persist=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  # These service and app configs are already persisted
+  # TODO: add more apps
+
+  if [[ "$2" = "nextcloud" ]]; then
+    edit_file --priviledged $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    prompt_apply_config nextcloud-web-1 false
+    exit
+  fi
+
+  if [[ "$2" = "nginx" ]]; then
+    edit_file $CITADEL_ROOT/nginx/nginx.conf
+    prompt_apply_config nginx false
+    exit
+  fi
+
+  if $persist; then
+    echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
+  else
+    echo "NOTE: Some changes to this configuration file may be overwritten the next time you start Citadel."
+    echo "To persist the changes run the command again with \`$CLI_NAME configure $2 --persist\`"
+  fi
+
+  read -p "Continue? [Y/n] " should_continue
+  echo
+  if [[ $should_continue =~ [Nn]$ ]]; then
+    exit
+  fi
+
+  # Service and app configs below may be overwritten
+  # TODO: check which implementation is running
+  # and do "bitcoin" / "lightning" / "electrum"
+
+  if [[ "$2" = "bitcoin" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/bitcoin-sample.conf
+      prompt_apply_config bitcoin true
+    else
+      edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
+      prompt_apply_config bitcoin false
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "lnd" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/lnd-sample.conf
+      prompt_apply_config lightning true
+    else
+      edit_file $CITADEL_ROOT/lnd/lnd.conf
+      prompt_apply_config lightning false
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "electrs" ]]; then
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
+    prompt_apply_config electrum true
+    exit
+  fi
+
+  if [[ "$2" = "fulcrumx" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/fulcrumx-sample.conf
+      prompt_apply_config electrum true
+    else
+      edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+      prompt_apply_config electrum false
+    fi
+    exit
+  fi
+
+  echo "No service or app \"$2\" not found."
+  exit 1
+fi
+
+# Show version information for this CLI
+if [[ "$command" = "--version" ]] || [[ "$command" = "-v" ]]; then
+  echo "$CLI_NAME v$CLI_VERSION"
+  exit
+fi
+
+# Show usage information for this CLI
+if [[ "$command" = "--help" ]] || [[ "$command" = "-h" ]]; then
+  show_help
+  exit
+fi
+
+# If we get here it means no valid command was supplied
+# Show help and exit
+show_help
+exit
