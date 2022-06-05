@@ -163,30 +163,46 @@ fi
 
 # Backup a choice of files and folders
 if [[ "$command" = "backup" ]]; then
-  # TODO: add some options
   shift
 
-  BACKUP_FOLDER_PATH=$2
-
-  mkdir -p "${BACKUP_FOLDER_PATH}"
-  mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
-  mkdir -p "${BACKUP_FOLDER_PATH}/bitcoin"
-
-  # TODO: add a readme to backup folder
-
+  # Get Bitcoin network
   [[ -f "${CITADEL_ROOT}/.env" ]] && source "${CITADEL_ROOT}/.env"
   BITCOIN_NETWORK=${BITCOIN_NETWORK:-mainnet}
 
-  # TODO: just copy channel.backup somewhere
-  cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/lnd/channel.backup"
+  BACKUP_FOLDER_PATH=$1
+  mkdir -p "${BACKUP_FOLDER_PATH}"
 
-  # TODO: copy wallet.db & channel.db (?)
-  cp --archive "${CITADEL_ROOT}/lnd/data/graph/${BITCOIN_NETWORK}/channel.db" "${BACKUP_FOLDER_PATH}/lnd/channel.db"
-  cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/wallet.db" "${BACKUP_FOLDER_PATH}/lnd/wallet.db"
+  backup_options=("Static Channel Backup (LND)" "State files (LND)" "Blockchain data")
+  preselection=("true" "false" "false")
 
-  # TODO: copy blockchain data
-  cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/blocks" "${BACKUP_FOLDER_PATH}/bitcoin/blocks"
-  cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/chainstate" "${BACKUP_FOLDER_PATH}/bitcoin/chainstate"
+  printf "Choose what to include in the backup: (Spacebar to toggle)\n\n"
+  multiselect result backup_options preselection
+
+  # TODO: stop services first
+
+  if [[ ${result[*]} =~ "Static Channel Backup" ]]; then
+    mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
+    echo "Backing up LND Static Channel Backup (SCB)..."
+    cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/lnd/channel.backup"
+  fi
+
+  if [[ ${result[*]} =~ "State files" ]]; then
+    mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
+    echo "Backing up LND State files..."
+    cp --archive "${CITADEL_ROOT}/lnd/data/graph/${BITCOIN_NETWORK}/channel.db" "${BACKUP_FOLDER_PATH}/lnd/channel.db"
+    cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/wallet.db" "${BACKUP_FOLDER_PATH}/lnd/wallet.db"
+  fi
+
+  if [[ ${result[*]} =~ "Blockchain" ]]; then
+    mkdir -p "${BACKUP_FOLDER_PATH}/bitcoin"
+    echo "Backing up Blockchain data..."
+    cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/indexes" "${BACKUP_FOLDER_PATH}/bitcoin/indexes"
+    cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/blocks" "${BACKUP_FOLDER_PATH}/bitcoin/blocks"
+    cp --archive "${CITADEL_ROOT}/bitcoin/${BITCOIN_NETWORK}/chainstate" "${BACKUP_FOLDER_PATH}/bitcoin/chainstate"
+  fi
+
+  # TODO: start services again
+  # TODO: add instructions on how to restore these backups
 
   exit
 fi

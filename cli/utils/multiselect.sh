@@ -81,6 +81,17 @@ function multiselect() {
     done
   }
 
+  get_result() {
+    local result=()
+    for ((i = 0; i < ${#options[@]}; i++)); do
+      if ${selected[i]}; then
+        result+=(${options[i]})
+      fi
+    done
+
+    echo "${result[@]}"
+  }
+
   local active=0
   while true; do
     print_options $active
@@ -108,5 +119,5 @@ function multiselect() {
   printf "\n"
   cursor_blink_on
 
-  eval $return_value='("${selected[@]}")'
+  eval $return_value='("$(get_result)")'
 }
