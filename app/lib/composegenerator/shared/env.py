@@ -4,7 +4,7 @@
 
 import re
 from typing import Union
-from lib.composegenerator.v1.types import App
+from lib.composegenerator.v2.types import App
 from lib.composegenerator.shared.const import always_allowed_env
 from lib.citadelutils import checkArrayContainsAllElements, getEnvVars
 

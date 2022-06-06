@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Main functions
-from lib.composegenerator.v1.types import App, AppStage3, AppStage2, Container
+from lib.composegenerator.v2.types import App, AppStage3, AppStage2, Container
 from lib.composegenerator.shared.const import permissions
 
 

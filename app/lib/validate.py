@@ -9,8 +9,6 @@ import yaml
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 
-with open(os.path.join(scriptDir, 'app-standard-v1.yml'), 'r') as f:
-    schemaVersion1 = yaml.safe_load(f)
 with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
     schemaVersion2 = yaml.safe_load(f)
 with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
@@ -19,15 +17,7 @@ with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
 # Validates app data
 # Returns true if valid, false otherwise
 def validateApp(app: dict):
-    if 'version' in app and str(app['version']) == "1":
-        try:
-            validate(app, schemaVersion1)
-            return True
-        # Catch and log any errors, and return false
-        except Exception as e:
-            print(e)
-            return False
-    elif 'version' in app and str(app['version']) == "2":
+    if 'version' in app and str(app['version']) == "2":
         try:
             validate(app, schemaVersion2)
             return True
