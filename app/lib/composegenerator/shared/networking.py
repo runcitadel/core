@@ -6,6 +6,7 @@ import json
 from os import path
 import random
 from lib.composegenerator.v2.types import ContainerStage2, NetworkConfig
+from lib.citadelutils import parse_dotenv
 from dacite import from_dict
 
 def getFreePort(networkingFile: str, appId: str):
