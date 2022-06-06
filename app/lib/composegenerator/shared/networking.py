@@ -5,6 +5,7 @@
 import json
 from os import path
 import random
+from lib.composegenerator.v2.types import ContainerStage2
 
 def getFreePort(networkingFile: str, appId: str):
     # Ports used currently in Citadel
