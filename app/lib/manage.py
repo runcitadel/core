@@ -64,7 +64,7 @@ def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
         sourceMap = json.load(f)
     if not name in sourceMap:
-        print("Warning: App {} is not in the source map".format(name))
+        print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
         sourceMap = {
             name: {
                 "githubRepo": "runcitadel/core",
@@ -127,7 +127,7 @@ def checkUpdateAvailable(name: str) -> bool:
     with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
         originalAppYml = yaml.safe_load(f)
     if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
-        print("App {} is not valid".format(name))
+        print("App {} is not valid".format(name), file=sys.stderr)
         return False
     return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
 
