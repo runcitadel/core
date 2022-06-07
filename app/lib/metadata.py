@@ -62,8 +62,10 @@ def getAppRegistry(apps, app_path):
                 app_metadata.append(metadata)
                 if version < 3:
                     getPortsOldApp(app_yml, app)
-                else:
+                elif version == 3:
                     getPortsV3App(app_yml, app)
+                elif version == 4:
+                    getPortsV4App(app_yml, app)
                     with open(app_cache_path, 'w') as f:
                         json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
             except Exception as e:
@@ -155,6 +157,25 @@ def getPortsV3App(app, appId):
                 validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 2)
             elif "preferredOutsidePort" in appContainer:
             
+                validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 1)
+            else:
+                validatePort(appContainer, appContainer["port"], appId, 0)
+        elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
+                validatePort(appContainer, getNewPort(appPorts.keys()), appId, 0, True)
+        if "requiredPorts" in appContainer:
+            for port in appContainer["requiredPorts"]:
+                validatePort(appContainer, port, appId, 2)
+        if "requiredUdpPorts" in appContainer:
+            for port in appContainer["requiredUdpPorts"]:
+                validatePort(appContainer, port, appId, 2)
+
+
+def getPortsV4App(app, appId):
+    for appContainer in app["services"]:
+        if "port" in appContainer:
+            if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
+                validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 2)
+            elif "preferredOutsidePort" in appContainer:
                 validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 1)
             else:
                 validatePort(appContainer, appContainer["port"], appId, 0)
