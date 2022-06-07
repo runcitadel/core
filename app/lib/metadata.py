@@ -69,7 +69,7 @@ def getAppRegistry(apps, app_path):
                     with open(app_cache_path, 'w') as f:
                         json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
             except Exception as e:
-                print(e)
+                print(traceback.format_exc())
                 print("App {} is invalid!".format(app))
     appPortsToMap()
     return {
