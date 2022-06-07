@@ -33,10 +33,9 @@ def validateApp(app: dict):
         except Exception as e:
             print(e)
             return False
-    else:
+    elif 'version' not in app and 'citadel_version' not in app:
         print("Unsupported app version")
         return False
-
 
 # Read in an app.yml file and pass it to the validation function
 # Returns true if valid, false otherwise

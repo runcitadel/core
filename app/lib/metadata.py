@@ -46,6 +46,11 @@ def getAppRegistry(apps, app_path):
             try:
                 with open(app_yml_path, 'r') as f:
                     app_yml = yaml.safe_load(f.read())
+                version = False
+                if 'version' in app_yml:
+                    version = int(app_yml['version'])
+                elif 'citadel_version' in app_yml:
+                    version = int(app_yml['citadel_version'])
                 metadata: dict = app_yml['metadata']
                 metadata['id'] = app
                 metadata['path'] = metadata.get('path', '')
@@ -55,7 +60,7 @@ def getAppRegistry(apps, app_path):
                 if "mainContainer" in metadata:
                     metadata.pop("mainContainer")
                 app_metadata.append(metadata)
-                if(app_yml["version"] != 3):
+                if version < 3:
                     getPortsOldApp(app_yml, app)
                 else:
                     getPortsV3App(app_yml, app)

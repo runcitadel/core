@@ -92,12 +92,17 @@ def update(verbose: bool = False):
     for app in apps:
         composeFile = os.path.join(appsDir, app, "docker-compose.yml")
         appYml = os.path.join(appsDir, app, "app.yml")
-        with open(composeFile, "w") as f:
-            appCompose = getApp(appYml, app)
-            if appCompose:
-                f.write(yaml.dump(appCompose, sort_keys=False))
-                if verbose:
-                    print("Wrote " + app + " to " + composeFile)
+        with open(appYml, 'r') as f:
+            appDefinition = yaml.safe_load(f)
+        if 'citadel_version' in appYml:
+            os.system("docker run -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml apps/{}/docker-compose.yml".format(appsDir, app, app, app))
+        else:
+            appCompose = getApp(appDefinition, app)
+            with open(composeFile, "w") as f:
+                if appCompose:
+                    f.write(yaml.dump(appCompose, sort_keys=False))
+                    if verbose:
+                        print("Wrote " + app + " to " + composeFile)
     print("Generated configuration successfully")
 
 
@@ -177,12 +182,7 @@ def stopInstalled():
     joinThreads(threads)
 
 # Loads an app.yml and converts it to a docker-compose.yml
-
-
-def getApp(appFile: str, appId: str):
-    with open(appFile, 'r') as f:
-        app = yaml.safe_load(f)
-
+def getApp(app, appId: str):
     if not "metadata" in app:
         raise Exception("Error: Could not find metadata in " + appFile)
     app["metadata"]["id"] = appId
