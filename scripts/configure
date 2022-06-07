@@ -38,7 +38,7 @@ dependencies = False
 def is_compose_version_except(target_version):
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
-    if output.decode('utf-8').strip() != 'Docker Compose version v{}'.format(target_version):
+    if output.decode('utf-8').strip() != 'Docker Compose version {}'.format(target_version):
       return True
     else:
       return False
@@ -57,7 +57,7 @@ def download_docker_compose():
 
   if is_compose_version_except(dependencies['compose']):
     print("Docker compose not found or not required version, updating.")
-    compose_url = 'https://github.com/docker/compose/releases/download/v{}/docker-compose-linux-{}'.format(dependencies['compose'], compose_arch)
+    compose_url = 'https://github.com/docker/compose/releases/download/{}/docker-compose-linux-{}'.format(dependencies['compose'], compose_arch)
     compose_file = os.path.expanduser('~/.docker/cli-plugins/docker-compose')
     subprocess.check_call(['wget', compose_url, '-O', compose_file])
     os.chmod(compose_file, 0o755)
