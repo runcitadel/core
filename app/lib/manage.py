@@ -90,19 +90,24 @@ def update(verbose: bool = False):
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
-        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-        appYml = os.path.join(appsDir, app, "app.yml")
-        with open(appYml, 'r') as f:
-            appDefinition = yaml.safe_load(f)
-        if 'citadel_version' in appDefinition:
-            os.system("docker run -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml apps/{}/docker-compose.yml".format(appsDir, app, app, app))
-        else:
-            appCompose = getApp(appDefinition, app)
-            with open(composeFile, "w") as f:
-                if appCompose:
-                    f.write(yaml.dump(appCompose, sort_keys=False))
-                    if verbose:
-                        print("Wrote " + app + " to " + composeFile)
+        try:
+            composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+            appYml = os.path.join(appsDir, app, "app.yml")
+            with open(appYml, 'r') as f:
+                appDefinition = yaml.safe_load(f)
+            if 'citadel_version' in appDefinition:
+                os.system("docker run -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml apps/{}/docker-compose.yml".format(appsDir, app, app, app))
+            else:
+                appCompose = getApp(appDefinition, app)
+                with open(composeFile, "w") as f:
+                    if appCompose:
+                        f.write(yaml.dump(appCompose, sort_keys=False))
+                        if verbose:
+                            print("Wrote " + app + " to " + composeFile)
+        except Exception as err:
+            print("Failed to convert app {}".format(app))
+            print(err)
+        
     print("Generated configuration successfully")
 
 
