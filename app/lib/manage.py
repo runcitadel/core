@@ -96,6 +96,7 @@ def update(verbose: bool = False):
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
+                print("docker run -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml apps/{}/docker-compose.yml".format(appsDir, app, app, app))
                 os.system("docker run -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml apps/{}/docker-compose.yml".format(appsDir, app, app, app))
             else:
                 appCompose = getApp(appDefinition, app)
