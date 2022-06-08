@@ -4,10 +4,11 @@
 
 import os
 import yaml
+import traceback
 
 from lib.composegenerator.next.stage1 import createCleanConfigFromV3
 from lib.composegenerator.v2.networking import getMainContainer
-from lib.composegenerator.v1.networking import getFreePort
+from lib.composegenerator.shared.networking import getFreePort
 from lib.entropy import deriveEntropy
 from typing import List
 import json
@@ -46,6 +47,11 @@ def getAppRegistry(apps, app_path):
             try:
                 with open(app_yml_path, 'r') as f:
                     app_yml = yaml.safe_load(f.read())
+                version = False
+                if 'version' in app_yml:
+                    version = int(app_yml['version'])
+                elif 'citadel_version' in app_yml:
+                    version = int(app_yml['citadel_version'])
                 metadata: dict = app_yml['metadata']
                 metadata['id'] = app
                 metadata['path'] = metadata.get('path', '')
@@ -55,14 +61,16 @@ def getAppRegistry(apps, app_path):
                 if "mainContainer" in metadata:
                     metadata.pop("mainContainer")
                 app_metadata.append(metadata)
-                if(app_yml["version"] != 3):
+                if version < 3:
                     getPortsOldApp(app_yml, app)
-                else:
+                elif version == 3:
                     getPortsV3App(app_yml, app)
                     with open(app_cache_path, 'w') as f:
                         json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
+                elif version == 4:
+                    getPortsV4App(app_yml, app)
             except Exception as e:
-                print(e)
+                print(traceback.format_exc())
                 print("App {} is invalid!".format(app))
     appPortsToMap()
     return {
@@ -97,12 +105,12 @@ def getNewPort(usedPorts):
         lastPort2 = lastPort2 + 1
     return lastPort2
 
-def validatePort(appContainer, port, appId, priority: int, isDynamic = False): 
+def validatePort(containerName, appContainer, port, appId, priority: int, isDynamic = False): 
     if port not in appPorts and port not in citadelPorts and port != 0:
         appPorts[port] = {
             "app": appId,
             "port": port,
-            "container": appContainer["name"],
+            "container": containerName,
             "priority": priority,
             "dynamic": isDynamic,
         }
@@ -115,7 +123,7 @@ def validatePort(appContainer, port, appId, priority: int, isDynamic = False):
                 appPorts[port]  = {
                     "app": appId,
                     "port": port,
-                    "container": appContainer["name"],
+                    "container": containerName,
                     "priority": priority,
                     "dynamic": isDynamic,
                 }
@@ -128,7 +136,7 @@ def validatePort(appContainer, port, appId, priority: int, isDynamic = False):
                     appPorts[newPort]  = {
                         "app": appId,
                         "port": port,
-                        "container": appContainer["name"],
+                        "container": containerName,
                         "priority": priority,
                         "dynamic": isDynamic,
                     }
@@ -136,28 +144,41 @@ def validatePort(appContainer, port, appId, priority: int, isDynamic = False):
 def getPortsOldApp(app, appId):
     for appContainer in app["containers"]:
         if "port" in appContainer:
-            validatePort(appContainer, appContainer["port"], appId, 0)
+            validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
         if "ports" in appContainer:
             for port in appContainer["ports"]:
                 realPort = int(str(port).split(":")[0])
-                validatePort(appContainer, realPort, appId, 2)
+                validatePort(appContainer["name"], appContainer, realPort, appId, 2)
 
 
 def getPortsV3App(app, appId):
     for appContainer in app["containers"]:
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
-                validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 2)
+                validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 2)
             elif "preferredOutsidePort" in appContainer:
             
-                validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 1)
+                validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 1)
             else:
-                validatePort(appContainer, appContainer["port"], appId, 0)
+                validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
         elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
-                validatePort(appContainer, getNewPort(appPorts.keys()), appId, 0, True)
+                validatePort(appContainer["name"], appContainer, getNewPort(appPorts.keys()), appId, 0, True)
         if "requiredPorts" in appContainer:
             for port in appContainer["requiredPorts"]:
-                validatePort(appContainer, port, appId, 2)
+                validatePort(appContainer["name"], appContainer, port, appId, 2)
         if "requiredUdpPorts" in appContainer:
             for port in appContainer["requiredUdpPorts"]:
-                validatePort(appContainer, port, appId, 2)
+                validatePort(appContainer["name"], appContainer, port, appId, 2)
+
+def getPortsV4App(app, appId):
+    for appContainerName in app["services"].keys():
+        appContainer = app["services"][appContainerName]
+        if "port" in appContainer:
+            validatePort(appContainerName, appContainer, appContainer["port"], appId, 0)
+        if "required_ports" in appContainer:
+            if "tcp" in appContainer["required_ports"]:
+                for port in appContainer["required_ports"]["tcp"].keys():
+                    validatePort(appContainerName, appContainer, port, appId, 2)
+            if "udp" in appContainer["required_ports"]:
+                for port in appContainer["required_ports"]["udp"].keys():
+                    validatePort(appContainerName, appContainer, port, appId, 2)

@@ -7,8 +7,7 @@ from lib.citadelutils import parse_dotenv
 import json
 from os import path
 import random
-from lib.composegenerator.v1.networking import assignIp, assignPort
-
+from lib.composegenerator.shared.networking import assignIp, assignPort
 
 def getMainContainerIndex(app: App):
     if len(app.containers) == 1:
@@ -77,6 +76,8 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
         # If it doesn't contain a :, it's the port itself
         if mainPort == False:
             mainPort = mainContainer.ports[0]
+            if mainPort.find(":") != -1:
+                mainPort = mainPort.split(":")[1]
     else:
         mainContainer.ports = [portToAppend]
 
@@ -103,4 +104,3 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
     with open(envFile, 'a') as f:
         f.write("{}={}\n".format(portAsEnvVar, app.metadata.port))
     return app
-

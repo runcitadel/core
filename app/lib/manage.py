@@ -25,7 +25,6 @@ except Exception:
     print("Continuing anyway, but some features won't be available,")
     print("for example checking for app updates")
 
-from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
@@ -65,7 +64,7 @@ def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
         sourceMap = json.load(f)
     if not name in sourceMap:
-        print("Warning: App {} is not in the source map".format(name))
+        print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
         sourceMap = {
             name: {
                 "githubRepo": "runcitadel/core",
@@ -91,14 +90,26 @@ def update(verbose: bool = False):
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
-        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-        appYml = os.path.join(appsDir, app, "app.yml")
-        with open(composeFile, "w") as f:
-            appCompose = getApp(appYml, app)
-            if appCompose:
-                f.write(yaml.dump(appCompose, sort_keys=False))
-                if verbose:
-                    print("Wrote " + app + " to " + composeFile)
+        try:
+            composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+            appYml = os.path.join(appsDir, app, "app.yml")
+            with open(appYml, 'r') as f:
+                appDefinition = yaml.safe_load(f)
+            if 'citadel_version' in appDefinition:
+                os.chown(os.path.join(appsDir, app), 1000, 1000)
+                print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'c-lightning'".format(appsDir, app, app, app))
+                os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'c-lightning'".format(appsDir, app, app, app))
+            else:
+                appCompose = getApp(appDefinition, app)
+                with open(composeFile, "w") as f:
+                    if appCompose:
+                        f.write(yaml.dump(appCompose, sort_keys=False))
+                        if verbose:
+                            print("Wrote " + app + " to " + composeFile)
+        except Exception as err:
+            print("Failed to convert app {}".format(app))
+            print(err)
+        
     print("Generated configuration successfully")
 
 
@@ -123,7 +134,7 @@ def checkUpdateAvailable(name: str) -> bool:
     with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
         originalAppYml = yaml.safe_load(f)
     if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
-        print("App {} is not valid".format(name))
+        print("App {} is not valid".format(name), file=sys.stderr)
         return False
     return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
 
@@ -178,20 +189,12 @@ def stopInstalled():
     joinThreads(threads)
 
 # Loads an app.yml and converts it to a docker-compose.yml
-
-
-def getApp(appFile: str, appId: str):
-    with open(appFile, 'r') as f:
-        app = yaml.safe_load(f)
-
+def getApp(app, appId: str):
     if not "metadata" in app:
         raise Exception("Error: Could not find metadata in " + appFile)
     app["metadata"]["id"] = appId
 
-    if 'version' in app and str(app['version']) == "1":
-        print("Warning: App {} uses version 1 of the app.yml format, which is scheduled for removal in Citadel 0.1.0".format(appId))
-        return createComposeConfigFromV1(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "2":
+    if 'version' in app and str(app['version']) == "2":
         print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":

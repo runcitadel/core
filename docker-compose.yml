@@ -2,7 +2,7 @@ version: '3.8'
 services:
   tor:
     container_name: tor
-    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
+    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
     user: toruser
     restart: on-failure
     volumes:
@@ -15,7 +15,7 @@ services:
         ipv4_address: $TOR_PROXY_IP
   app-tor:
     container_name: app-tor
-    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
+    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
     user: toruser
     restart: on-failure
     volumes:
@@ -26,7 +26,7 @@ services:
         ipv4_address: $APPS_TOR_IP
   app-2-tor:
     container_name: app-2-tor
-    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
+    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
     user: toruser
     restart: on-failure
     volumes:
@@ -37,7 +37,7 @@ services:
         ipv4_address: $APPS_2_TOR_IP
   app-3-tor:
     container_name: app-3-tor
-    image: lncm/tor:0.4.6.8@sha256:c262923ffd0bd224a4a4123cf1c88eea11e2314566b7b7e8a1f77969deeb0208
+    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
     user: toruser
     restart: on-failure
     volumes:
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.12@sha256:102a44b938765be8224c63785949b90bf796670f01aef4e282d58a4c26a42595
+    image: ghcr.io/runcitadel/dashboard:v0.0.13@sha256:86be4a105e9599163866d2e4f79c4d4ab9725ce56d71d7d7341e4d0ab3441b54
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.13@sha256:3ced2643e12253fea46abb48a69dcd999d69d3d86ed9956ae0298d4f6be4f06d
+    image: ghcr.io/runcitadel/manager:v0.0.14@sha256:656efb89b5e0e849c40666ae6c4a36cf0def136fe0fab2da52889dacd7c2b688
     depends_on:
     - tor
     - redis
@@ -120,7 +120,6 @@ services:
     volumes:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
-    - ${PWD}/events/signals:/signals
     - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
@@ -253,6 +252,7 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+
 networks:
   default:
     name: citadel_main_network

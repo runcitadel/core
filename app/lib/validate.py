@@ -6,34 +6,25 @@ import os
 import yaml
 from jsonschema import validate
 import yaml
+import traceback
 
+scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+
+with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
+    schemaVersion2 = yaml.safe_load(f)
+with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
+    schemaVersion3 = yaml.safe_load(f)
 
 # Validates app data
 # Returns true if valid, false otherwise
-scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 def validateApp(app: dict):
-    with open(os.path.join(scriptDir, 'app-standard-v1.yml'), 'r') as f:
-        schemaVersion1 = yaml.safe_load(f)
-    with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
-        schemaVersion2 = yaml.safe_load(f)
-    with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
-        schemaVersion3 = yaml.safe_load(f)
-
-    if 'version' in app and str(app['version']) == "1":
-        try:
-            validate(app, schemaVersion1)
-            return True
-        # Catch and log any errors, and return false
-        except Exception as e:
-            print(e)
-            return False
-    elif 'version' in app and str(app['version']) == "2":
+    if 'version' in app and str(app['version']) == "2":
         try:
             validate(app, schemaVersion2)
             return True
         # Catch and log any errors, and return false
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             return False
     elif 'version' in app and str(app['version']) == "3":
         try:
@@ -41,12 +32,13 @@ def validateApp(app: dict):
             return True
         # Catch and log any errors, and return false
         except Exception as e:
-            print(e)
+            print(traceback.format_exc())
             return False
-    else:
+    elif 'version' not in app and 'citadel_version' not in app:
         print("Unsupported app version")
         return False
-
+    else:
+        return True
 
 # Read in an app.yml file and pass it to the validation function
 # Returns true if valid, false otherwise
@@ -113,12 +105,13 @@ def findAndValidateApps(dir: str):
                             should_continue=False
         if not should_continue:
             continue
-        for container in appyml['containers']:
-            if 'permissions' in container:
-                for permission in container['permissions']:
-                    if permission not in appyml['metadata']['dependencies'] and permission not in ["root", "hw"]:
-                        print("WARNING: App {}'s container '{}' requires the '{}' permission, but the app doesn't list it in it's dependencies".format(app, container['name'], permission))
-                        #apps.remove(app)
-                        # Skip to the next iteration of the loop
-                        continue
+        if 'containers' in appyml:
+            for container in appyml['containers']:
+                if 'permissions' in container:
+                    for permission in container['permissions']:
+                        if permission not in appyml['metadata']['dependencies'] and permission not in ["root", "hw"]:
+                            print("WARNING: App {}'s container '{}' requires the '{}' permission, but the app doesn't list it in it's dependencies".format(app, container['name'], permission))
+                            #apps.remove(app)
+                            # Skip to the next iteration of the loop
+                            continue
     return apps
