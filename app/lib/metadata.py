@@ -65,10 +65,10 @@ def getAppRegistry(apps, app_path):
                     getPortsOldApp(app_yml, app)
                 elif version == 3:
                     getPortsV3App(app_yml, app)
-                elif version == 4:
-                    getPortsV4App(app_yml, app)
                     with open(app_cache_path, 'w') as f:
                         json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
+                elif version == 4:
+                    getPortsV4App(app_yml, app)
             except Exception as e:
                 print(traceback.format_exc())
                 print("App {} is invalid!".format(app))
