@@ -106,7 +106,7 @@ def update(verbose: bool = False):
                         yaml.dump(resultYml["spec"], dockerComposeFile)
                     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
                     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
-                    with open(path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+                    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
                         f.write(resultYml["new_tor_entries"])
             else:
                 appCompose = getApp(appDefinition, app)
