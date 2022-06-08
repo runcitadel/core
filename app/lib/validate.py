@@ -105,12 +105,13 @@ def findAndValidateApps(dir: str):
                             should_continue=False
         if not should_continue:
             continue
-        for container in appyml['containers']:
-            if 'permissions' in container:
-                for permission in container['permissions']:
-                    if permission not in appyml['metadata']['dependencies'] and permission not in ["root", "hw"]:
-                        print("WARNING: App {}'s container '{}' requires the '{}' permission, but the app doesn't list it in it's dependencies".format(app, container['name'], permission))
-                        apps.remove(app)
-                        # Skip to the next iteration of the loop
-                        continue
+        if 'containers' in appyml:
+            for container in appyml['containers']:
+                if 'permissions' in container:
+                    for permission in container['permissions']:
+                        if permission not in appyml['metadata']['dependencies'] and permission not in ["root", "hw"]:
+                            print("WARNING: App {}'s container '{}' requires the '{}' permission, but the app doesn't list it in it's dependencies".format(app, container['name'], permission))
+                            apps.remove(app)
+                            # Skip to the next iteration of the loop
+                            continue
     return apps
