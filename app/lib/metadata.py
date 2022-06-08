@@ -144,11 +144,11 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
 def getPortsOldApp(app, appId):
     for appContainer in app["containers"]:
         if "port" in appContainer:
-            validatePort(appContainer, appContainer["port"], appId, 0)
+            validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
         if "ports" in appContainer:
             for port in appContainer["ports"]:
                 realPort = int(str(port).split(":")[0])
-                validatePort(appContainer, realPort, appId, 2)
+                validatePort(appContainer["name"], appContainer, realPort, appId, 2)
 
 
 def getPortsV3App(app, appId):
