@@ -21,7 +21,17 @@ function get_memory_usage() {
 function mem_usage_to_percent() {
   local mem_usage="$1"
   local total_mem="$(free -m | awk 'NR==2 {print $2}')"
-  echo "$(awk "BEGIN {printf \"%.1f\", $mem_usage / $total_mem * 100}")"
+  echo "$(awk "BEGIN {printf \"%.1f\", ${mem_usage/,/.} / ${total_mem/,/.} * 100}")"
+}
+
+function app_mem_usage() {
+  # For every container of the app, get the mem usage, save it, and at the end, print the total mem usage of the app
+    local mem_usage=0
+    for container in $(get_app_containers "$1"); do
+      # Use awk to add, it supports floating point numbers
+      mem_usage=$(awk "BEGIN {printf \"%.2f\", $mem_usage + $(get_memory_usage "$container")}")
+    done
+    echo "${1}: $mem_usage%"
 }
 
 get_total_used_mem_raw() {
@@ -35,7 +45,7 @@ get_total_used_mem() {
 # To get the containers of the app, list every container whose name starts with the name of the app
 get_app_containers () {
   local app_name="$1"
-  "${CITADEL_ROOT}/scripts/app" compose "${app_name}" ps | awk '{print $1}' | grep -v 'Name\|-----'
+  "${CITADEL_ROOT}/scripts/app" compose "${app_name}" ps | awk '{print $1}' | grep -v 'NAME'
 }
 
 # Get the memory usage of the whole system, excluding docker containers
@@ -48,22 +58,17 @@ get_system_memory_usage() {
 }
 
 main() {
-  echo "total: $(get_total_used_mem)%"&
+  echo "total: $(get_total_used_mem)%"
+  echo "system: $(get_system_memory_usage)%"
   for service in bitcoin lightning electrum tor; do
     echo "${service}: $(get_memory_usage "$service")%" &
   done
   for app in $("${CITADEL_ROOT}/scripts/app" ls-installed); do
-    # For every container of the app, get the mem usage, save it, and at the end, print the total mem usage of the app
-    local mem_usage=0
-    for container in $(get_app_containers "$app"); do
-      # Use awk to add, it supports floating point numbers
-      mem_usage=$(awk "BEGIN {printf \"%.2f\", $mem_usage + $(get_memory_usage "$container")}")
-    done
-    wait
-    echo "${app}: $mem_usage%"
+    app_mem_usage "${app}" &
   done
-  echo "system: $(get_system_memory_usage)%"
   wait
 }
 
+echo "Calculating memory usage..."
+echo "This may take a while, please wait..."
 main | sort --key 2 --numeric-sort --reverse
