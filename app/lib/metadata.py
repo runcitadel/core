@@ -4,6 +4,7 @@
 
 import os
 import yaml
+import traceback
 
 from lib.composegenerator.next.stage1 import createCleanConfigFromV3
 from lib.composegenerator.v2.networking import getMainContainer
