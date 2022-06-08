@@ -172,7 +172,7 @@ def getPortsV3App(app, appId):
 
 
 def getPortsV4App(app, appId):
-    for appContainer in app["services"]:
+    for appContainer in app["services"].items():
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
                 validatePort(appContainer, appContainer["preferredOutsidePort"], appId, 2)
