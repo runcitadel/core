@@ -97,8 +97,16 @@ def update(verbose: bool = False):
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
                 os.chown(os.path.join(appsDir, app), 1000, 1000)
-                print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'lnd'".format(appsDir, app, app, app))
-                os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'lnd'".format(appsDir, app, app, app))
+                print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
+                os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
+                with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
+                    resultYml = yaml.safe_load(resultFile)
+                    with open(composeFile, "w") as dockerComposeFile:
+                        yaml.dump(resultYml["spec"], dockerComposeFile)
+                    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+                    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+                    with open(path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+                        f.write(resultYml["new_tor_entries"])
             else:
                 appCompose = getApp(appDefinition, app)
                 with open(composeFile, "w") as f:
