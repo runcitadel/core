@@ -58,6 +58,7 @@ def assignIpV4(appId: str, containerName: str):
     scriptDir = path.dirname(path.realpath(__file__))
     nodeRoot = path.join(scriptDir, "..", "..", "..", "..")
     networkingFile = path.join(nodeRoot, "apps", "networking.json")
+    envFile = path.join(nodeRoot, ".env")
     cleanContainerName = containerName.strip()
     # If the name still contains a newline, throw an error
     if cleanContainerName.find("\n") != -1:
