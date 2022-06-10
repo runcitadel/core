@@ -8,7 +8,7 @@ import traceback
 
 from lib.composegenerator.next.stage1 import createCleanConfigFromV3
 from lib.composegenerator.v2.networking import getMainContainer
-from lib.composegenerator.shared.networking import getFreePort
+from lib.composegenerator.shared.networking import getFreePort, assignIpV4
 from lib.entropy import deriveEntropy
 from typing import List
 import json
@@ -173,6 +173,9 @@ def getPortsV3App(app, appId):
 def getPortsV4App(app, appId):
     for appContainerName in app["services"].keys():
         appContainer = app["services"][appContainerName]
+        if "enable_networking" in appContainer and not appContainer["enable_networking"]:
+            return
+        assignIpV4(appId, appContainerName)
         if "port" in appContainer:
             validatePort(appContainerName, appContainer, appContainer["port"], appId, 0)
         if "required_ports" in appContainer:
