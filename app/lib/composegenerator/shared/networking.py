@@ -55,6 +55,9 @@ def getFreePort(networkingFile: str, appId: str):
     return port
 
 def assignIpV4(appId: str, containerName: str):
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    nodeRoot = os.path.join(scriptDir, "..", "..", "..", "..")
+    networkingFile = os.path.join(nodeRoot, "apps", "networking.json")
     cleanContainerName = containerName.strip()
     # If the name still contains a newline, throw an error
     if cleanContainerName.find("\n") != -1:
