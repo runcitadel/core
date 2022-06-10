@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.14@sha256:656efb89b5e0e849c40666ae6c4a36cf0def136fe0fab2da52889dacd7c2b688
+    image: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
     depends_on:
     - tor
     - redis
@@ -162,7 +162,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.10@sha256:afd6e2b6f5ba27cde32f6f6d630ddc6dd46d1072871f7834d7424d0554d0f53d
+    image: ghcr.io/runcitadel/middleware:v0.0.11@sha256:e472da8cbfa67d9a9dbf321334fe65cdf20a0f9b6d6bab33fdf07210f54e7002
     depends_on:
     - manager
     - bitcoin
