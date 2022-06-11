@@ -13,7 +13,7 @@ CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 result=$(docker compose \
   --file "${CITADEL_ROOT}/docker-compose.yml" \
   --env-file "${CITADEL_ROOT}/.env" \
-  exec lnd lncli "$@")
+  exec lightning lncli "$@")
 
 # We need to echo with quotes to preserve output formatting
 echo "$result"
