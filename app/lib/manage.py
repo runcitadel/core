@@ -118,7 +118,7 @@ def update(verbose: bool = False):
                         raise Exception("Registry file not found")
 
                     for registryApp in registry:
-                        if registryApp['id'] == app.metadata.id:
+                        if registryApp['id'] == app:
                             registry[registry.index(registryApp)]['port'] = resultYml["port"]
                             break
 
