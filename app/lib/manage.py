@@ -108,6 +108,22 @@ def update(verbose: bool = False):
                     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
                     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
                         f.write(resultYml["new_tor_entries"])
+                    mainPort = resultYml["port"]
+                    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
+                    registry: list = []
+                    if os.path.isfile(registryFile):
+                        with open(registryFile, 'r') as f:
+                            registry = json.load(f)
+                    else:
+                        raise Exception("Registry file not found")
+
+                    for registryApp in registry:
+                        if registryApp['id'] == app.metadata.id:
+                            registry[registry.index(registryApp)]['port'] = resultYml["port"]
+                            break
+
+                    with open(registryFile, 'w') as f:
+                        json.dump(registry, f, indent=4, sort_keys=True)
             else:
                 appCompose = getApp(appDefinition, app)
                 with open(composeFile, "w") as f:
