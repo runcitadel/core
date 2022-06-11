@@ -31,6 +31,21 @@ args = parser.parse_args()
 # Function to install a service
 # To install it, read the service's YAML file (nodeRoot/services/name.yml) and add it to the main compose file (nodeRoot/docker-compose.yml)
 def setService(name, implementation):
+    # Get all available services
+    services = next(os.walk(os.path.join(nodeRoot, "services")))[1]
+
+    if not name in services:
+        print("\"{}\" is not a valid service.".format(name))
+        exit(1)
+
+    # Get all available implementations
+    implementations = next(os.walk(os.path.join(nodeRoot, "services", name)), (None, None, []))[2]
+    implementations = [x.split('.')[0] for x in implementations]
+
+    if not implementation in implementations:
+        print("\"{}\" is not a valid implementation.".format(implementation))
+        exit(1)
+
     # Read the YAML file
     with open(os.path.join(nodeRoot, "services", name, implementation + ".yml"), 'r') as stream:
         service = yaml.safe_load(stream)
