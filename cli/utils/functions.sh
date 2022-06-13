@@ -13,16 +13,37 @@ Flags:
     -v, --version                      Show version information for this CLI
 
 Commands:
-    debug                              View logs for troubleshooting
+    start                              Start the Citadel service
+    stop                               Stop the Citadel service safely
     restart                            Restart the Citadel service
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel
     backup                             Backup a choice of files and folders
-    set <command>                      Configure Citadel
+    set <command>                      Switch between Bitcoin & Lightning implementations
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
+    list                               List all installed services apps
+    logs <service>                     Show logs for an app or service
+    debug                              View logs for troubleshooting
 EOF
+}
+
+is_managed_by_systemd() {
+  if systemctl --all --type service | grep -q "$SERVICE_NAME"; then
+    echo true
+  else
+    echo false
+  fi
+}
+
+is_service_active() {
+  service_status=$(systemctl is-active $SERVICE_NAME)
+  if [[ "$service_status" = "active" ]]; then
+    echo true
+  else
+    echo false
+  fi
 }
 
 edit_file() {

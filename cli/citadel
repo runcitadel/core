@@ -10,6 +10,7 @@ CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 CLI_NAME="$(basename $0)"
 CLI_VERSION="0.0.1"
 CLI_DIR="$(dirname "$(readlink -f "$0")")"
+SERVICE_NAME="citadel-startup"
 EDITOR="${EDITOR:-micro}"
 
 source $CLI_DIR/utils/functions.sh
@@ -70,23 +71,57 @@ if [[ "$command" = "update" ]]; then
   exit
 fi
 
+# Start Citadel
+if [[ "$command" = "start" ]]; then
+  if $(is_managed_by_systemd); then
+    if $(is_service_active); then
+      echo 'Citadel is already running.'
+    else
+      sudo systemctl start citadel-startup
+    fi
+  else
+    sudo $CITADEL_ROOT/scripts/start
+  fi
+  exit
+fi
+
+# Stop Citadel
+if [[ "$command" = "stop" ]]; then
+  active=$(is_service_active)
+
+  if $(is_managed_by_systemd) && $active; then
+    if $(is_service_active); then
+      sudo systemctl stop citadel-startup
+    else
+      echo 'Citadel is not running.'
+    fi
+  else
+    sudo $CITADEL_ROOT/scripts/stop
+  fi
+  exit
+fi
+
 # Restart Citadel
 if [[ "$command" = "restart" ]]; then
-  sudo $CITADEL_ROOT/scripts/stop
-  sudo $CITADEL_ROOT/scripts/start
+  if $(is_managed_by_systemd); then
+    sudo systemctl restart $SERVICE_NAME
+  else
+    sudo $CITADEL_ROOT/scripts/stop
+    sudo $CITADEL_ROOT/scripts/start
+  fi
   exit
 fi
 
 # Reboot the system
 if [[ "$command" = "reboot" ]]; then
-  sudo $CITADEL_ROOT/scripts/stop || true
+  $CLI_NAME stop || true
   sudo reboot
   exit
 fi
 
 # Shutdown the system
 if [[ "$command" = "shutdown" ]]; then
-  sudo $CITADEL_ROOT/scripts/stop || true
+  $CLI_NAME stop || true
   sudo shutdown now
   exit
 fi
@@ -325,6 +360,64 @@ if [[ "$command" = "configure" ]]; then
 
   echo "No service or app \"$2\" not found."
   exit 1
+fi
+
+# List all installed services apps
+if [[ "$command" = "list" ]]; then
+  echo 'karen'
+  docker ps --format "{{.Names}}"
+  exit
+fi
+
+# Show logs for apps & services
+# TODO: enable multiple
+if [[ "$command" = "logs" ]]; then
+  if [ -z ${2+x} ]; then
+    echo "Specify an app or service to show logs for."
+    echo "To see all installed services & apps use \`$CLI_NAME list\`"
+    echo "Usage: \`$CLI_NAME $command <service>\`"
+    exit 1
+  fi
+
+  POSITIONAL_ARGS=()
+
+  follow=false
+  number_of_lines=10
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -f | --follow)
+      follow=true
+      shift # past argument
+      ;;
+    -n | --tail)
+      number_of_lines="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  if [[ "$2" = "karen" ]]; then
+    tail $($follow && echo "-f") -n $number_of_lines $CITADEL_ROOT/logs/karen.log
+  fi
+
+  docker compose logs $($follow && echo "-f") --tail $number_of_lines $@ || {
+    echo "To see all installed services & apps use \`$CLI_NAME list\`"
+    echo "Usage: \`$CLI_NAME $command <service>\`"
+    exit 1
+  }
+  exit
 fi
 
 # Show version information for this CLI
