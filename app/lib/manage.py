@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import asyncio
 import stat
 import sys
 import tempfile
@@ -33,8 +34,6 @@ from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
 
 # For an array of threads, join them and wait for them to finish
-
-
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
@@ -52,14 +51,40 @@ userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-
-
 def getArguments():
     arguments = ""
     for i in range(3, len(argv)):
         arguments += argv[i] + " "
     return arguments
 
+async def handleAppV4(app):
+    os.chown(os.path.join(appsDir, app), 1000, 1000)
+    print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
+    with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
+        resultYml = yaml.safe_load(resultFile)
+    with open(composeFile, "w") as dockerComposeFile:
+        yaml.dump(resultYml["spec"], dockerComposeFile)
+    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+        f.write(resultYml["new_tor_entries"])
+    mainPort = resultYml["port"]
+    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
+    registry: list = []
+    if os.path.isfile(registryFile):
+        with open(registryFile, 'r') as f:
+            registry = json.load(f)
+    else:
+        raise Exception("Registry file not found")
+
+    for registryApp in registry:
+        if registryApp['id'] == app:
+            registry[registry.index(registryApp)]['port'] = resultYml["port"]
+            break
+
+    with open(registryFile, 'w') as f:
+        json.dump(registry, f, indent=4, sort_keys=True)
 
 def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
@@ -97,33 +122,7 @@ def update(verbose: bool = False):
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
-                os.chown(os.path.join(appsDir, app), 1000, 1000)
-                print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
-                os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
-                with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
-                    resultYml = yaml.safe_load(resultFile)
-                    with open(composeFile, "w") as dockerComposeFile:
-                        yaml.dump(resultYml["spec"], dockerComposeFile)
-                    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
-                    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
-                    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
-                        f.write(resultYml["new_tor_entries"])
-                    mainPort = resultYml["port"]
-                    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
-                    registry: list = []
-                    if os.path.isfile(registryFile):
-                        with open(registryFile, 'r') as f:
-                            registry = json.load(f)
-                    else:
-                        raise Exception("Registry file not found")
-
-                    for registryApp in registry:
-                        if registryApp['id'] == app:
-                            registry[registry.index(registryApp)]['port'] = resultYml["port"]
-                            break
-
-                    with open(registryFile, 'w') as f:
-                        json.dump(registry, f, indent=4, sort_keys=True)
+                handleAppV4(app)
             else:
                 appCompose = getApp(appDefinition, app)
                 with open(composeFile, "w") as f:
