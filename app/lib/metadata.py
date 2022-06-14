@@ -6,7 +6,6 @@ import os
 import yaml
 import traceback
 
-from lib.composegenerator.next.stage1 import createCleanConfigFromV3
 from lib.composegenerator.v2.networking import getMainContainer
 from lib.composegenerator.shared.networking import assignIpV4
 from lib.entropy import deriveEntropy
@@ -42,7 +41,6 @@ def getAppRegistry(apps, app_path):
     app_metadata = []
     for app in apps:
         app_yml_path = os.path.join(app_path, app, 'app.yml')
-        app_cache_path = os.path.join(app_path, app, 'app.cache.json')
         if os.path.isfile(app_yml_path):
             try:
                 with open(app_yml_path, 'r') as f:
@@ -65,8 +63,6 @@ def getAppRegistry(apps, app_path):
                     getPortsOldApp(app_yml, app)
                 elif version == 3:
                     getPortsV3App(app_yml, app)
-                    with open(app_cache_path, 'w') as f:
-                        json.dump(createCleanConfigFromV3(app_yml, os.path.dirname(app_path)), f)
                 elif version == 4:
                     getPortsV4App(app_yml, app)
             except Exception as e:
