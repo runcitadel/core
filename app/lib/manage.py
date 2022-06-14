@@ -123,7 +123,7 @@ def update(verbose: bool = False):
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
-                thread = threading.Thread(target=handleAppV4, args=(app))
+                thread = threading.Thread(target=handleAppV4, args=(app,))
                 thread.start()
                 threads.append(thread)
             else:
