@@ -378,7 +378,7 @@ with open("docker-compose.yml", 'r') as stream:
 with open("db/dependencies.yml", 'r') as stream:
   dependencies = yaml.safe_load(stream)
 for service in ["manager", "middleware", "dashboard"]:
-  compose["services"][service][image] = dependencies[service]
+  compose["services"][service]["image"] = dependencies[service]
 with open("docker-compose.yml") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
