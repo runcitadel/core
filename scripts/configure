@@ -371,6 +371,17 @@ print("Generated configuration files\n")
 print("Checking if Docker Compose is installed...")
 download_docker_compose()
 
+print("Updating core services...")
+print()
+with open("docker-compose.yml", 'r') as stream:
+  compose = yaml.safe_load(stream)
+with open("db/dependencies.yml", 'r') as stream:
+  dependencies = yaml.safe_load(stream)
+for service in ["manager", "middleware", "dashboard"]:
+  compose[service][image] = dependencies[service]
+with open("docker-compose.yml") as stream:
+    yaml.dump(compose, stream, sort_keys=False)
+
 if not reconfiguring:
   print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure update')
