@@ -114,6 +114,7 @@ def update(verbose: bool = False):
         json.dump(registry["ports"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
+    threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
         try:
@@ -122,7 +123,9 @@ def update(verbose: bool = False):
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
-                handleAppV4(app)
+                thread = threading.Thread(target=handleAppV4, args=(app))
+                thread.start()
+                threads.append(thread)
             else:
                 appCompose = getApp(appDefinition, app)
                 with open(composeFile, "w") as f:
@@ -134,6 +137,7 @@ def update(verbose: bool = False):
             print("Failed to convert app {}".format(app))
             print(err)
         
+    joinThreads(threads)
     print("Generated configuration successfully")
 
 
