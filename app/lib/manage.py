@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import asyncio
 import stat
 import sys
 import tempfile
@@ -57,7 +56,7 @@ def getArguments():
         arguments += argv[i] + " "
     return arguments
 
-async def handleAppV4(app):
+def handleAppV4(app):
     os.chown(os.path.join(appsDir, app), 1000, 1000)
     print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
     os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
