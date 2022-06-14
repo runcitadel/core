@@ -16,6 +16,17 @@ if [[ $UID != 0 ]]; then
     exit 1
 fi
 
+[[ -f /etc/lsb-release ]] && source /etc/lsb-release
+
+if [ "${DISTRIB_ID}"="Ubuntu" ] && [ "${DISTRIB_RELEASE}"="20.04" ]; then
+  echo "Please learn to read."
+  echo "As our guide clearly mentions, Ubuntu 22.04 is the minimum version."
+  echo "You can update, then you can use Citadel."
+  exit 1
+fi
+
+exit 1
+
 check_dependencies () {
   for cmd in "$@"; do
     if ! command -v $cmd >/dev/null 2>&1; then
