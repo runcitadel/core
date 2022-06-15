@@ -187,22 +187,29 @@ def getUserData():
             userData = json.load(f)
     return userData
 
-def checkUpdateAvailable(name: str) -> bool:
+def checkUpdateAvailable(name: str):
     latestAppYml = yaml.safe_load(getAppYml(name))
     with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
         originalAppYml = yaml.safe_load(f)
     if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
         print("App {} is not valid".format(name), file=sys.stderr)
         return False
-    return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
+    if semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0:
+        return {
+            "updateFrom": originalAppYml["metadata"]["version"],
+            "updateTo": latestAppYml["metadata"]["version"]
+        }
+    else:
+        return False
 
 def getAvailableUpdates():
     availableUpdates = []
     apps = findAndValidateApps(appsDir)
     for app in apps:
         try:
-            if checkUpdateAvailable(app):
-                availableUpdates.append(app)
+            checkResult = checkUpdateAvailable(app)
+            if checkResult:
+                availableUpdates.append(checkResult)
         except Exception:
             print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
     return availableUpdates
