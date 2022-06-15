@@ -33,8 +33,6 @@ from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
 
-
-
 class FileLock:
     """Implements a file-based lock using flock(2).
     The lock file is saved in directory dir with name lock_name.
@@ -75,6 +73,9 @@ updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
+with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
+  dependencies = yaml.safe_load(file)
+
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
 def getArguments():
@@ -86,8 +87,7 @@ def getArguments():
 def handleAppV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
-    print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
-    os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, app, app, app))
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, dependencies['app-cli'], app, app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:

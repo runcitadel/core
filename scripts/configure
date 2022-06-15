@@ -375,8 +375,6 @@ print("Updating core services...")
 print()
 with open("docker-compose.yml", 'r') as stream:
   compose = yaml.safe_load(stream)
-with open("db/dependencies.yml", 'r') as stream:
-  dependencies = yaml.safe_load(stream)
 for service in ["manager", "middleware", "dashboard"]:
   compose["services"][service]["image"] = dependencies[service]
 with open("docker-compose.yml", "w") as stream:
