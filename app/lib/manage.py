@@ -203,13 +203,13 @@ def checkUpdateAvailable(name: str):
         return False
 
 def getAvailableUpdates():
-    availableUpdates = []
+    availableUpdates = {}
     apps = findAndValidateApps(appsDir)
     for app in apps:
         try:
             checkResult = checkUpdateAvailable(app)
             if checkResult:
-                availableUpdates.append(checkResult)
+                availableUpdates[app] = checkResult
         except Exception:
             print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
     return availableUpdates
