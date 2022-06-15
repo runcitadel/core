@@ -6,9 +6,11 @@ import stat
 import sys
 import tempfile
 import threading
+import random
 from typing import List
 from sys import argv
 import os
+import fcntl
 import requests
 import shutil
 import json
@@ -31,9 +33,31 @@ from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
 
+class FileLock:
+    """Implements a file-based lock using flock(2).
+    The lock file is saved in directory dir with name lock_name.
+    dir is the current directory by default.
+    """
+
+    def __init__(self, lock_name, dir="."):
+        self.lock_file = open(os.path.join(dir, lock_name), "w")
+
+    def acquire(self, blocking=True):
+        """Acquire the lock.
+        If the lock is not already acquired, return None.  If the lock is
+        acquired and blocking is True, block until the lock is released.  If
+        the lock is acquired and blocking is False, raise an IOError.
+        """
+        ops = fcntl.LOCK_EX
+        if not blocking:
+            ops |= fcntl.LOCK_NB
+        fcntl.flock(self.lock_file, ops)
+
+    def release(self):
+        """Release the lock. Return None even if lock not currently acquired"""
+        fcntl.flock(self.lock_file, fcntl.LOCK_UN)
+
 # For an array of threads, join them and wait for them to finish
-
-
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
@@ -49,16 +73,48 @@ updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
+with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
+  dependencies = yaml.safe_load(file)
+
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-
-
 def getArguments():
     arguments = ""
     for i in range(3, len(argv)):
         arguments += argv[i] + " "
     return arguments
 
+def handleAppV4(app):
+    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+    os.chown(os.path.join(appsDir, app), 1000, 1000)
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'c-lightning'".format(appsDir, dependencies['app-cli'], app, app, app))
+    with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
+        resultYml = yaml.safe_load(resultFile)
+    with open(composeFile, "w") as dockerComposeFile:
+        yaml.dump(resultYml["spec"], dockerComposeFile)
+    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+        f.write(resultYml["new_tor_entries"])
+    mainPort = resultYml["port"]
+    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
+    registry: list = []
+    lock = FileLock("citadeL_registry_lock", dir="/tmp")
+    lock.acquire()
+    if os.path.isfile(registryFile):
+        with open(registryFile, 'r') as f:
+            registry = json.load(f)
+    else:
+        raise Exception("Registry file not found")
+
+    for registryApp in registry:
+        if registryApp['id'] == app:
+            registry[registry.index(registryApp)]['port'] = resultYml["port"]
+            break
+
+    with open(registryFile, 'w') as f:
+        json.dump(registry, f, indent=4, sort_keys=True)
+    lock.release()
 
 def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
@@ -88,6 +144,7 @@ def update(verbose: bool = False):
         json.dump(registry["ports"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
+    threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
         try:
@@ -96,9 +153,9 @@ def update(verbose: bool = False):
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
             if 'citadel_version' in appDefinition:
-                os.chown(os.path.join(appsDir, app), 1000, 1000)
-                print("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'c-lightning'".format(appsDir, app, app, app))
-                os.system("docker run --rm -v {}:/apps -u 1000:1000 ghcr.io/runcitadel/app-cli:main /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/docker-compose.yml --services 'c-lightning'".format(appsDir, app, app, app))
+                thread = threading.Thread(target=handleAppV4, args=(app,))
+                thread.start()
+                threads.append(thread)
             else:
                 appCompose = getApp(appDefinition, app)
                 with open(composeFile, "w") as f:
@@ -110,6 +167,7 @@ def update(verbose: bool = False):
             print("Failed to convert app {}".format(app))
             print(err)
         
+    joinThreads(threads)
     print("Generated configuration successfully")
 
 

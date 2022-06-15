@@ -97,7 +97,7 @@ def createComposeConfigFromV3(app: dict, nodeRoot: str):
         del container.requiredPorts
     for container in newApp.containers:
         for udpPort in container.requiredUdpPorts:
-            container.ports.append("{}/udp:{}/udp".format(udpPort, udpPort))
+            container.ports.append("{}:{}/udp".format(udpPort, udpPort))
         del container.requiredUdpPorts
     newApp = configureMainPort(newApp, nodeRoot)
     newApp = configureHiddenServices(newApp, nodeRoot)
