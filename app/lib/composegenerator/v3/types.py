@@ -38,7 +38,7 @@ class Container:
     port: Union[int, None] = None
     requiredPorts: list = field(default_factory=list)
     requiredUdpPorts: list = field(default_factory=list)
-    preferredOutsidePort: Union[int, None] = None
+    #preferredOutsidePort: Union[int, None] = None
     requiresPort: Union[bool, None] = None
     environment: Union[dict, None] = None
     data: list = field(default_factory=list)

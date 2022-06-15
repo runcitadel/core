@@ -25,7 +25,6 @@ electrs/*
 fulcrumx/*
 nginx/*
 redis/*
-events/signals/*
 docker-compose.override.yml
 
 # Commit these empty directories
@@ -36,7 +35,6 @@ docker-compose.override.yml
 !db/citadel-seed
 db/citadel-seed/*
 !db/citadel-seed/.gitkeep
-!events/signals/.gitkeep
 !lnd/.gitkeep
 !logs/.gitkeep
 !tor/data/.gitkeep
@@ -46,9 +44,9 @@ db/citadel-seed/*
 !nginx/.gitkeep
 !redis/.gitkeep
 !fulcrumx/.gitkeep
-!events/signals/.gitkeep
 
 !**/*.license
 services/installed.json
 services/installed.yml
 
+events/karen

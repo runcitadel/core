@@ -77,6 +77,8 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
         # If it doesn't contain a :, it's the port itself
         if mainPort == False:
             mainPort = mainContainer.ports[0]
+            if mainPort.find(":") != -1:
+                mainPort = mainPort.split(":")[1]
     else:
         mainContainer.ports = [portToAppend]
 

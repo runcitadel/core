@@ -75,7 +75,7 @@ def is_builtin_type(obj):
 def classToDict(theClass):
   obj: dict = {}
   for key, value in theClass.__dict__.items():
-    if value is None or (isinstance(value, list) and len(value) == 0):
+    if type(value).__name__ == "NoneType" or (isinstance(value, list) and len(value) == 0):
       continue
     if isinstance(value, list):
       newList = []
@@ -83,7 +83,8 @@ def classToDict(theClass):
         if is_builtin_type(element):
           newList.append(element)
         else:
-          newList.append(classToDict(element))
+          if type(element).__name__ != "NoneType":
+            newList.append(classToDict(element))
         obj[key] = newList
     elif isinstance(value, dict):
       newDict = {}
@@ -95,8 +96,7 @@ def classToDict(theClass):
       obj[key] = newDict
     elif is_builtin_type(value):
       obj[key] = value
-    else:
-      #print(value)
+    elif type(value).__name__ != "NoneType":
       obj[key] = classToDict(value)
   return obj
   

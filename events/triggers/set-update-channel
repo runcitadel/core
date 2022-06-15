@@ -6,4 +6,4 @@
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
-"${CITADEL_ROOT}/scripts/set-update-channel" beta
+"${CITADEL_ROOT}/scripts/set-update-channel" "${1}"
