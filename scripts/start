@@ -19,9 +19,9 @@ fi
 [[ -f /etc/lsb-release ]] && source /etc/lsb-release
 
 if [ "${DISTRIB_ID}"="Ubuntu" ] && [ "${DISTRIB_RELEASE}"="20.04" ]; then
-  echo "Please learn to read."
-  echo "As our guide clearly mentions, Ubuntu 22.04 is the minimum version."
-  echo "You can update, then you can use Citadel."
+  echo "Ubuntu 22.04 is the minimum version required for Citadel."
+  echo "You can update using the following command, then you can use Citadel:"
+  echo "sudo do-release-upgrade"
   exit 1
 fi
 
