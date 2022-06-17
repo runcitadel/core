@@ -12,7 +12,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 30, "description": "Starting update", "updateTo": "$RELEASE"}
 EOF
 
-curl "https://github.com/runcitadel/core/blob/${RELEASE}/db/dependencies.yml" > "$CITADEL_ROOT"/db/dependencies
+curl "https://raw.githubusercontent.com/runcitadel/core/${RELEASE}/db/dependencies.yml" > "$CITADEL_ROOT"/db/dependencies
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 70, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
