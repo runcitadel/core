@@ -123,8 +123,8 @@ def getAppYml(name):
         print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
         sourceMap = {
             name: {
-                "githubRepo": "runcitadel/core",
-                "branch": "v2"
+                "githubRepo": "runcitadel/apps",
+                "branch": "v4-stable"
             }
         }
     url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
