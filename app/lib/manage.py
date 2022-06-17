@@ -263,6 +263,7 @@ def getApp(app, appId: str):
         print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":
+        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.3.0".format(appId))
         return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
