@@ -67,10 +67,9 @@ def findAndValidateApps(dir: str):
     for subdir in os.scandir(dir):
         if not subdir.is_dir():
             continue
-
         app_dir = subdir.path
         if os.path.isfile(os.path.join(app_dir, "app.yml")):
-            apps.append(name)
+            apps.append(subdir.name)
             # Read the app.yml and append it to app_data
             with open(os.path.join(app_dir, "app.yml"), 'r') as f:
                 app_data[subdir.name] = yaml.safe_load(f)
