@@ -64,16 +64,18 @@ def findApps(dir: str):
 def findAndValidateApps(dir: str):
     apps = []
     app_data = {}
-    for root, dirs, files in os.walk(dir, topdown=False):
-        for name in dirs:
-            app_dir = os.path.join(root, name)
-            if os.path.isfile(os.path.join(app_dir, "app.yml")):
-                apps.append(name)
-                # Read the app.yml and append it to app_data
-                with open(os.path.join(app_dir, "app.yml"), 'r') as f:
-                    app_data[name] = yaml.safe_load(f)
-            else:
-                print("App {} has no app.yml".format(name))
+    for subdir in os.scandir(dir):
+        if not subdir.is_dir():
+            continue
+
+        app_dir = subdir.path
+        if os.path.isfile(os.path.join(app_dir, "app.yml")):
+            apps.append(name)
+            # Read the app.yml and append it to app_data
+            with open(os.path.join(app_dir, "app.yml"), 'r') as f:
+                app_data[subdir.name] = yaml.safe_load(f)
+        else:
+            print("App {} has no app.yml".format(subdir.name))
     # Now validate all the apps using the validateAppFile function by passing the app.yml as an argument to it, if an app is invalid, remove it from the list
     for app in apps:
         appyml = app_data[app]
