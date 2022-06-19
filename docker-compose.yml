@@ -235,6 +235,13 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+    
+  app-cli:
+    container_name: app-cli
+    image: ghcr.io/runcitadel/app-cli:main@sha256:694e52fa9da1ac976165f269c17e27803032a05a76293dfe3589a50813306ded
+    volumes:
+    - ${PWD}/apps:/apps
+
 networks:
   default:
     name: citadel_main_network

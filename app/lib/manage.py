@@ -27,7 +27,6 @@ except Exception:
     print("Continuing anyway, but some features won't be available,")
     print("for example checking for app updates")
 
-from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
@@ -236,10 +235,7 @@ def getApp(app, appId: str):
         raise Exception("Error: Could not find metadata in " + appFile)
     app["metadata"]["id"] = appId
 
-    if 'version' in app and str(app['version']) == "1":
-        print("Warning: App {} uses version 1 of the app.yml format, which is scheduled for removal in Citadel 0.1.0".format(appId))
-        return createComposeConfigFromV1(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "2":
+    if 'version' in app and str(app['version']) == "2":
         print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":
