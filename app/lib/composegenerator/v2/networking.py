@@ -8,7 +8,7 @@ import json
 from os import path
 import random
 from lib.composegenerator.v2.utils.networking import getContainerHiddenService
-from lib.composegenerator.v1.networking import assignIp, assignPort
+from lib.composegenerator.shared.networking import assignIp, assignPort
 
 
 def getMainContainer(app: App) -> Container:
