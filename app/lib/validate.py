@@ -72,6 +72,8 @@ def findAndValidateApps(dir: str):
                 # Read the app.yml and append it to app_data
                 with open(os.path.join(app_dir, "app.yml"), 'r') as f:
                     app_data[name] = yaml.safe_load(f)
+            else:
+                print("App {} has no app.yml".format(name))
     # Now validate all the apps using the validateAppFile function by passing the app.yml as an argument to it, if an app is invalid, remove it from the list
     for app in apps:
         appyml = app_data[app]
