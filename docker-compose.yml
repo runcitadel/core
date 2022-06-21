@@ -223,6 +223,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   redis:
     container_name: redis
+    user: 1000:1000
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:
@@ -234,12 +235,6 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
-    
-  app-cli:
-    container_name: app-cli
-    image: ghcr.io/runcitadel/app-cli:main@sha256:694e52fa9da1ac976165f269c17e27803032a05a76293dfe3589a50813306ded
-    volumes:
-    - ${PWD}/apps:/apps
 
 networks:
   default:

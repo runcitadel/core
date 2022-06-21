@@ -2,5 +2,6 @@
     "version": "0.0.5",
     "name": "Citadel 0.0.5",
     "requires": ">=0.0.1",
+    "isQuickUpdate": false,
     "notes": "This update fixes a few bugs in the 0.0.4 release that were preventing some apps from working correctly."
 }
