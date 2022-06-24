@@ -447,7 +447,9 @@ fi
 
 # Show version information for this CLI
 if [[ "$command" = "--version" ]] || [[ "$command" = "-v" ]]; then
-  echo "$CLI_NAME v$CLI_VERSION"
+  citadel_version=$(jq -r '.version' $CITADEL_ROOT/info.json)
+  echo "Citadel v$citadel_version"
+  echo "citadel-cli v$CLI_VERSION"
   exit
 fi
 
