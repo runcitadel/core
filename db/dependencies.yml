@@ -1,5 +1,5 @@
 compose: v2.6.0
-dashboard: ghcr.io/runcitadel/dashboard:v0.0.15@sha256:a2cf5ad79367fb083db0f61e5a296aafee655c99af0c228680644c248ec674a5
-manager: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
+dashboard: ghcr.io/runcitadel/dashboard:fix-small-issues-and-translations@sha256:82059a11e50d77eec8edb20a8c0e1f821988ea176b928944738df1a93304c26e
+manager: ghcr.io/runcitadel/manager:v0.0.16@sha256:9de3acad76e957811ff7f81cdba8b9a280a79762d24e1bcd16a4517e5643dfca
 middleware: ghcr.io/runcitadel/middleware:v0.0.11@sha256:e472da8cbfa67d9a9dbf321334fe65cdf20a0f9b6d6bab33fdf07210f54e7002
 app-cli: ghcr.io/runcitadel/app-cli:main@sha256:f532923eac28cfac03579cbb440397bcf16c8730f291b39eeada8278331f7054
