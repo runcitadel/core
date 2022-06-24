@@ -13,6 +13,7 @@ Flags:
     -v, --version                      Show version information for this CLI
 
 Commands:
+    status                             Check the status of all services
     start                              Start the Citadel service
     stop                               Stop the Citadel service safely
     restart                            Restart the Citadel service

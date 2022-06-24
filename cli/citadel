@@ -24,10 +24,9 @@ else
   command="$1"
 fi
 
-# Debug Citadel
-if [[ "$command" = "debug" ]]; then
-  shift
-  sudo $CITADEL_ROOT/scripts/debug $@
+# Check Citadel Status
+if [[ "$command" = "status" ]]; then
+  docker container ls --format "table {{.Names}}\t{{.Status}}"
   exit
 fi
 
@@ -103,6 +102,16 @@ fi
 
 # Restart Citadel
 if [[ "$command" = "restart" ]]; then
+  shift
+
+  # TODO: enable restarting services
+
+  if [ ! -z ${1+x} ]; then
+    echo "Too many arguments."
+    echo "Usage: \`$CLI_NAME $command\`"
+    exit 1
+  fi
+
   if $(is_managed_by_systemd); then
     sudo systemctl restart $SERVICE_NAME
   else
@@ -370,8 +379,9 @@ if [[ "$command" = "list" ]]; then
 fi
 
 # Show logs for apps & services
-# TODO: enable multiple
 if [[ "$command" = "logs" ]]; then
+  shift
+
   if [ -z ${2+x} ]; then
     echo "Specify an app or service to show logs for."
     echo "To see all installed services & apps use \`$CLI_NAME list\`"
@@ -382,7 +392,6 @@ if [[ "$command" = "logs" ]]; then
   POSITIONAL_ARGS=()
 
   follow=false
-  number_of_lines=10
 
   while [[ $# -gt 0 ]]; do
     case $1 in
@@ -408,7 +417,16 @@ if [[ "$command" = "logs" ]]; then
 
   set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-  if [[ "$2" = "karen" ]]; then
+  # Set default number_of_lines if not set by user
+  if [ -z ${number_of_lines+x} ]; then
+    if [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
+      number_of_lines=40
+    else
+      number_of_lines=10
+    fi
+  fi
+
+  if [[ "$1" = "karen" ]]; then
     tail $($follow && echo "-f") -n $number_of_lines $CITADEL_ROOT/logs/karen.log
   fi
 
@@ -417,6 +435,13 @@ if [[ "$command" = "logs" ]]; then
     echo "Usage: \`$CLI_NAME $command <service>\`"
     exit 1
   }
+  exit
+fi
+
+# Debug Citadel
+if [[ "$command" = "debug" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/debug $@
   exit
 fi
 
