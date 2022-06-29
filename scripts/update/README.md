@@ -11,7 +11,7 @@ How over-the-air updates work on Citadel.
 
 1. New developments across the any/entire fleet of Citadel's services (bitcoind, lnd, dashboard, middleware, etc) are made, which maintain their own independent version-control and release-schedule. Subsequently, their new docker images are built, tagged and pushed to Docker Hub.
 
-2. The newly built and tagged images are updated in the main repository's (i.e. this repo) [`docker-compose.yml`](https://github.com/runcitadel/core/blob/main/docker-compose.yml) file.
+2. The newly built and tagged images are updated in the main repository's (i.e. this repo) [`docker-compose.yml.citadel`](https://github.com/runcitadel/core/blob/main/docker-compose.yml.citadel) file.
 
 3. Any new developments to the main repository (i.e. this repo) are made, eg. adding a new directory or a new config file.
 

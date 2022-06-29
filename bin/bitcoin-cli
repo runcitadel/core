@@ -10,8 +10,8 @@ set -euo pipefail
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
-result=$(docker compose \
-  --file "${CITADEL_ROOT}/docker-compose.yml" \
+result=$(docker compose -f docker-compose.yml.citadel \
+  --file "${CITADEL_ROOT}/docker-compose.yml.citadel" \
   --env-file "${CITADEL_ROOT}/.env" \
   exec bitcoin bitcoin-cli "$@")
 

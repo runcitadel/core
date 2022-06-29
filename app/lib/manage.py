@@ -90,7 +90,7 @@ def update(verbose: bool = False):
 
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
-        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+        composeFile = os.path.join(appsDir, app, "docker-compose.yml.citadel")
         appYml = os.path.join(appsDir, app, "app.yml")
         with open(composeFile, "w") as f:
             appCompose = getApp(appYml, app)
@@ -176,7 +176,7 @@ def stopInstalled():
         threads.append(thread)
     joinThreads(threads)
 
-# Loads an app.yml and converts it to a docker-compose.yml
+# Loads an app.yml and converts it to a docker-compose.yml.citadel
 
 
 def getApp(appFile: str, appId: str):
@@ -201,8 +201,8 @@ def compose(app, arguments):
         print("Warning: App {} doesn't exist on Citadel".format(app))
         return
     # Runs a compose command in the app dir
-    # Before that, check if a docker-compose.yml exists in the app dir
-    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+    # Before that, check if a docker-compose.yml.citadel exists in the app dir
+    composeFile = os.path.join(appsDir, app, "docker-compose.yml.citadel")
     commonComposeFile = os.path.join(appSystemDir, "docker-compose.common.yml")
     os.environ["APP_DOMAIN"] = subprocess.check_output(
         "hostname -s 2>/dev/null || echo 'citadel'", shell=True).decode("utf-8").strip() + ".local"
@@ -233,10 +233,10 @@ def compose(app, arguments):
             appHiddenServiceFile), shell=True).decode("utf-8").strip()
 
     if not os.path.isfile(composeFile):
-        print("Error: Could not find docker-compose.yml in " + app)
+        print("Error: Could not find docker-compose.yml.citadel in " + app)
         exit(1)
     os.system(
-        "docker compose --env-file '{}' --project-name '{}' --file '{}' --file '{}' {}".format(
+        "docker compose -f docker-compose.yml.citadel --env-file '{}' --project-name '{}' --file '{}' --file '{}' {}".format(
             os.path.join(nodeRoot, ".env"), app, commonComposeFile, composeFile, arguments))
 
 
