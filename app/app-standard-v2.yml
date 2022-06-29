@@ -167,7 +167,7 @@ properties:
           type: boolean
           description: >-
             Set this to true if the container shouldn't get an IP & port
-            exposed. This isn't necessary, but helps the docker-compose.yml.citadel generator to generate a cleaner output.
+            exposed. This isn't necessary, but helps the docker-compose.citadel.yml generator to generate a cleaner output.
         hiddenServicePorts:
           type: 
             - object

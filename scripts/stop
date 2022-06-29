@@ -37,4 +37,4 @@ echo
 
 echo "Stopping Docker services..."
 echo
-docker compose -f docker-compose.yml.citadel down
+docker compose -f docker-compose.citadel.yml down

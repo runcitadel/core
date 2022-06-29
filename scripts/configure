@@ -31,7 +31,7 @@ if not is_arm64 and not is_amd64:
   print('Citadel only works on arm64 and amd64!')
   exit(1)
 
-# Check the output of "docker compose -f docker-compose.yml.citadel version", if it matches "Docker Compose version v2.0.0-rc.3", return true
+# Check the output of "docker compose -f docker-compose.citadel.yml version", if it matches "Docker Compose version v2.0.0-rc.3", return true
 # Otherwise, return false
 def is_compose_rc_or_outdated():
   try:
