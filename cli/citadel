@@ -209,9 +209,9 @@ fi
 if [[ "$command" = "backup" ]]; then
   shift
 
-  if [ -z ${2+x} ]; then
+  if [ -z ${1+x} ]; then
     echo "Specify a path."
-    echo "Usage: \`$CLI_NAME $command <path>\`"
+    echo "Usage: \`$CLI_NAME $command <user>@<ip-address>:<path-to-backup>\`"
     exit 1
   fi
 
@@ -231,9 +231,14 @@ if [[ "$command" = "backup" ]]; then
   # TODO: stop services first
 
   if [[ ${result[*]} =~ "Static Channel Backup" ]]; then
-    mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
-    echo "Backing up LND Static Channel Backup (SCB)..."
-    cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/lnd/channel.backup"
+    # mkdir -p "${BACKUP_FOLDER_PATH}/lnd"
+    # echo "Backing up LND Static Channel Backup (SCB)..."
+    # cp --archive "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" "${BACKUP_FOLDER_PATH}/lnd/channel.backup"
+
+    rsync -vh --progress "${CITADEL_ROOT}/lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/channel.backup" $1
+
+    # echo "Run the following command on your other machine:"
+    # echo "\`rsync -vh --progress citadel@citadel:~/citadel/lnd/data/chain/bitcoin/mainnet/channel.backup .\`"
   fi
 
   if [[ ${result[*]} =~ "State files" ]]; then
