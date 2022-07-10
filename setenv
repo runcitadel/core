@@ -13,3 +13,5 @@ alias docker-compose="sudo docker compose"
 alias docker="sudo docker"
 alias debug="${CITADEL_ROOT}/scripts/debug"
 alias app="${CITADEL_ROOT}/scripts/app"
+
+export BOS_DEFAULT_LND_PATH="/home/citadel/citadel/lnd"
