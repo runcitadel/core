@@ -120,7 +120,6 @@ services:
     volumes:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
-    - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
@@ -226,7 +225,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   c-lightning:
     container_name: c-lightning
-    image: ghcr.io/runcitadel/core-ln:main@sha256:827264070bb07b74d695ca8e6505a241c1a8fbbef84b7a88cdee258811eb3112
+    image: ghcr.io/runcitadel/core-ln:main@sha256:e4ac6be508b2cb0c123bc1bb11831a22bec26073f29a5ed686f542b36812d4e0
     environment:
       LIGHTNINGD_NETWORK: bitcoin
       CL_REST_STATE_DIR: /data/.lightning
