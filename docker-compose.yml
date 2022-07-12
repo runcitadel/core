@@ -2,7 +2,7 @@ version: '3.8'
 services:
   tor:
     container_name: tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -15,7 +15,7 @@ services:
         ipv4_address: $TOR_PROXY_IP
   app-tor:
     container_name: app-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -26,7 +26,7 @@ services:
         ipv4_address: $APPS_TOR_IP
   app-2-tor:
     container_name: app-2-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -37,7 +37,7 @@ services:
         ipv4_address: $APPS_2_TOR_IP
   app-3-tor:
     container_name: app-3-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.15@sha256:a2cf5ad79367fb083db0f61e5a296aafee655c99af0c228680644c248ec674a5
+    image: ghcr.io/runcitadel/dashboard:fix-small-issues-and-translations@sha256:82059a11e50d77eec8edb20a8c0e1f821988ea176b928944738df1a93304c26e
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
+    image: ghcr.io/runcitadel/manager:v0.0.16@sha256:9de3acad76e957811ff7f81cdba8b9a280a79762d24e1bcd16a4517e5643dfca
     depends_on:
     - tor
     - redis
@@ -241,6 +241,7 @@ services:
         ipv4_address: $C_LIGHTNING_IP
   redis:
     container_name: redis
+    user: 1000:1000
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:

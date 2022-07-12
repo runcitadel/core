@@ -123,8 +123,8 @@ def getAppYml(name):
         print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
         sourceMap = {
             name: {
-                "githubRepo": "runcitadel/core",
-                "branch": "c-lightning-v3"
+                "githubRepo": "runcitadel/apps",
+                "branch": "v4-dev"
             }
         }
     url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
@@ -144,6 +144,7 @@ def update(verbose: bool = False):
         json.dump(registry["ports"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
+    os.system("docker pull {}".format(dependencies['app-cli']))
     threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
@@ -187,22 +188,29 @@ def getUserData():
             userData = json.load(f)
     return userData
 
-def checkUpdateAvailable(name: str) -> bool:
+def checkUpdateAvailable(name: str):
     latestAppYml = yaml.safe_load(getAppYml(name))
     with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
         originalAppYml = yaml.safe_load(f)
     if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
         print("App {} is not valid".format(name), file=sys.stderr)
         return False
-    return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
+    if semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0:
+        return {
+            "updateFrom": originalAppYml["metadata"]["version"],
+            "updateTo": latestAppYml["metadata"]["version"]
+        }
+    else:
+        return False
 
 def getAvailableUpdates():
-    availableUpdates = []
+    availableUpdates = {}
     apps = findAndValidateApps(appsDir)
     for app in apps:
         try:
-            if checkUpdateAvailable(app):
-                availableUpdates.append(app)
+            checkResult = checkUpdateAvailable(app)
+            if checkResult:
+                availableUpdates[app] = checkResult
         except Exception:
             print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
     return availableUpdates
@@ -256,6 +264,7 @@ def getApp(app, appId: str):
         print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":
+        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.3.0".format(appId))
         return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
