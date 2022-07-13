@@ -111,7 +111,7 @@ echo
 echo
 echo "Starting Docker services..."
 echo
-docker compose up --detach --build --remove-orphans || {
+docker compose -f docker-compose.citadel.yml up --detach --build --remove-orphans || {
   echo "Failed to start containers"
   exit 1
 }
