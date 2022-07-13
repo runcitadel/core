@@ -15,7 +15,7 @@ services:
         ipv4_address: $TOR_PROXY_IP
   app-tor:
     container_name: app-tor
-    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
+    lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
