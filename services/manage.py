@@ -29,7 +29,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 # Function to install a service
-# To install it, read the service's YAML file (nodeRoot/services/name.yml) and add it to the main compose file (nodeRoot/docker-compose.yml)
+# To install it, read the service's YAML file (nodeRoot/services/name.yml) and add it to the main compose file (nodeRoot/docker-compose.citadel.yml)
 def setService(name, implementation):
     # Get all available services
     services = next(os.walk(os.path.join(nodeRoot, "services")))[1]
@@ -51,14 +51,14 @@ def setService(name, implementation):
         service = yaml.safe_load(stream)
 
     # Read the main compose file
-    with open(os.path.join(nodeRoot, "docker-compose.yml"), 'r') as stream:
+    with open(os.path.join(nodeRoot, "docker-compose.citadel.yml"), 'r') as stream:
         compose = yaml.safe_load(stream)
 
     # Add the service to the main compose file
     compose['services'].update(service)
 
     # Write the main compose file
-    with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
+    with open(os.path.join(nodeRoot, "docker-compose.citadel.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     # If the file doesn't exist, put [] in it, then run the code below
@@ -81,7 +81,7 @@ def uninstallService(name):
         print("Service definition not found, cannot uninstall")
         exit(1)
     # Read the main compose file
-    with open(os.path.join(nodeRoot, "docker-compose.yml"), 'r') as stream:
+    with open(os.path.join(nodeRoot, "docker-compose.citadel.yml"), 'r') as stream:
         compose = yaml.safe_load(stream)
 
     # Remove the service from the main compose file
@@ -91,7 +91,7 @@ def uninstallService(name):
         pass
 
     # Write the main compose file
-    with open(os.path.join(nodeRoot, "docker-compose.yml"), 'w') as stream:
+    with open(os.path.join(nodeRoot, "docker-compose.citadel.yml"), 'w') as stream:
         yaml.dump(compose, stream, sort_keys=False)
     # Save the service name in nodeRoot/services/installed.json, which is a JSON file with a list of installed services
     try:
