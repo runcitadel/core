@@ -55,6 +55,12 @@ if [[ "$command" = "status" ]]; then
     docker container ls --format "table {{.Names}}\t{{.Status}}"
   fi
 
+  if [[ $(pgrep -f karen) ]]; then
+    printf "\nKaren is listening.\n"
+  else
+    printf "\nERROR: Karen is not listening.\n"
+  fi
+
   exit
 fi
 
