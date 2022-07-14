@@ -169,6 +169,38 @@ if [[ "$command" = "shutdown" ]]; then
   exit
 fi
 
+# List all installed services apps
+if [[ "$command" = "list" ]]; then
+  echo 'karen'
+  docker ps --format "{{.Names}}"
+  exit
+fi
+
+# Run a command inside a container
+if [[ "$command" = "run" ]]; then
+  shift
+
+  if [ -z ${1+x} ]; then
+    echo "Specify an app or service."
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  fi
+
+  if [ -z ${2+x} ]; then
+    echo "Specify a command to run."
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  fi
+
+  docker exec -t $1 sh -c "$2" || {
+    echo "To see all installed services & apps use \`$CLI_NAME list\`"
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  }
+
+  exit
+fi
+
 # Configure Citadel
 if [[ "$command" = "set" ]]; then
   shift
@@ -350,13 +382,6 @@ if [[ "$command" = "configure" ]]; then
 
   echo "No service or app \"$2\" not found."
   exit 1
-fi
-
-# List all installed services apps
-if [[ "$command" = "list" ]]; then
-  echo 'karen'
-  docker ps --format "{{.Names}}"
-  exit
 fi
 
 # Show logs for apps & services

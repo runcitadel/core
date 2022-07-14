@@ -20,10 +20,11 @@ Commands:
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel
+    list                               List all installed services apps
+    run <service> "<command>"          Run a command inside a container
     set <command>                      Switch between Bitcoin & Lightning implementations
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
-    list                               List all installed services apps
     logs <service>                     Show logs for an app or service
     debug                              View logs for troubleshooting
 EOF
