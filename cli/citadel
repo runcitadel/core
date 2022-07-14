@@ -26,7 +26,35 @@ fi
 
 # Check Citadel Status
 if [[ "$command" = "status" ]]; then
-  docker container ls --format "table {{.Names}}\t{{.Status}}"
+  POSITIONAL_ARGS=()
+
+  long=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -l | --long)
+      long=true
+      shift
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}"
+
+  if $long; then
+    docker container ls --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+  else
+    docker container ls --format "table {{.Names}}\t{{.Status}}"
+  fi
+
   exit
 fi
 
@@ -329,13 +357,6 @@ fi
 if [[ "$command" = "logs" ]]; then
   shift
 
-  if [ -z ${2+x} ]; then
-    echo "Specify an app or service to show logs for."
-    echo "To see all installed services & apps use \`$CLI_NAME list\`"
-    echo "Usage: \`$CLI_NAME $command <service>\`"
-    exit 1
-  fi
-
   POSITIONAL_ARGS=()
 
   follow=false
@@ -366,22 +387,39 @@ if [[ "$command" = "logs" ]]; then
 
   # Set default number_of_lines if not set by user
   if [ -z ${number_of_lines+x} ]; then
-    if [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
+    if [[ ${#POSITIONAL_ARGS[@]} == 0 ]] || [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
       number_of_lines=40
     else
       number_of_lines=10
     fi
   fi
 
-  if [[ "$1" = "karen" ]]; then
+  if [ -z ${1+x} ] || [[ "$1" = "karen" ]]; then
+    if [[ ${#POSITIONAL_ARGS[@]} == 2 ]]; then
+      echo "Karen logs cannot be viewed together with other services."
+      echo "Usage: \`$CLI_NAME $command karen\`"
+      exit 1
+    fi
+
     tail $($follow && echo "-f") -n $number_of_lines $CITADEL_ROOT/logs/karen.log
+    exit
   fi
 
-  docker compose logs $($follow && echo "-f") --tail $number_of_lines $@ || {
-    echo "To see all installed services & apps use \`$CLI_NAME list\`"
-    echo "Usage: \`$CLI_NAME $command <service>\`"
-    exit 1
-  }
+  if [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
+    docker logs $($follow && echo "-f") --tail $number_of_lines $@ || {
+      echo "To see all installed services & apps use \`$CLI_NAME list\`"
+      echo "Usage: \`$CLI_NAME $command <service>\`"
+      exit 1
+    }
+  else
+    # TODO: can only show logs for services in docker-compose.yml
+    docker compose logs $($follow && echo "-f") --tail $number_of_lines $@ || {
+      echo "To see all installed services & apps use \`$CLI_NAME list\`"
+      echo "Usage: \`$CLI_NAME $command <service>\`"
+      exit 1
+    }
+  fi
+
   exit
 fi
 
