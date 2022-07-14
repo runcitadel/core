@@ -20,7 +20,6 @@ Commands:
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel
-    backup                             Backup a choice of files and folders
     set <command>                      Switch between Bitcoin & Lightning implementations
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
