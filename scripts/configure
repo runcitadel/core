@@ -373,11 +373,11 @@ download_docker_compose()
 
 print("Updating core services...")
 print()
-with open("docker-compose.citadel.yml", 'r') as stream:
+with open("docker-compose.yml", 'r') as stream:
   compose = yaml.safe_load(stream)
 for service in ["manager", "middleware", "dashboard"]:
   compose["services"][service]["image"] = dependencies[service]
-with open("docker-compose.citadel.yml", "w") as stream:
+with open("docker-compose.yml", "w") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
 if not reconfiguring:

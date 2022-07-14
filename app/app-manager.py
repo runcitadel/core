@@ -58,12 +58,12 @@ elif args.action == 'generate':
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
-        os.system("docker compose -f docker-compose.citadel.yml stop app-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-tor")
-        os.system("docker compose -f docker-compose.citadel.yml stop app-2-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-2-tor")
-        os.system("docker compose -f docker-compose.citadel.yml stop app-3-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-3-tor")
+        os.system("docker compose stop app-tor")
+        os.system("docker compose start app-tor")
+        os.system("docker compose stop app-2-tor")
+        os.system("docker compose start app-2-tor")
+        os.system("docker compose stop app-3-tor")
+        os.system("docker compose start app-3-tor")
     exit(0)
 elif args.action == 'update':
     if args.app is None:
@@ -77,12 +77,12 @@ elif args.action == 'update':
     else:
         os.system(os.path.join(nodeRoot, "scripts", "configure"))
         os.chdir(nodeRoot)
-        os.system("docker compose -f docker-compose.citadel.yml stop app-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-tor")
-        os.system("docker compose -f docker-compose.citadel.yml stop app-2-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-2-tor")
-        os.system("docker compose -f docker-compose.citadel.yml stop app-3-tor")
-        os.system("docker compose -f docker-compose.citadel.yml start app-3-tor")
+        os.system("docker compose stop app-tor")
+        os.system("docker compose start app-tor")
+        os.system("docker compose stop app-2-tor")
+        os.system("docker compose start app-2-tor")
+        os.system("docker compose stop app-3-tor")
+        os.system("docker compose start app-3-tor")
     exit(0)
 elif args.action == 'ls-installed':
     # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps

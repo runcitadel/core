@@ -95,7 +95,7 @@ echo "Pulling new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 50, "description": "Pulling new containers", "updateTo": "$RELEASE"}
 EOF
-docker compose -f docker-compose.citadel.yml pull
+docker compose pull
 
 # Stopping karen
 echo "Stopping background daemon"

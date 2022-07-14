@@ -53,7 +53,7 @@ def findApps(dir: str):
     for root, dirs, files in os.walk(dir, topdown=False):
         for name in dirs:
             app_dir = os.path.join(root, name)
-            if os.path.isfile(os.path.join(app_dir, "app.yml")) or os.path.isfile(os.path.join(app_dir, "docker-compose.citadel.yml")):
+            if os.path.isfile(os.path.join(app_dir, "app.yml")) or os.path.isfile(os.path.join(app_dir, "docker-compose.yml")):
                 apps.append(name)
     return apps
 
