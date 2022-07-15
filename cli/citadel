@@ -1,0 +1,487 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+set -euo pipefail
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
+CLI_NAME="$(basename $0)"
+CLI_VERSION="0.0.1"
+CLI_DIR="$(dirname "$(readlink -f "$0")")"
+SERVICE_NAME="citadel-startup"
+EDITOR="${EDITOR:-micro}"
+
+source $CLI_DIR/utils/functions.sh
+source $CLI_DIR/utils/multiselect.sh
+source $CLI_DIR/utils/spinner.sh
+source $CLI_DIR/utils/helpers.sh
+
+if [ -z ${1+x} ]; then
+  command=""
+else
+  command="$1"
+fi
+
+# Check Citadel Status
+if [[ "$command" = "status" ]]; then
+  POSITIONAL_ARGS=()
+
+  long=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -l | --long)
+      long=true
+      shift
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}"
+
+  free -m | awk 'NR==2{printf "Memory Usage: %s/%sMB (%.2f%%)\n", $3,$2,$3*100/$2 }'
+  df -h | awk '$NF=="/"{printf "Disk Usage: %d/%dGB (%s)\n", $3,$2,$5}'
+  top -bn1 | grep load | awk '{printf "CPU Load: %.2f\n", $(NF-2)}'
+
+  echo
+
+  if $long; then
+    docker container ls --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+  else
+    docker container ls --format "table {{.Names}}\t{{.Status}}"
+  fi
+
+  if [[ $(pgrep -f karen) ]]; then
+    printf "\nKaren is listening.\n"
+  else
+    printf "\nERROR: Karen is not listening.\n"
+  fi
+
+  exit
+fi
+
+# Update Citadel
+if [[ "$command" = "update" ]]; then
+  POSITIONAL_ARGS=()
+
+  branch=$(get_update_channel)
+  force=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -b | --branch)
+      branch="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --force)
+      force=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  if $force; then
+    sudo rm -f $CITADEL_ROOT/statuses/update-in-progress
+  fi
+
+  sudo $CITADEL_ROOT/scripts/update/update --repo runcitadel/core#$branch
+
+  exit
+fi
+
+# Start Citadel
+if [[ "$command" = "start" ]]; then
+  if $(is_managed_by_systemd); then
+    if $(is_service_active); then
+      echo 'Citadel is already running.'
+    else
+      sudo systemctl start citadel-startup
+    fi
+  else
+    sudo $CITADEL_ROOT/scripts/start
+  fi
+  exit
+fi
+
+# Stop Citadel
+if [[ "$command" = "stop" ]]; then
+  active=$(is_service_active)
+
+  if $(is_managed_by_systemd) && $active; then
+    if $(is_service_active); then
+      sudo systemctl stop citadel-startup
+    else
+      echo 'Citadel is not running.'
+    fi
+  else
+    sudo $CITADEL_ROOT/scripts/stop
+  fi
+  exit
+fi
+
+# Restart Citadel
+if [[ "$command" = "restart" ]]; then
+  shift
+
+  # TODO: enable restarting services
+
+  if [ ! -z ${1+x} ]; then
+    echo "Too many arguments."
+    echo "Usage: \`$CLI_NAME $command\`"
+    exit 1
+  fi
+
+  if $(is_managed_by_systemd); then
+    sudo systemctl restart $SERVICE_NAME
+  else
+    sudo $CITADEL_ROOT/scripts/stop
+    sudo $CITADEL_ROOT/scripts/start
+  fi
+  exit
+fi
+
+# Reboot the system
+if [[ "$command" = "reboot" ]]; then
+  $CLI_NAME stop || true
+  sudo reboot
+  exit
+fi
+
+# Shutdown the system
+if [[ "$command" = "shutdown" ]]; then
+  $CLI_NAME stop || true
+  sudo shutdown now
+  exit
+fi
+
+# List all installed services apps
+if [[ "$command" = "list" ]]; then
+  echo 'karen'
+  docker ps --format "{{.Names}}"
+  exit
+fi
+
+# Run a command inside a container
+if [[ "$command" = "run" ]]; then
+  shift
+
+  if [ -z ${1+x} ]; then
+    echo "Specify an app or service."
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  fi
+
+  if [ -z ${2+x} ]; then
+    echo "Specify a command to run."
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  fi
+
+  docker exec -t $1 sh -c "$2" || {
+    echo "To see all installed services & apps use \`$CLI_NAME list\`"
+    echo "Usage: \`$CLI_NAME $command <service> \"<command>\"\`"
+    exit 1
+  }
+
+  exit
+fi
+
+# Configure Citadel
+if [[ "$command" = "set" ]]; then
+  shift
+
+  if [ -z ${1+x} ]; then
+    echo "Missing subcommand."
+    echo "Usage: \`$CLI_NAME $command <subcommand>\`"
+    exit 1
+  else
+    subcommand="$1"
+  fi
+
+  # Switch update channel
+  if [[ "$subcommand" = "update-channel" ]]; then
+    if [ -z ${2+x} ]; then
+      echo "Specify an update channel to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <stable|beta|c-lightning>\`"
+      exit 1
+    fi
+
+    case $2 in "stable" | "beta" | "c-lightning")
+      # continue
+      ;;
+    *)
+      echo "Not a valid update channel: \"$2\""
+      exit 1
+      ;;
+    esac
+
+    sudo $CITADEL_ROOT/scripts/set-update-channel $2
+    $CLI_NAME update
+    exit
+  fi
+
+  # Switch Bitcoin/Electrum implementation
+  if [[ "$subcommand" = "implementation" ]] || [[ "$subcommand" = "impl" ]]; then
+    shift
+    sudo $CITADEL_ROOT/services/manage.py set $@
+    $CLI_NAME restart
+    exit
+  fi
+
+  # Switch Bitcoin network
+  if [[ "$subcommand" = "network" ]]; then
+    shift
+
+    if [ -z ${1+x} ]; then
+      echo "Specify a network to switch to."
+      echo "Usage: \`$CLI_NAME $subcommand <mainnet|signet|testnet|regtest>\`"
+    else
+      case $1 in
+      "mainnet" | "testnet" | "signet" | "regtest")
+        sudo $CITADEL_ROOT/scripts/stop
+        sudo OVERWRITE_NETWORK=$1 $CITADEL_ROOT/scripts/configure
+        sudo $CITADEL_ROOT/scripts/start
+        ;;
+      *)
+        echo "Not a valid value for network"
+        exit 1
+        ;;
+      esac
+    fi
+
+    exit
+  fi
+
+  echo "\"$subcommand\" is not a valid subcommand."
+  exit 1
+fi
+
+# App commands
+if [[ "$command" = "app" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/app $@
+  exit
+fi
+
+# Edit common app configuration files
+if [[ "$command" = "configure" ]]; then
+  if [ -z ${2+x} ]; then
+    echo "Specify an app or service to configure."
+    echo "Usage: \`$CLI_NAME $command <service>\`"
+    exit 1
+  fi
+
+  POSITIONAL_ARGS=()
+
+  persist=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    --persist)
+      persist=true
+      shift # past argument
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  # These service and app configs are already persisted
+  # TODO: add more apps
+
+  if [[ "$2" = "nextcloud" ]]; then
+    edit_file --priviledged $CITADEL_ROOT/app-data/nextcloud/data/nextcloud/config/config.php
+    prompt_apply_config nextcloud-web-1 false
+    exit
+  fi
+
+  if [[ "$2" = "nginx" ]]; then
+    edit_file $CITADEL_ROOT/nginx/nginx.conf
+    prompt_apply_config nginx false
+    exit
+  fi
+
+  if $persist; then
+    echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."
+  else
+    echo "NOTE: Some changes to this configuration file may be overwritten the next time you start Citadel."
+    echo "To persist the changes run the command again with \`$CLI_NAME configure $2 --persist\`"
+  fi
+
+  read -p "Continue? [Y/n] " should_continue
+  echo
+  if [[ $should_continue =~ [Nn]$ ]]; then
+    exit
+  fi
+
+  # Service and app configs below may be overwritten
+  # TODO: check which implementation is running
+  # and do "bitcoin" / "lightning" / "electrum"
+
+  if [[ "$2" = "bitcoin" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/bitcoin-sample.conf
+      prompt_apply_config bitcoin true
+    else
+      edit_file $CITADEL_ROOT/bitcoin/bitcoin.conf
+      prompt_apply_config bitcoin false
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "lnd" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/lnd-sample.conf
+      prompt_apply_config lightning true
+    else
+      edit_file $CITADEL_ROOT/lnd/lnd.conf
+      prompt_apply_config lightning false
+    fi
+    exit
+  fi
+
+  if [[ "$2" = "electrs" ]]; then
+    edit_file $CITADEL_ROOT/templates/electrs-sample.toml
+    prompt_apply_config electrum true
+    exit
+  fi
+
+  if [[ "$2" = "fulcrumx" ]]; then
+    if $persist; then
+      edit_file $CITADEL_ROOT/templates/fulcrumx-sample.conf
+      prompt_apply_config electrum true
+    else
+      edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+      prompt_apply_config electrum false
+    fi
+    exit
+  fi
+
+  echo "No service or app \"$2\" not found."
+  exit 1
+fi
+
+# Show logs for apps & services
+if [[ "$command" = "logs" ]]; then
+  shift
+
+  POSITIONAL_ARGS=()
+
+  follow=false
+
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -f | --follow)
+      follow=true
+      shift # past argument
+      ;;
+    -n | --tail)
+      number_of_lines="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -* | --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift                   # past argument
+      ;;
+    esac
+  done
+
+  set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
+
+  # Set default number_of_lines if not set by user
+  if [ -z ${number_of_lines+x} ]; then
+    if [[ ${#POSITIONAL_ARGS[@]} == 0 ]] || [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
+      number_of_lines=40
+    else
+      number_of_lines=10
+    fi
+  fi
+
+  if [ -z ${1+x} ] || [[ "$1" = "karen" ]]; then
+    if [[ ${#POSITIONAL_ARGS[@]} == 2 ]]; then
+      echo "Karen logs cannot be viewed together with other services."
+      echo "Usage: \`$CLI_NAME $command karen\`"
+      exit 1
+    fi
+
+    tail $($follow && echo "-f") -n $number_of_lines $CITADEL_ROOT/logs/karen.log
+    exit
+  fi
+
+  if [[ ${#POSITIONAL_ARGS[@]} == 1 ]]; then
+    docker logs $($follow && echo "-f") --tail $number_of_lines $@ || {
+      echo "To see all installed services & apps use \`$CLI_NAME list\`"
+      echo "Usage: \`$CLI_NAME $command <service>\`"
+      exit 1
+    }
+  else
+    # TODO: can only show logs for services in docker-compose.yml
+    docker compose logs $($follow && echo "-f") --tail $number_of_lines $@ || {
+      echo "To see all installed services & apps use \`$CLI_NAME list\`"
+      echo "Usage: \`$CLI_NAME $command <service>\`"
+      exit 1
+    }
+  fi
+
+  exit
+fi
+
+# Debug Citadel
+if [[ "$command" = "debug" ]]; then
+  shift
+  sudo $CITADEL_ROOT/scripts/debug $@
+  exit
+fi
+
+# Show version information for this CLI
+if [[ "$command" = "--version" ]] || [[ "$command" = "-v" ]]; then
+  citadel_version=$(jq -r '.version' $CITADEL_ROOT/info.json)
+  echo "Citadel v$citadel_version"
+  echo "citadel-cli v$CLI_VERSION"
+  exit
+fi
+
+# Show usage information for this CLI
+if [[ "$command" = "--help" ]] || [[ "$command" = "-h" ]]; then
+  show_help
+  exit
+fi
+
+# If we get here it means no valid command was supplied
+# Show help and exit
+show_help
+exit
