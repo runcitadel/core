@@ -148,6 +148,7 @@ def update(verbose: bool = False):
     threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
+<<<<<<< feat/quick-updates -- Incoming Change
         try:
             composeFile = os.path.join(appsDir, app, "docker-compose.yml")
             appYml = os.path.join(appsDir, app, "app.yml")
@@ -169,6 +170,16 @@ def update(verbose: bool = False):
             print(err)
         
     joinThreads(threads)
+=======
+        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+        appYml = os.path.join(appsDir, app, "app.yml")
+        with open(composeFile, "w") as f:
+            appCompose = getApp(appYml, app)
+            if appCompose:
+                f.write(yaml.dump(appCompose, sort_keys=False))
+                if verbose:
+                    print("Wrote " + app + " to " + composeFile)
+>>>>>>> beta -- Current Change
     print("Generated configuration successfully")
 
 
@@ -255,7 +266,16 @@ def stopInstalled():
     joinThreads(threads)
 
 # Loads an app.yml and converts it to a docker-compose.yml
+<<<<<<< feat/quick-updates -- Incoming Change
 def getApp(app, appId: str):
+=======
+
+
+def getApp(appFile: str, appId: str):
+    with open(appFile, 'r') as f:
+        app = yaml.safe_load(f)
+
+>>>>>>> beta -- Current Change
     if not "metadata" in app:
         raise Exception("Error: Could not find metadata in " + appFile)
     app["metadata"]["id"] = appId

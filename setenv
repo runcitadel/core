@@ -7,7 +7,7 @@
 CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 
 alias citadel-update="${CITADEL_ROOT}/scripts/update/update"
-alias lncli="docker exec -it lnd lncli"
+alias lncli="docker exec -it lightning lncli"
 alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
 alias docker-compose="sudo docker compose"
 alias docker="sudo docker"

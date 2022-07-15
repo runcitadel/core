@@ -239,11 +239,7 @@ neutrino.addpeer=testnet2-btcd.zaphq.io
 elif BITCOIN_NETWORK == "signet":
   BITCOIN_RPC_PORT=38332
   BITCOIN_P2P_PORT=38333
-  NEUTRINO_PEERS='''
-[neutrino]
-neutrino.addpeer=testnet1-btcd.zaphq.io
-neutrino.addpeer=testnet2-btcd.zaphq.io
-  '''
+  BITCOIN_NODE="bitcoind"
 elif BITCOIN_NETWORK == "regtest":
   BITCOIN_RPC_PORT=18334
   BITCOIN_P2P_PORT=18335
