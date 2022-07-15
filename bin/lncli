@@ -10,8 +10,8 @@ set -euo pipefail
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
-result=$(docker compose -f docker-compose.citadel.yml \
-  --file "${CITADEL_ROOT}/docker-compose.citadel.yml" \
+result=$(docker compose \
+  --file "${CITADEL_ROOT}/docker-compose.yml" \
   --env-file "${CITADEL_ROOT}/.env" \
   exec lightning lncli "$@")
 
