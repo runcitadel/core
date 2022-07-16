@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.15@sha256:a2cf5ad79367fb083db0f61e5a296aafee655c99af0c228680644c248ec674a5
+    image: ghcr.io/runcitadel/dashboard:main@sha256:25b6fb413c10f47e186309c8737926c241c0f2bec923b2c08dd837b828f14dbd
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
+    image: ghcr.io/runcitadel/manager:main@sha256:db5775e986d53e762e43331540bb1c05a27b362da94d587c4a4591c981c00ee4
     depends_on:
     - tor
     - redis
@@ -162,7 +162,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.11@sha256:e472da8cbfa67d9a9dbf321334fe65cdf20a0f9b6d6bab33fdf07210f54e7002
+    image: ghcr.io/runcitadel/middleware:main@sha256:2fbbfb2e818bf0462f74a6aaab192881615ae018e6dcb62a50d05f82ec622cb0
     depends_on:
     - manager
     - bitcoin
@@ -223,6 +223,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   redis:
     container_name: redis
+    user: 1000:1000
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:
@@ -234,12 +235,6 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
-    
-  app-cli:
-    container_name: app-cli
-    image: ghcr.io/runcitadel/app-cli:main@sha256:694e52fa9da1ac976165f269c17e27803032a05a76293dfe3589a50813306ded
-    volumes:
-    - ${PWD}/apps:/apps
 
 networks:
   default:

@@ -10,7 +10,7 @@ NODE_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 # If $1 is not given, fail
 if [ -z "$1" ]; then
     echo "Usage: $0 <channel>"
-    echo "Channel can currently either be 'stable' or 'beta'"
+    echo "Channel can currently either be 'stable', 'beta' or 'c-lightning'"
     exit 1
 fi
 sed -i "s/UPDATE_CHANNEL=.*/UPDATE_CHANNEL=${1}/" "${NODE_ROOT}/.env"
