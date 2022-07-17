@@ -1,7 +1,7 @@
 {
-    "version": "0.0.6",
-    "name": "Citadel 0.0.6",
-    "requires": ">=0.0.1",
+    "version": "0.1.0-preview.1",
+    "name": "Citadel 0.10 Preview 1",
+    "requires": ">=0.0.5",
     "isQuickUpdate": false,
-    "notes": "This update fixes a security issue in Tor which could lead to slower Tor performance or your node being inaccessible via Tor."
+    "notes": "This update brings some of the new features for Citadel 0.1.0 and a lot of internal changes."
 }
