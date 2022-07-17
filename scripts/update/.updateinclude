@@ -9,3 +9,4 @@ apps/docker-compose.common.yml
 services/bitcoin/*
 services/electrum/*
 services/lightning/*
+db/dependencies.yml
