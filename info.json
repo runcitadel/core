@@ -1,6 +1,7 @@
 {
-    "version": "0.0.5",
-    "name": "Citadel 0.0.5",
-    "requires": ">=0.0.1",
-    "notes": "This update fixes a few bugs in the 0.0.4 release that were preventing some apps from working correctly."
+    "version": "0.1.0-preview.2",
+    "name": "Citadel 0.10 Preview 2",
+    "requires": ">=0.0.5",
+    "isQuickUpdate": false,
+    "notes": "This update brings some of the new features for Citadel 0.1.0 and a lot of internal changes."
 }

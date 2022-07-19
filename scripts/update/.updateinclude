@@ -10,3 +10,4 @@ c-lightning/.gitkeep
 services/bitcoin/*
 services/electrum/*
 services/lightning/*
+db/dependencies.yml

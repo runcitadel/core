@@ -2,7 +2,7 @@ version: '3.8'
 services:
   tor:
     container_name: tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -15,7 +15,7 @@ services:
         ipv4_address: $TOR_PROXY_IP
   app-tor:
     container_name: app-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -26,7 +26,7 @@ services:
         ipv4_address: $APPS_TOR_IP
   app-2-tor:
     container_name: app-2-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -37,7 +37,7 @@ services:
         ipv4_address: $APPS_2_TOR_IP
   app-3-tor:
     container_name: app-3-tor
-    image: lncm/tor:0.4.7.7@sha256:3c4ae833d2fefbea7d960f833a1e89fc9b2069a6e5f360109b5ddc9334ac0227
+    image: lncm/tor:0.4.7.8@sha256:aab30ebb496aa25934d6096951d8b200347c3c3ce5db3493695229efa2601f7b
     user: toruser
     restart: on-failure
     volumes:
@@ -79,7 +79,7 @@ services:
         ipv4_address: $BITCOIN_IP
   lightning:
     container_name: lightning
-    image: lightninglabs/lnd:v0.14.3-beta@sha256:6a2234b0aad4caed3d993736816b198d6228f32c59b27ba2218d5ebf516ae905
+    image: lightninglabs/lnd:v0.15.0-beta@sha256:d227a9db0727ff56020c8d6604c8c369757123d238ab6ce679579c2dd0d0d259
     user: 1000:1000
     depends_on:
     - tor
@@ -100,7 +100,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.13@sha256:86be4a105e9599163866d2e4f79c4d4ab9725ce56d71d7d7341e4d0ab3441b54
+    image: ghcr.io/runcitadel/dashboard:main@sha256:25b6fb413c10f47e186309c8737926c241c0f2bec923b2c08dd837b828f14dbd
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
+    image: ghcr.io/runcitadel/manager:main@sha256:db5775e986d53e762e43331540bb1c05a27b362da94d587c4a4591c981c00ee4
     depends_on:
     - tor
     - redis
@@ -161,7 +161,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.11@sha256:e472da8cbfa67d9a9dbf321334fe65cdf20a0f9b6d6bab33fdf07210f54e7002
+    image: ghcr.io/runcitadel/middleware:main@sha256:2fbbfb2e818bf0462f74a6aaab192881615ae018e6dcb62a50d05f82ec622cb0
     depends_on:
     - manager
     - bitcoin
@@ -240,6 +240,7 @@ services:
         ipv4_address: $C_LIGHTNING_IP
   redis:
     container_name: redis
+    user: 1000:1000
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:
@@ -251,6 +252,7 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+
 networks:
   default:
     name: citadel_main_network
