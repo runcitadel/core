@@ -120,6 +120,7 @@ services:
     volumes:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
+    - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
