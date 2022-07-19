@@ -73,6 +73,7 @@ def findAndValidateApps(dir: str):
             continue
         app_dir = subdir.path
         if os.path.isfile(os.path.join(app_dir, "app.yml.jinja")):
+            os.chown(os.path.join(app_dir, "app.yml.jinja"), 1000, 1000)
             os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli preprocess --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml.jinja /apps/{}/app.yml --services 'lnd'".format(dir, dependencies['app-cli'], subdir.name, subdir.name, subdir.name))
         if os.path.isfile(os.path.join(app_dir, "app.yml")):
             apps.append(subdir.name)
