@@ -9,11 +9,15 @@ import yaml
 import traceback
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
+nodeRoot = os.path.join(scriptDir, "..")
 
 with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
     schemaVersion2 = yaml.safe_load(f)
 with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
     schemaVersion3 = yaml.safe_load(f)
+
+with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
+  dependencies = yaml.safe_load(file)
 
 # Validates app data
 # Returns true if valid, false otherwise
@@ -68,6 +72,9 @@ def findAndValidateApps(dir: str):
         if not subdir.is_dir():
             continue
         app_dir = subdir.path
+        if os.path.isfile(os.path.join(app_dir, "app.yml.jinja")):
+            os.chown(app_dir, 1000, 1000)
+            os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli preprocess --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml.jinja /apps/{}/app.yml --services 'lnd'".format(dir, dependencies['app-cli'], subdir.name, subdir.name, subdir.name))
         if os.path.isfile(os.path.join(app_dir, "app.yml")):
             apps.append(subdir.name)
             # Read the app.yml and append it to app_data
