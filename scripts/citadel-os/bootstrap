@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+# Install dependencies
+pip3 install dacite
+
+cd $CITADEL_ROOT
+
+IMAGES=$(grep '^\s*image' docker-compose.yml | sed 's/image://' | sed 's/\"//g' | sed '/^$/d;s/[[:blank:]]//g' | sort | uniq)
+echo
+echo "Images to load: $IMAGES"
+echo
+
+while IFS= read -r image; do
+    docker pull --platform=linux/arm64 $image &
+done <<< "$IMAGES"
+
+wait
+
+# Initial configuration of Citadel
+./scripts/configure
+
+# Install system services
+cd scripts/citadel-os/services
+CITADEL_SYSTEMD_SERVICES=$(ls *.service)
+echo "Enabling Citadel systemd services: ${CITADEL_SYSTEMD_SERVICES}"
+for service in $CITADEL_SYSTEMD_SERVICES; do
+    install -m 644 "${service}"   "/etc/systemd/system/${service}"
+    systemctl enable "${service}"
+done
+
+# Disable setup services
+systemctl disable citadel-setup.service
+systemctl disable oem-boot.service
+
+# Reboot
+sudo reboot
