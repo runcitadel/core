@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+# Start a minimal web server that serves the public directory in the same dir as this script
+
+import os
+import http.server
+import socketserver
+
+current_dir = os.path.dirname(os.path.realpath(__file__))
+public_dir = os.path.join(current_dir, "public")
+
+PORT = 3000
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=public_dir, **kwargs)
+
+
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    httpd.serve_forever()
