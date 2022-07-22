@@ -118,26 +118,6 @@ def getUserData():
             userData = json.load(f)
     return userData
 
-def checkUpdateAvailable(name: str) -> bool:
-    latestAppYml = yaml.safe_load(getAppYml(name))
-    with open(os.path.join(appsDir, name, "app.yml"), "r") as f:
-        originalAppYml = yaml.safe_load(f)
-    if not "metadata" in latestAppYml or not "version" in latestAppYml["metadata"] or not "metadata" in originalAppYml or not "version" in originalAppYml["metadata"]:
-        print("App {} is not valid".format(name))
-        return False
-    return semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0
-
-def getAvailableUpdates():
-    availableUpdates = []
-    apps = findAndValidateApps(appsDir)
-    for app in apps:
-        try:
-            if checkUpdateAvailable(app):
-                availableUpdates.append(app)
-        except Exception:
-            print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
-    return availableUpdates
-
 def startInstalled():
     # If userfile doesn't exist, just do nothing
     userData = {}
@@ -364,3 +344,59 @@ def updateRepos():
         shutil.rmtree(tempDir)
     with open(os.path.join(appsDir, "sourceMap.json"), "w") as f:
         json.dump(sourceMap, f)
+
+
+def getAvailableUpdates():
+    availableUpdates = {}
+    repos = []
+    ignoreApps = []
+    with open(sourcesList) as f:
+        repos = f.readlines()
+    try:
+        with open(updateIgnore) as f:
+            ignoreApps = f.readlines()
+    except: pass
+    # For each repo, clone the repo to a temporary dir, checkout the branch,
+    # and overwrite the current app dir with the contents of the temporary dir/apps/app
+    # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
+    # but apps specified in updateignore have the highest priority
+    alreadyDefined = [s.strip() for s in ignoreApps]
+    for repo in repos:
+        repo = repo.strip()
+        if repo == "":
+            continue
+        # Also ignore comments
+        if repo.startswith("#"):
+            continue
+        # Split the repo into the git url and the branch
+        repo = repo.split(" ")
+        if len(repo) != 2:
+            print("Error: Invalid repo format in " + sourcesList, file=sys.stderr)
+            exit(1)
+        gitUrl = repo[0]
+        branch = repo[1]
+        # Clone the repo to a temporary dir
+        tempDir = tempfile.mkdtemp()
+        # Git clone with a depth of 1 to avoid cloning the entire repo
+        # Don't print anything to stdout, as we don't want to see the git clone output
+        subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
+        # Overwrite the current app dir with the contents of the temporary dir/apps/app
+        for app in os.listdir(os.path.join(tempDir, "apps")):
+            try:
+                # if the app is already installed (or a simple file instead of a valid app), skip it
+                if app in alreadyDefined or not os.path.isdir(os.path.join(tempDir, "apps", app)):
+                    continue
+                with open(os.path.join(appsDir, app, "app.yml"), "r") as f:
+                    originalAppYml = yaml.safe_load(f)
+                with open(os.path.join(tempDir, "apps", app, "app.yml"), "r") as f:
+                    latestAppYml = yaml.safe_load(f)
+                if semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0:
+                    availableUpdates[app] = {
+                        "updateFrom": originalAppYml["metadata"]["version"],
+                        "updateTo": latestAppYml["metadata"]["version"]
+                    }
+            except Exception:
+                print("Warning: Can't check app {} (yet)".format(app), file=sys.stderr)
+        # Remove the temporary dir
+        shutil.rmtree(tempDir)
+    return availableUpdates
