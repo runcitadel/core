@@ -460,9 +460,7 @@ def getAvailableUpdates():
                         "updateTo": latestAppYml["metadata"]["version"]
                     }
             except Exception:
-                print("Warning: Can't check app {} yet".format(app), file=sys.stderr)
+                print("Warning: Can't check app {} (yet)".format(app), file=sys.stderr)
         # Remove the temporary dir
         shutil.rmtree(tempDir)
-    with open(os.path.join(appsDir, "sourceMap.json"), "w") as f:
-        json.dump(sourceMap, f)
     return availableUpdates
