@@ -16,7 +16,7 @@ Commands:
     status                             Check the status of all services
     start                              Start the Citadel service
     stop                               Stop the Citadel service safely
-    restart                            Restart the Citadel service
+    restart <service>                  Restart Citadel or individual services
     reboot                             Reboot the system
     shutdown                           Shutdown the system
     update                             Update Citadel

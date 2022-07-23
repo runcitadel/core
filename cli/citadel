@@ -140,24 +140,29 @@ if [[ "$command" = "stop" ]]; then
   exit
 fi
 
-# Restart Citadel
+# Restart Citadel or individual services
 if [[ "$command" = "restart" ]]; then
   shift
 
-  # TODO: enable restarting services
-
+  # restart Docker containers
   if [ ! -z ${1+x} ]; then
-    echo "Too many arguments."
-    echo "Usage: \`$CLI_NAME $command\`"
-    exit 1
+    docker restart $@ || {
+      echo "To see all installed services & apps use \`$CLI_NAME list\`"
+      echo "Usage: \`$CLI_NAME $command <service>\`"
+      exit 1
+    }
+
+    exit
   fi
 
+  # restart Citadel
   if $(is_managed_by_systemd); then
     sudo systemctl restart $SERVICE_NAME
   else
     sudo $CITADEL_ROOT/scripts/stop
     sudo $CITADEL_ROOT/scripts/start
   fi
+
   exit
 fi
 
@@ -177,6 +182,7 @@ fi
 
 # List all installed services apps
 if [[ "$command" = "list" ]]; then
+  # TODO: make this a bit nicer
   echo 'karen'
   docker ps --format "{{.Names}}"
   exit
