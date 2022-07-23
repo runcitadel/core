@@ -6,7 +6,6 @@
 
 CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 
-alias c="${CITADEL_ROOT}/bin/citadel"
 alias citadel="${CITADEL_ROOT}/bin/citadel"
 alias lncli="docker exec -it lightning lncli"
 alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
