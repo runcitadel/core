@@ -13,20 +13,20 @@ Flags:
     -v, --version                      Show version information for this CLI
 
 Commands:
-    status                             Check the status of all services
+    status [options]                   Check the status of all services
     start                              Start the Citadel service
     stop                               Stop the Citadel service safely
-    restart <service>                  Restart Citadel or individual services
+    restart [service]                  Restart Citadel or individual services
     reboot                             Reboot the system
     shutdown                           Shutdown the system
-    update                             Update Citadel
+    update [options]                   Update Citadel
     list                               List all installed services apps
     run <service> "<command>"          Run a command inside a container
     set <command>                      Switch between Bitcoin & Lightning implementations
     app <command>                      Install, update or restart apps
     configure <service>                Edit service & app configuration files
-    logs <service>                     Show logs for an app or service
-    debug                              View logs for troubleshooting
+    logs [service]                     Show logs for an app or service
+    debug [options]                    View logs for troubleshooting
 EOF
 }
 
