@@ -12,4 +12,4 @@ alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
 alias docker-compose="sudo docker compose"
 alias docker="sudo docker"
 
-export BOS_DEFAULT_LND_PATH="/home/citadel/citadel/lnd"
+export BOS_DEFAULT_LND_PATH="${CITADEL_ROOT}/lnd"
