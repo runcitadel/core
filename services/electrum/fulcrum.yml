@@ -4,12 +4,12 @@
 
 electrum:
   container_name: electrum
-  image: ghcr.io/runcitadel/fulcrumx:latest@sha256:a74abdfe8397f02482faed6bd828477c452df071129f66ad6596d0ab8d29cf39
+  image: cculianu/fulcrum:latest@sha256:c0543f8b8a5bf6b0c447d8525d6b4360a6c07532f7741f19cc2c179968e71848
   working_dir: /data
   volumes:
     - ${PWD}/bitcoin:/bitcoin:ro
-    - ${PWD}/fulcrumx:/data
-  command: /usr/bin/FulcrumX /data/fulcrumx.conf
+    - ${PWD}/fulcrum:/data
+  command: /usr/bin/Fulcrum /data/fulcrum.conf
   restart: on-failure
   stop_grace_period: 5m
   ports:
