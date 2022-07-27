@@ -22,7 +22,7 @@ statuses/*
 app-data
 apps
 electrs/*
-fulcrumx/*
+fulcrum/*
 nginx/*
 redis/*
 docker-compose.override.yml
@@ -43,7 +43,7 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !redis/.gitkeep
-!fulcrumx/.gitkeep
+!fulcrum/.gitkeep
 
 !**/*.license
 services/installed.json
