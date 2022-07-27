@@ -65,7 +65,7 @@ services:
         ipv4_address: $NGINX_IP
   bitcoin:
     container_name: bitcoin
-    image: nolim1t/bitcoinknots:v22.0.knots20211108@sha256:a475da2b2ecda55fcc65ea23e1a36c58b2c10549f1c3d3bb3c31c7dda1127354
+    image: ghcr.io/runcitadel/bitcoinknots:main@sha256:5fbee0f6f0d09d42aacc11c373ffe6162210c42ce21e6eba294e547e3ad80219
     depends_on:
     - tor
     volumes:
