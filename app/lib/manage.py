@@ -434,13 +434,12 @@ def getAvailableUpdates():
         # Split the repo into the git url and the branch
         repo = repo.split(" ")
         if len(repo) != 2:
-            print("Error: Invalid repo format in " + sourcesList)
+            print("Error: Invalid repo format in " + sourcesList, file=sys.stderr)
             exit(1)
         gitUrl = repo[0]
         branch = repo[1]
         # Clone the repo to a temporary dir
         tempDir = tempfile.mkdtemp()
-        print("Cloning the repository")
         # Git clone with a depth of 1 to avoid cloning the entire repo
         # Don't print anything to stdout, as we don't want to see the git clone output
         subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
