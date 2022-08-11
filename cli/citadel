@@ -375,12 +375,12 @@ if [[ "$command" = "configure" ]]; then
     exit
   fi
 
-  if [[ "$2" = "fulcrumx" ]]; then
+  if [[ "$2" = "fulcrum" ]]; then
     if $persist; then
-      edit_file $CITADEL_ROOT/templates/fulcrumx-sample.conf
+      edit_file $CITADEL_ROOT/templates/fulcrum-sample.conf
       prompt_apply_config electrum true
     else
-      edit_file $CITADEL_ROOT/fulcrumx/fulcrumx.conf
+      edit_file $CITADEL_ROOT/fulcrum/fulcrum.conf
       prompt_apply_config electrum false
     fi
     exit

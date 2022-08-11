@@ -1,6 +1,6 @@
 lightning:
   container_name: lightning
-  image: lightninglabs/lnd:v0.14.3-beta@sha256:6a2234b0aad4caed3d993736816b198d6228f32c59b27ba2218d5ebf516ae905
+  image: lightninglabs/lnd:v0.15.0-beta@sha256:d227a9db0727ff56020c8d6604c8c369757123d238ab6ce679579c2dd0d0d259
   user: 1000:1000
   depends_on:
   - tor
