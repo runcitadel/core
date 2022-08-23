@@ -44,29 +44,6 @@ def parse_dotenv(file_path):
         exit(1)
   return envVars
 
-# Combines an object and a class
-# If the key exists in both objects, the value of the second object is used
-# If the key does not exist in the first object, the value from the second object is used
-# If a key contains a list, the second object's list is appended to the first object's list
-# If a key contains another object, these objects are combined
-def combineObjectAndClass(theClass, obj: dict):
-  for key, value in obj.items():
-    if key in theClass.__dict__:
-      if isinstance(value, list):
-        if isinstance(theClass.__dict__[key], list):
-          theClass.__dict__[key].extend(value)
-        else:
-          theClass.__dict__[key] = [theClass.__dict__[key]] + value
-      elif isinstance(value, dict):
-        if isinstance(theClass.__dict__[key], dict):
-          theClass.__dict__[key].update(value)
-        else:
-          theClass.__dict__[key] = {theClass.__dict__[key]: value}
-      else:
-        theClass.__dict__[key] = value
-    else:
-      theClass.__dict__[key] = value
-
 def is_builtin_type(obj):
   return isinstance(obj, (int, float, str, bool, list, dict))
 
