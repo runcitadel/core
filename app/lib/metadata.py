@@ -39,6 +39,7 @@ def appPortsToMap():
 # Return a list of all app's metadata
 def getAppRegistry(apps, app_path):
     app_metadata = []
+    virtual_apps = {}
     for app in apps:
         app_yml_path = os.path.join(app_path, app, 'app.yml')
         if os.path.isfile(app_yml_path):
@@ -58,6 +59,11 @@ def getAppRegistry(apps, app_path):
                     metadata['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
                 if "mainContainer" in metadata:
                     metadata.pop("mainContainer")
+                if "implements" in metadata:
+                    implements = metadata["implements"]
+                    if implements not in virtual_apps:
+                        virtual_apps[implements] = []
+                    virtual_apps[implements].append(app)
                 app_metadata.append(metadata)
                 if version < 3:
                     getPortsOldApp(app_yml, app)
@@ -70,6 +76,7 @@ def getAppRegistry(apps, app_path):
                 print("App {} is invalid!".format(app))
     appPortsToMap()
     return {
+        "virtual_apps": virtual_apps,
         "metadata": app_metadata,
         "ports": appPortMap
     }

@@ -142,6 +142,8 @@ def update(verbose: bool = False):
         json.dump(registry["metadata"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
+        json.dump(registry["virtual_apps"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
     os.system("docker pull {}".format(dependencies['app-cli']))
