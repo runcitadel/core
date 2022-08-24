@@ -100,7 +100,7 @@ def handleAppV4(app):
     mainPort = resultYml["port"]
     registryFile = os.path.join(nodeRoot, "apps", "registry.json")
     registry: list = []
-    lock = FileLock("citadeL_registry_lock", dir="/tmp")
+    lock = FileLock("citadel_registry_lock", dir="/tmp")
     lock.acquire()
     if os.path.isfile(registryFile):
         with open(registryFile, 'r') as f:
