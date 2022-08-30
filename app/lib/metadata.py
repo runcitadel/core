@@ -102,9 +102,11 @@ citadelPorts = [
 
 lastPort = 3000
 
-def getNewPort(usedPorts):
+def getNewPort(appPorts, appId):
     lastPort2 = lastPort
-    while lastPort2 in usedPorts or lastPort2 in citadelPorts:
+    while lastPort2 in appPorts.keys() or lastPort2 in citadelPorts:
+        if lastPort2 in appPorts.keys() and appPorts[lastPort2]["app"] == appId:
+            return lastPort2
         lastPort2 = lastPort2 + 1
     return lastPort2
 
@@ -119,7 +121,7 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
         }
     else:
         if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != appContainer["name"]:
-            newPort = getNewPort(appPorts.keys())
+            newPort = getNewPort(appPorts.keys(), appId)
             if port in appPorts and priority > appPorts[port]["priority"]:
                 #print("Prioritizing app {} over {}".format(appId, appPorts[port]["app"]))
                 appPorts[newPort] = appPorts[port].copy()
