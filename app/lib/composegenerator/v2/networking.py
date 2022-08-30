@@ -9,6 +9,7 @@ from os import path
 import os
 import random
 from lib.composegenerator.shared.networking import assignIp
+from lib.citadelutils import FileLock
 
 def getFreePort(networkingFile: str, appId: str):
     # Ports used currently in Citadel
@@ -94,6 +95,8 @@ def assignPort(container: dict, appId: str, networkingFile: str, envFile: str):
 
 
 def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
+    lock = FileLock("citadel_registry_lock", dir="/tmp")
+    lock.acquire()
     registryFile = path.join(nodeRoot, "apps", "registry.json")
     registry: list = []
     if path.isfile(registryFile):
@@ -151,5 +154,5 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
 
     with open(registryFile, 'w') as f:
         json.dump(registry, f, indent=4, sort_keys=True)
-
+    lock.release()
     return app

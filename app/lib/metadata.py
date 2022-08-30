@@ -8,9 +8,6 @@ import traceback
 
 from lib.composegenerator.shared.networking import assignIpV4
 from lib.entropy import deriveEntropy
-from typing import List
-import json
-import random
 
 appPorts = {}
 appPortMap = {}
@@ -36,9 +33,10 @@ def appPortsToMap():
 # Also check the path and defaultPassword and set them to an empty string if they don't exist
 # In addition, set id on the metadata to the name of the app
 # Return a list of all app's metadata
-def getAppRegistry(apps, app_path):
+def getAppRegistry(apps, app_path, portCache):
     app_metadata = []
     virtual_apps = {}
+    appPorts = portCache
     for app in apps:
         app_yml_path = os.path.join(app_path, app, 'app.yml')
         if os.path.isfile(app_yml_path):
@@ -77,7 +75,8 @@ def getAppRegistry(apps, app_path):
     return {
         "virtual_apps": virtual_apps,
         "metadata": app_metadata,
-        "ports": appPortMap
+        "ports": appPortMap,
+        "portCache": appPorts,
     }
 
 citadelPorts = [
@@ -101,9 +100,11 @@ citadelPorts = [
 
 lastPort = 3000
 
-def getNewPort(usedPorts):
+def getNewPort(usedPorts, appId, containerName, allowExisting):
     lastPort2 = lastPort
-    while lastPort2 in usedPorts or lastPort2 in citadelPorts:
+    while lastPort2 in usedPorts.keys() or lastPort2 in citadelPorts:
+        if allowExisting and lastPort2 in usedPorts.keys() and usedPorts[lastPort2]["app"] == appId and usedPorts[lastPort2]["container"] == containerName:
+            break
         lastPort2 = lastPort2 + 1
     return lastPort2
 
@@ -117,10 +118,10 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
             "dynamic": isDynamic,
         }
     else:
-        if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != appContainer["name"]:
-            newPort = getNewPort(appPorts.keys())
+        if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != containerName:
             if port in appPorts and priority > appPorts[port]["priority"]:
                 #print("Prioritizing app {} over {}".format(appId, appPorts[port]["app"]))
+                newPort = getNewPort(appPorts, appPorts[port]["app"], appPorts[port]["container"], False)
                 appPorts[newPort] = appPorts[port].copy()
                 appPorts[port]  = {
                     "app": appId,
@@ -134,7 +135,8 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
                     disabledApps.append(appId)
                     print("App {} disabled because of port conflict".format(appId))
                 else:
-                    #print("Port conflict! Moving app {}'s container {} to port {} (from {})".format(appId, appContainer["name"], newPort, port))
+                    newPort = getNewPort(appPorts, appId, containerName, True)
+                    #print("Port conflict! Moving app {}'s container {} to port {} (from {})".format(appId, containerName, newPort, port))
                     appPorts[newPort]  = {
                         "app": appId,
                         "port": port,
@@ -164,7 +166,8 @@ def getPortsV3App(app, appId):
             else:
                 validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
         elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
-                validatePort(appContainer["name"], appContainer, getNewPort(appPorts.keys()), appId, 0, True)
+                # if the container does not define a port, assume 3000, and pass it to the container as env var
+                validatePort(appContainer["name"], appContainer, 3000, appId, 0, True)
         if "requiredPorts" in appContainer:
             for port in appContainer["requiredPorts"]:
                 validatePort(appContainer["name"], appContainer, port, appId, 2)

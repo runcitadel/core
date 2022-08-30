@@ -10,7 +10,6 @@ import random
 from typing import List
 from sys import argv
 import os
-import fcntl
 import requests
 import shutil
 import json
@@ -32,30 +31,7 @@ from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
-
-class FileLock:
-    """Implements a file-based lock using flock(2).
-    The lock file is saved in directory dir with name lock_name.
-    dir is the current directory by default.
-    """
-
-    def __init__(self, lock_name, dir="."):
-        self.lock_file = open(os.path.join(dir, lock_name), "w")
-
-    def acquire(self, blocking=True):
-        """Acquire the lock.
-        If the lock is not already acquired, return None.  If the lock is
-        acquired and blocking is True, block until the lock is released.  If
-        the lock is acquired and blocking is False, raise an IOError.
-        """
-        ops = fcntl.LOCK_EX
-        if not blocking:
-            ops |= fcntl.LOCK_NB
-        fcntl.flock(self.lock_file, ops)
-
-    def release(self):
-        """Release the lock. Return None even if lock not currently acquired"""
-        fcntl.flock(self.lock_file, fcntl.LOCK_UN)
+from lib.citadelutils import FileLock
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
@@ -109,7 +85,7 @@ def handleAppV4(app):
 
     for registryApp in registry:
         if registryApp['id'] == app:
-            registry[registry.index(registryApp)]['port'] = resultYml["port"]
+            registry[registry.index(registryApp)]['port'] = mainPort
             break
 
     with open(registryFile, 'w') as f:
@@ -136,12 +112,19 @@ def getAppYml(name):
 
 def update(verbose: bool = False):
     apps = findAndValidateApps(appsDir)
+    portCache = {}
+    try:
+        with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+            portCache = json.load(f)
+    except Exception: pass
     # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir)
+    registry = getAppRegistry(apps, appsDir, portCache)
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
         json.dump(registry["metadata"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+        json.dump(registry["portCache"], f, sort_keys=True)
     with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
         json.dump(registry["virtual_apps"], f, sort_keys=True)
     print("Wrote registry to registry.json")
