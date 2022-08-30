@@ -108,7 +108,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.17@sha256:ba436a07d6f96282217851756d8c81aeaa03c42dfa2246a89a78fc3384eed3cb
+    image: ghcr.io/runcitadel/manager:deno@sha256:38ef8474cc501d3f3e9ea63e73d1c48f848662467ffe5f7f0b9bbb44e04055cf
     depends_on:
     - tor
     - redis
@@ -128,7 +128,6 @@ services:
     - jwt-public-key:/jwt-public-key
     - jwt-private-key:/jwt-private-key
     environment:
-      PORT: '3006'
       USER_PASSWORD_FILE: /db/user.json
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       JWT_PRIVATE_KEY_FILE: /jwt-private-key/jwt.key
