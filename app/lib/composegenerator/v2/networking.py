@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from app.lib.citadelutils import parse_dotenv
+from lib.citadelutils import parse_dotenv
 from lib.composegenerator.v2.types import App, AppStage2, AppStage3, Container
 import json
 from os import path
