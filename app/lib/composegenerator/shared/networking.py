@@ -5,7 +5,7 @@
 import json
 from os import path
 import random
-from lib.composegenerator.v2.utils.networking import getContainerHiddenService
+from lib.composegenerator.shared.utils.networking import getContainerHiddenService
 from lib.composegenerator.v2.types import AppStage2, AppStage3, ContainerStage2, NetworkConfig, App, Container
 from lib.citadelutils import parse_dotenv
 from dacite import from_dict
