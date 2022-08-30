@@ -5,9 +5,9 @@
 import os
 
 from lib.citadelutils import classToDict
-from lib.composegenerator.shared.main import convertDataDirToVolume, convertContainersToServices
+from lib.composegenerator.shared.main import convertContainersToServices
 from lib.composegenerator.shared.env import validateEnv
-from lib.composegenerator.v2.networking import configureIps, configureHiddenServices
+from lib.composegenerator.shared.networking import configureIps, configureHiddenServices
 
 from lib.composegenerator.v3.types import App, AppStage2, AppStage4, generateApp
 from lib.composegenerator.v3.networking import configureMainPort

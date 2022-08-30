@@ -99,7 +99,6 @@ services:
       default:
         ipv4_address: $LND_IP
   dashboard:
-    container_name: dashboard
     image: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
     restart: on-failure
     stop_grace_period: 1m30s
@@ -231,6 +230,7 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+
 networks:
   default:
     name: citadel_main_network

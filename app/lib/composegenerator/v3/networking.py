@@ -2,13 +2,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from lib.composegenerator.v3.types import App, AppStage2, AppStage3, Container
-from lib.citadelutils import parse_dotenv
+from lib.composegenerator.v3.types import App, AppStage2, AppStage3
 import json
 from os import path
-import random
-from lib.composegenerator.v1.networking import assignIp, assignPort
-
+from lib.composegenerator.shared.networking import assignIp
+from lib.citadelutils import FileLock
 
 def getMainContainerIndex(app: App):
     if len(app.containers) == 1:
@@ -27,6 +25,8 @@ def getMainContainerIndex(app: App):
 
 
 def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
+    lock = FileLock("citadel_registry_lock", dir="/tmp")
+    lock.acquire()
     registryFile = path.join(nodeRoot, "apps", "registry.json")
     portsFile = path.join(nodeRoot, "apps", "ports.json")
     envFile = path.join(nodeRoot, ".env")
@@ -101,8 +101,8 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
 
     with open(registryFile, 'w') as f:
         json.dump(registry, f, indent=4, sort_keys=True)
+    lock.release()
 
     with open(envFile, 'a') as f:
         f.write("{}={}\n".format(portAsEnvVar, app.metadata.port))
     return app
-
