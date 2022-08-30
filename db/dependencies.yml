@@ -1,5 +1,5 @@
 compose: v2.10.2
 dashboard: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
-manager: ghcr.io/runcitadel/manager:deno@sha256:755aad8fc745ae189f89880356ce676e5146afaf0c7b250adcd9f65a0856db81
+manager: ghcr.io/runcitadel/manager:deno@sha256:896b98ab270355d053203c8e4a31df449b447ff1ef91ef86b1b0907400db1bd6
 middleware: ghcr.io/runcitadel/middleware:main@sha256:2aa20f31001ab9e61cda548acbd1864a598728731ad6121f050c6a41503866ae
 app-cli: ghcr.io/runcitadel/app-cli:main@sha256:6dad26faf652b930cb219a6261af8edfa84d5db4d679153700dbc1b136267bbf
