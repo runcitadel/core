@@ -121,7 +121,7 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
         }
     else:
         if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != appContainer["name"]:
-            newPort = getNewPort(appPorts.keys(), appId)
+            newPort = getNewPort(appPorts, appId)
             if port in appPorts and priority > appPorts[port]["priority"]:
                 #print("Prioritizing app {} over {}".format(appId, appPorts[port]["app"]))
                 appPorts[newPort] = appPorts[port].copy()
@@ -167,7 +167,7 @@ def getPortsV3App(app, appId):
             else:
                 validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
         elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
-                validatePort(appContainer["name"], appContainer, getNewPort(appPorts.keys()), appId, 0, True)
+                validatePort(appContainer["name"], appContainer, getNewPort(appPorts, appId), appId, 0, True)
         if "requiredPorts" in appContainer:
             for port in appContainer["requiredPorts"]:
                 validatePort(appContainer["name"], appContainer, port, appId, 2)
