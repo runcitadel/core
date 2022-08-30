@@ -232,7 +232,7 @@ def stopInstalled():
 # Loads an app.yml and converts it to a docker-compose.yml
 def getApp(app, appId: str):
     if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appFile)
+        raise Exception("Error: Could not find metadata in " + appId)
     app["metadata"]["id"] = appId
 
     if 'version' in app and str(app['version']) == "2":
