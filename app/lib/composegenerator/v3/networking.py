@@ -2,12 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from lib.composegenerator.v3.types import App, AppStage2, AppStage3, Container
-from lib.citadelutils import parse_dotenv
+from lib.composegenerator.v3.types import App, AppStage2, AppStage3
 import json
 from os import path
-import random
-from lib.composegenerator.shared.networking import assignIp, assignPort
+from lib.composegenerator.shared.networking import assignIp
 
 def getMainContainerIndex(app: App):
     if len(app.containers) == 1:

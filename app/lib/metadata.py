@@ -6,7 +6,6 @@ import os
 import yaml
 import traceback
 
-from lib.composegenerator.v2.networking import getMainContainer
 from lib.composegenerator.shared.networking import assignIpV4
 from lib.entropy import deriveEntropy
 from typing import List

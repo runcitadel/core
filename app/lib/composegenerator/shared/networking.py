@@ -5,54 +5,21 @@
 import json
 from os import path
 import random
-from lib.composegenerator.v2.types import ContainerStage2, NetworkConfig
+from app.lib.composegenerator.v2.utils.networking import getContainerHiddenService
+from lib.composegenerator.v2.types import AppStage2, AppStage3, ContainerStage2, NetworkConfig, App, Container
 from lib.citadelutils import parse_dotenv
 from dacite import from_dict
 
-def getFreePort(networkingFile: str, appId: str):
-    # Ports used currently in Citadel
-    usedPorts = [
-        # Dashboard
-        80,
-        # Sometimes used by nginx with some setups
-        433,
-        # Dashboard SSL
-        443,
-        # Bitcoin Core P2P
-        8333,
-        # LND gRPC
-        10009,
-        # LND REST
-        8080,
-        # Electrum Server
-        50001,
-        # Tor Proxy
-        9050,
-    ]
-    networkingData = {}
-    if path.isfile(networkingFile):
-        with open(networkingFile, 'r') as f:
-            networkingData = json.load(f)
-    if 'ports' in networkingData:
-        usedPorts += list(networkingData['ports'].values())
+def getMainContainer(app: App) -> Container:
+    if len(app.containers) == 1:
+        return app.containers[0]
     else:
-        networkingData['ports'] = {}
-
-    if appId in networkingData['ports']:
-        return networkingData['ports'][appId]
-
-    while True:
-        port = str(random.randint(1024, 49151))
-        if port not in usedPorts:
-            # Check if anyhing is listening on the specific port
-            if os.system("netstat -ntlp | grep " + port + " > /dev/null") != 0:
-                networkingData['ports'][appId] = port
-                break
-
-    with open(networkingFile, 'w') as f:
-        json.dump(networkingData, f)
-
-    return port
+        for container in app.containers:
+            # Main is recommended, support web for easier porting from Umbrel
+            if container.name == 'main' or container.name == 'web':
+                return container
+    # Fallback to first container
+    return app.containers[0]
 
 def assignIpV4(appId: str, containerName: str):
     scriptDir = path.dirname(path.realpath(__file__))
@@ -161,30 +128,44 @@ def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFil
         json.dump(networkingData, f)
     return container
 
+def configureIps(app: AppStage2, networkingFile: str, envFile: str):
+    for container in app.containers:
+        if container.network_mode and container.network_mode == "host":
+            continue
+        if container.noNetwork:
+            # Check if port is defined for the container
+            if container.port:
+                raise Exception("Port defined for container without network")
+            if getMainContainer(app).name == container.name:
+                raise Exception("Main container without network")
+            # Skip this iteration of the loop
+            continue
 
-def assignPort(container: dict, appId: str, networkingFile: str, envFile: str):
-    # Strip leading/trailing whitespace from container.name
-    container.name = container.name.strip()
-    # If the name still contains a newline, throw an error
-    if container.name.find("\n") != -1 or container.name.find(" ") != -1:
-        raise Exception("Newline or space in container name")
+        container = assignIp(container, app.metadata.id,
+                             networkingFile, envFile)
 
-    env_var = "APP_{}_{}_PORT".format(
-        appId.upper().replace("-", "_"),
-        container.name.upper().replace("-", "_")
-    )
+    return app
 
-    port = getFreePort(networkingFile, appId)
+def configureHiddenServices(app: AppStage3, nodeRoot: str) -> AppStage3:
+    dotEnv = parse_dotenv(path.join(nodeRoot, ".env"))
+    hiddenServices = ""
 
-    dotEnv = parse_dotenv(envFile)
-    if env_var in dotEnv and str(dotEnv[env_var]) == str(port):
-        return {"port": port, "env_var": "${{{}}}".format(env_var)}
+    mainContainer = getMainContainer(app)
 
-    # Now append a new line  with APP_{app_name}_{container_name}_PORT=${PORT} to the envFile
-    with open(envFile, 'a') as f:
-        f.write("{}={}\n".format(env_var, port))
+    for container in app.containers:
+        if container.network_mode and container.network_mode == "host":
+            continue
+        env_var = "APP_{}_{}_IP".format(
+            app.metadata.id.upper().replace("-", "_"),
+            container.name.upper().replace("-", "_")
+        )
+        hiddenServices += getContainerHiddenService(
+            app.metadata, container, dotEnv[env_var], container.name == mainContainer.name)
+        if container.hiddenServicePorts:
+            del container.hiddenServicePorts
 
-    # This is confusing, but {{}} is an escaped version of {} so it is ${{ {} }}
-    # where the outer {{ }} will be replaced by {} in the returned string
-    return {"port": port, "env_var": "${{{}}}".format(env_var)}
-
+    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    with open(path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+        f.write(hiddenServices)
+    return app
