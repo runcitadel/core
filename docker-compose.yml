@@ -165,7 +165,7 @@ services:
     - bitcoin
     - lightning
     - redis
-    command: sh -c "./start.sh"
+    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ././start.sh"
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
