@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+import fcntl
+import os
 
 # Helper functions
 
@@ -44,29 +46,6 @@ def parse_dotenv(file_path):
         exit(1)
   return envVars
 
-# Combines an object and a class
-# If the key exists in both objects, the value of the second object is used
-# If the key does not exist in the first object, the value from the second object is used
-# If a key contains a list, the second object's list is appended to the first object's list
-# If a key contains another object, these objects are combined
-def combineObjectAndClass(theClass, obj: dict):
-  for key, value in obj.items():
-    if key in theClass.__dict__:
-      if isinstance(value, list):
-        if isinstance(theClass.__dict__[key], list):
-          theClass.__dict__[key].extend(value)
-        else:
-          theClass.__dict__[key] = [theClass.__dict__[key]] + value
-      elif isinstance(value, dict):
-        if isinstance(theClass.__dict__[key], dict):
-          theClass.__dict__[key].update(value)
-        else:
-          theClass.__dict__[key] = {theClass.__dict__[key]: value}
-      else:
-        theClass.__dict__[key] = value
-    else:
-      theClass.__dict__[key] = value
-
 def is_builtin_type(obj):
   return isinstance(obj, (int, float, str, bool, list, dict))
 
@@ -99,4 +78,28 @@ def classToDict(theClass):
     elif type(value).__name__ != "NoneType":
       obj[key] = classToDict(value)
   return obj
+  
+class FileLock:
+    """Implements a file-based lock using flock(2).
+    The lock file is saved in directory dir with name lock_name.
+    dir is the current directory by default.
+    """
+
+    def __init__(self, lock_name, dir="."):
+        self.lock_file = open(os.path.join(dir, lock_name), "w")
+
+    def acquire(self, blocking=True):
+        """Acquire the lock.
+        If the lock is not already acquired, return None.  If the lock is
+        acquired and blocking is True, block until the lock is released.  If
+        the lock is acquired and blocking is False, raise an IOError.
+        """
+        ops = fcntl.LOCK_EX
+        if not blocking:
+            ops |= fcntl.LOCK_NB
+        fcntl.flock(self.lock_file, ops)
+
+    def release(self):
+        """Release the lock. Return None even if lock not currently acquired"""
+        fcntl.flock(self.lock_file, fcntl.LOCK_UN)
   

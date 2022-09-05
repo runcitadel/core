@@ -1,6 +1,7 @@
 {
-    "version": "0.0.7",
-    "name": "Citadel 0.0.7",
-    "requires": ">=0.0.1",
-    "notes": "While we are busy with the next huge update, you may need to wait longer for updates. This update updates Bitcoin Knots and LND to their latest versions to ensure apps can utilize their latest features. In addition, this update includes the Citadel CLI. More information on that will be published soon."
+    "version": "0.0.8",
+    "name": "Citadel 0.0.8",
+    "requires": ">=0.0.5",
+    "isQuickUpdate": false,
+    "notes": "This update includes a new version of the Citadel app system and includes a few new apps. With the new app system, Citadel can handle more apps and makes app development eaier."
 }

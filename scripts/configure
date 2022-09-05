@@ -31,13 +31,14 @@ if not is_arm64 and not is_amd64:
   print('Citadel only works on arm64 and amd64!')
   exit(1)
 
+dependencies = False
+
 # Check the output of "docker compose version", if it matches "Docker Compose version v2.0.0-rc.3", return true
 # Otherwise, return false
-def is_compose_rc_or_outdated():
+def is_compose_version_except(target_version):
   try:
     output = subprocess.check_output(['docker', 'compose', 'version'])
-    if output.decode('utf-8').strip() != 'Docker Compose version v2.3.3':
-      print("Using outdated Docker Compose, updating...")
+    if output.decode('utf-8').strip() != 'Docker Compose version {}'.format(target_version):
       return True
     else:
       return False
@@ -48,17 +49,19 @@ def is_compose_rc_or_outdated():
 def download_docker_compose():
   # Skip if os.path.expanduser('~/.docker/cli-plugins/docker-compose') exists
   subprocess.check_call(["mkdir", "-p", os.path.expanduser('~/.docker/cli-plugins/')])
-  if (os.path.exists(os.path.expanduser('~/.docker/cli-plugins/docker-compose')) or os.path.exists('/usr/lib/docker/cli-plugins/docker-compose')) and not is_compose_rc_or_outdated():
-    print("Found {}\n".format(subprocess.check_output(['docker', 'compose', 'version']).decode('utf-8').strip()))
-    return
-
-  print("Installing Docker Compose...\n")
-
   if is_arm64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-aarch64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
+    compose_arch = 'aarch64'
   elif is_amd64:
-    subprocess.check_call(['wget', 'https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64', '-O', os.path.expanduser('~/.docker/cli-plugins/docker-compose')])
-  os.chmod(os.path.expanduser('~/.docker/cli-plugins/docker-compose'), 0o755)
+    compose_arch = 'x86_64'
+  # We validate that no other case than the two above can happen before
+
+  if is_compose_version_except(dependencies['compose']):
+    print("Docker compose not found or not required version, updating.")
+    compose_url = 'https://github.com/docker/compose/releases/download/{}/docker-compose-linux-{}'.format(dependencies['compose'], compose_arch)
+    compose_file = os.path.expanduser('~/.docker/cli-plugins/docker-compose')
+    subprocess.check_call(['wget', compose_url, '-O', compose_file])
+    os.chmod(compose_file, 0o755)
+  
 
 if not shutil.which("wget"):
     print('Wget is not installed!')
@@ -71,6 +74,9 @@ if not shutil.which("docker"):
 # Switch to node root directory.
 CITADEL_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(CITADEL_ROOT)
+
+with open("./db/dependencies.yml", "r") as file: 
+  dependencies = yaml.safe_load(file)
 
 updating = False
 status_dir = os.path.join(CITADEL_ROOT, 'statuses')
@@ -364,6 +370,15 @@ print("Generated configuration files\n")
 
 print("Checking if Docker Compose is installed...")
 download_docker_compose()
+
+print("Updating core services...")
+print()
+with open("docker-compose.yml", 'r') as stream:
+  compose = yaml.safe_load(stream)
+for service in ["manager", "middleware", "dashboard"]:
+  compose["services"][service]["image"] = dependencies[service]
+with open("docker-compose.yml", "w") as stream:
+    yaml.dump(compose, stream, sort_keys=False)
 
 if not reconfiguring:
   print("Updating apps...\n")

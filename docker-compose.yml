@@ -51,7 +51,6 @@ services:
     image: nginx:1.21.6@sha256:2834dc507516af02784808c5f48b7cbe38b8ed5d0f4837f16e78d00deb7e7767
     depends_on:
     - dashboard
-    - manager
     volumes:
     - ${PWD}/nginx:/etc/nginx
     restart: on-failure
@@ -99,8 +98,7 @@ services:
       default:
         ipv4_address: $LND_IP
   dashboard:
-    container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.15@sha256:a2cf5ad79367fb083db0f61e5a296aafee655c99af0c228680644c248ec674a5
+    image: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +106,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.15@sha256:9fb5a86d9e40a04f93d5b6110d43a0f9a5c4ad6311a843b5442290013196a5ce
+    image: ghcr.io/runcitadel/manager:v0.0.17@sha256:ba436a07d6f96282217851756d8c81aeaa03c42dfa2246a89a78fc3384eed3cb
     depends_on:
     - tor
     - redis
@@ -162,13 +160,12 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:v0.0.11@sha256:e472da8cbfa67d9a9dbf321334fe65cdf20a0f9b6d6bab33fdf07210f54e7002
+    image: ghcr.io/runcitadel/middleware:main@sha256:2aa20f31001ab9e61cda548acbd1864a598728731ad6121f050c6a41503866ae
     depends_on:
-    - manager
     - bitcoin
     - lightning
     - redis
-    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
+    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ././start.sh"
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd
@@ -223,6 +220,7 @@ services:
         ipv4_address: $ELECTRUM_IP
   redis:
     container_name: redis
+    user: 1000:1000
     image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
     working_dir: /data
     volumes:
@@ -234,6 +232,7 @@ services:
     networks:
       default:
         ipv4_address: $REDIS_IP
+
 networks:
   default:
     name: citadel_main_network

@@ -6,6 +6,7 @@ import stat
 import sys
 import tempfile
 import threading
+import random
 from typing import List
 from sys import argv
 import os
@@ -25,16 +26,14 @@ except Exception:
     print("Continuing anyway, but some features won't be available,")
     print("for example checking for app updates")
 
-from lib.composegenerator.v1.generate import createComposeConfigFromV1
 from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
+from lib.citadelutils import FileLock
 
 # For an array of threads, join them and wait for them to finish
-
-
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
@@ -50,26 +49,58 @@ updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
+with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
+  dependencies = yaml.safe_load(file)
+
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-
-
 def getArguments():
     arguments = ""
     for i in range(3, len(argv)):
         arguments += argv[i] + " "
     return arguments
 
+def handleAppV4(app):
+    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+    os.chown(os.path.join(appsDir, app), 1000, 1000)
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
+    with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
+        resultYml = yaml.safe_load(resultFile)
+    with open(composeFile, "w") as dockerComposeFile:
+        yaml.dump(resultYml["spec"], dockerComposeFile)
+    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
+    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
+        f.write(resultYml["new_tor_entries"])
+    mainPort = resultYml["port"]
+    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
+    registry: list = []
+    lock = FileLock("citadel_registry_lock", dir="/tmp")
+    lock.acquire()
+    if os.path.isfile(registryFile):
+        with open(registryFile, 'r') as f:
+            registry = json.load(f)
+    else:
+        raise Exception("Registry file not found")
+
+    for registryApp in registry:
+        if registryApp['id'] == app:
+            registry[registry.index(registryApp)]['port'] = mainPort
+            break
+
+    with open(registryFile, 'w') as f:
+        json.dump(registry, f, indent=4, sort_keys=True)
+    lock.release()
 
 def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
         sourceMap = json.load(f)
     if not name in sourceMap:
-        print("Warning: App {} is not in the source map".format(name))
+        print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
         sourceMap = {
             name: {
-                "githubRepo": "runcitadel/core",
-                "branch": "v2"
+                "githubRepo": "runcitadel/apps",
+                "branch": "v4-stable"
             }
         }
     url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
@@ -81,24 +112,48 @@ def getAppYml(name):
 
 def update(verbose: bool = False):
     apps = findAndValidateApps(appsDir)
+    portCache = {}
+    try:
+        with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+            portCache = json.load(f)
+    except Exception: pass
     # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir)
+    registry = getAppRegistry(apps, appsDir, portCache)
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
         json.dump(registry["metadata"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+        json.dump(registry["portCache"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
+        json.dump(registry["virtual_apps"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
+    os.system("docker pull {}".format(dependencies['app-cli']))
+    threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
-        composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-        appYml = os.path.join(appsDir, app, "app.yml")
-        with open(composeFile, "w") as f:
-            appCompose = getApp(appYml, app)
-            if appCompose:
-                f.write(yaml.dump(appCompose, sort_keys=False))
-                if verbose:
-                    print("Wrote " + app + " to " + composeFile)
+        try:
+            composeFile = os.path.join(appsDir, app, "docker-compose.yml")
+            appYml = os.path.join(appsDir, app, "app.yml")
+            with open(appYml, 'r') as f:
+                appDefinition = yaml.safe_load(f)
+            if 'citadel_version' in appDefinition:
+                thread = threading.Thread(target=handleAppV4, args=(app,))
+                thread.start()
+                threads.append(thread)
+            else:
+                appCompose = getApp(appDefinition, app)
+                with open(composeFile, "w") as f:
+                    if appCompose:
+                        f.write(yaml.dump(appCompose, sort_keys=False))
+                        if verbose:
+                            print("Wrote " + app + " to " + composeFile)
+        except Exception as err:
+            print("Failed to convert app {}".format(app))
+            print(err)
+        
+    joinThreads(threads)
     print("Generated configuration successfully")
 
 
@@ -158,23 +213,16 @@ def stopInstalled():
     joinThreads(threads)
 
 # Loads an app.yml and converts it to a docker-compose.yml
-
-
-def getApp(appFile: str, appId: str):
-    with open(appFile, 'r') as f:
-        app = yaml.safe_load(f)
-
+def getApp(app, appId: str):
     if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appFile)
+        raise Exception("Error: Could not find metadata in " + appId)
     app["metadata"]["id"] = appId
 
-    if 'version' in app and str(app['version']) == "1":
-        print("Warning: App {} uses version 1 of the app.yml format, which is scheduled for removal in Citadel 0.1.0".format(appId))
-        return createComposeConfigFromV1(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "2":
-        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
+    if 'version' in app and str(app['version']) == "2":
+        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":
+        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
         return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
