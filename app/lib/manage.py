@@ -71,10 +71,7 @@ def parse_dotenv(file_path):
   return envVars
 
 dotCitadelPath = os.path.join(nodeRoot, "..", ".citadel")
-if os.path.isfile(dotCitadelPath):
-    dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
-else:
-    dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
+dotenv = {}
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
 def getArguments():
@@ -109,6 +106,10 @@ def handleAppV4(app):
         yaml.dump(resultYml["spec"], dockerComposeFile)
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    if os.path.isfile(dotCitadelPath):
+        dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
+    else:
+        dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
         f.write(replace_vars(resultYml["new_tor_entries"]))
     mainPort = resultYml["port"]
