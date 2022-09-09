@@ -15,6 +15,7 @@ import shutil
 import json
 import yaml
 import subprocess
+import re
 try:
     import semver
 except Exception:
@@ -52,6 +53,25 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
 
+def parse_dotenv(file_path):
+  envVars: dict = {}
+  with open(file_path, 'r') as file:
+    for line in file:
+      line = line.strip()
+      if line.startswith('#') or len(line) == 0:
+        continue
+      if '=' in line:
+        key, value = line.split('=', 1)
+        value = value.strip('"').strip("'")
+        envVars[key] = value
+      else:
+        print("Error: Invalid line in {}: {}".format(file_path, line))
+        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
+        exit(1)
+  return envVars
+
+dotCitadelPath = os.path.join(nodeRoot, "..", ".citadel")
+dotenv = {}
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
 def getArguments():
@@ -59,6 +79,26 @@ def getArguments():
     for i in range(3, len(argv)):
         arguments += argv[i] + " "
     return arguments
+
+def get_var(var_name):
+    if os.path.isfile(dotCitadelPath):
+        dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
+    else:
+        dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
+    if var_name in dotenv:
+        return str(dotenv[var_name])
+    else:
+        print("Error: {} is not defined!".format(var_name))
+        exit(1)
+
+# Converts a string to uppercase, also replaces all - with _
+def convert_to_upper(string):
+  return string.upper().replace('-', '_')
+
+# Put variables in the config file. A config file accesses an env var $EXAMPLE_VARIABLE by containing <example-variable>
+# in the config file. Check for such occurences and replace them with the actual variable
+def replace_vars(file_content: str):
+  return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
 def handleAppV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
@@ -71,7 +111,7 @@ def handleAppV4(app):
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
-        f.write(resultYml["new_tor_entries"])
+        f.write(replace_vars(resultYml["new_tor_entries"]))
     mainPort = resultYml["port"]
     registryFile = os.path.join(nodeRoot, "apps", "registry.json")
     registry: list = []

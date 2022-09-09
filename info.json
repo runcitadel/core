@@ -1,6 +1,6 @@
 {
-    "version": "0.0.8",
-    "name": "Citadel 0.0.8",
+    "version": "0.0.9",
+    "name": "Citadel 0.0.9",
     "requires": ">=0.0.5",
     "isQuickUpdate": false,
     "notes": "This update includes a new version of the Citadel app system and includes a few new apps. With the new app system, Citadel can handle more apps and makes app development eaier."
