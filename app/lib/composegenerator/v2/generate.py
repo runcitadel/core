@@ -3,15 +3,34 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from lib.composegenerator.v2.types import App, AppStage2, AppStage4, generateApp
-from lib.composegenerator.v2.networking import configureHiddenServices, configureIps, configureMainPort
-from lib.composegenerator.shared.main import convertDataDirToVolume, convertContainerPermissions, convertContainersToServices
+from lib.composegenerator.v2.networking import configureMainPort
+from lib.composegenerator.shared.networking import configureHiddenServices, configureIps
+from lib.composegenerator.shared.main import convertContainerPermissions, convertContainersToServices
 from lib.composegenerator.shared.env import validateEnv
 from lib.citadelutils import classToDict
 import os
 
 def convertDataDirToVolumeGen2(app: App) -> AppStage2:
-    app = convertDataDirToVolume(app)
     for container in app.containers:
+        # Loop through data dirs in container.data, if they don't contain a .., add them to container.volumes
+        # Also, a datadir shouldn't start with a /
+        for dataDir in container.data:
+            if dataDir.find("..") == -1 and dataDir[0] != "/":
+                container.volumes.append(
+                    '${APP_DATA_DIR}/' + dataDir)
+            else:
+                print("Data dir " + dataDir +
+                        " contains invalid characters")
+        del container.data
+        if container.bitcoin_mount_dir != None:
+            if not 'bitcoind' in container.permissions:
+                print("Warning: container {} of app {} defines bitcoin_mount_dir but has no permissions for bitcoind".format(container.name, app.metadata.name))
+                # Skip this container
+                continue
+            # Also skip the container if container.bitcoin_mount_dir contains a :
+            if container.bitcoin_mount_dir.find(":") == -1:
+                container.volumes.append('${BITCOIN_DATA_DIR}:' + container.bitcoin_mount_dir)
+            del container.bitcoin_mount_dir
         if container.lnd_mount_dir != None:
             if not 'lnd' in container.permissions:
                 print("Warning: container {} of app {} defines lnd_mount_dir but doesn't request lnd permission".format(container.name, app.metadata.name))

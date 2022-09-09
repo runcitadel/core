@@ -51,7 +51,6 @@ services:
     image: nginx:1.21.6@sha256:2834dc507516af02784808c5f48b7cbe38b8ed5d0f4837f16e78d00deb7e7767
     depends_on:
     - dashboard
-    - manager
     volumes:
     - ${PWD}/nginx:/etc/nginx
     restart: on-failure
@@ -79,7 +78,7 @@ services:
         ipv4_address: $BITCOIN_IP
   lightning:
     container_name: lightning
-    image: lightninglabs/lnd:v0.15.0-beta@sha256:d227a9db0727ff56020c8d6604c8c369757123d238ab6ce679579c2dd0d0d259
+    image: lightninglabs/lnd:v0.15.1-beta@sha256:b2a5f62806d1a295c4e600e0b99159cbfae1d5caf338db01bccfbc8393838275
     user: 1000:1000
     depends_on:
     - tor
@@ -100,7 +99,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:main@sha256:25b6fb413c10f47e186309c8737926c241c0f2bec923b2c08dd837b828f14dbd
+    image: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -108,7 +107,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:main@sha256:db5775e986d53e762e43331540bb1c05a27b362da94d587c4a4591c981c00ee4
+    image: ghcr.io/runcitadel/manager:v0.0.17@sha256:ba436a07d6f96282217851756d8c81aeaa03c42dfa2246a89a78fc3384eed3cb
     depends_on:
     - tor
     - redis
@@ -162,13 +161,12 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:2fbbfb2e818bf0462f74a6aaab192881615ae018e6dcb62a50d05f82ec622cb0
+    image: ghcr.io/runcitadel/middleware:main@sha256:2aa20f31001ab9e61cda548acbd1864a598728731ad6121f050c6a41503866ae
     depends_on:
-    - manager
     - bitcoin
     - lightning
     - redis
-    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ./start.sh"
+    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ././start.sh"
     restart: on-failure
     volumes:
     - ${PWD}/lnd:/lnd

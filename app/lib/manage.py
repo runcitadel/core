@@ -32,6 +32,7 @@ from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
+from lib.citadelutils import FileLock
 
 class FileLock:
     """Implements a file-based lock using flock(2).
@@ -87,7 +88,7 @@ def getArguments():
 def handleAppV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
-    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml --services 'lnd'".format(appsDir, dependencies['app-cli'], app, app, app))
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:
@@ -99,7 +100,7 @@ def handleAppV4(app):
     mainPort = resultYml["port"]
     registryFile = os.path.join(nodeRoot, "apps", "registry.json")
     registry: list = []
-    lock = FileLock("citadeL_registry_lock", dir="/tmp")
+    lock = FileLock("citadel_registry_lock", dir="/tmp")
     lock.acquire()
     if os.path.isfile(registryFile):
         with open(registryFile, 'r') as f:
@@ -109,7 +110,7 @@ def handleAppV4(app):
 
     for registryApp in registry:
         if registryApp['id'] == app:
-            registry[registry.index(registryApp)]['port'] = resultYml["port"]
+            registry[registry.index(registryApp)]['port'] = mainPort
             break
 
     with open(registryFile, 'w') as f:
@@ -136,12 +137,21 @@ def getAppYml(name):
 
 def update(verbose: bool = False):
     apps = findAndValidateApps(appsDir)
+    portCache = {}
+    try:
+        with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+            portCache = json.load(f)
+    except Exception: pass
     # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir)
+    registry = getAppRegistry(apps, appsDir, portCache)
     with open(os.path.join(appsDir, "registry.json"), "w") as f:
         json.dump(registry["metadata"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
+        json.dump(registry["portCache"], f, sort_keys=True)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
+        json.dump(registry["virtual_apps"], f, sort_keys=True)
     print("Wrote registry to registry.json")
 
     os.system("docker pull {}".format(dependencies['app-cli']))
@@ -230,14 +240,14 @@ def stopInstalled():
 # Loads an app.yml and converts it to a docker-compose.yml
 def getApp(app, appId: str):
     if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appFile)
+        raise Exception("Error: Could not find metadata in " + appId)
     app["metadata"]["id"] = appId
 
     if 'version' in app and str(app['version']) == "2":
-        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.2.0".format(appId))
+        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
     elif 'version' in app and str(app['version']) == "3":
-        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.3.0".format(appId))
+        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
         return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
