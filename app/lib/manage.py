@@ -15,6 +15,7 @@ import shutil
 import json
 import yaml
 import subprocess
+import re
 try:
     import semver
 except Exception:
