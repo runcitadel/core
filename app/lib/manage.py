@@ -71,11 +71,11 @@ def parse_dotenv(file_path):
         exit(1)
   return envVars
 
-dotCitadelPath = path.join(nodeRoot, "..", ".citadel")
+dotCitadelPath = os.path.join(nodeRoot, "..", ".citadel")
 if os.path.isfile(dotCitadelPath):
-    dotenv=parse_dotenv(path.join(nodeRoot, "..", ".env"))
+    dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
 else:
-    dotenv=parse_dotenv(path.join(nodeRoot, ".env"))
+    dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
 def getArguments():
