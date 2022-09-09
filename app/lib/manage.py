@@ -84,6 +84,10 @@ def getArguments():
     return arguments
 
 def get_var(var_name):
+    if os.path.isfile(dotCitadelPath):
+        dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
+    else:
+        dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
   if var_name in dotenv:
     return str(dotenv[var_name])
   else:
