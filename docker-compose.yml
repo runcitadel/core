@@ -107,14 +107,11 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:v0.0.17@sha256:ba436a07d6f96282217851756d8c81aeaa03c42dfa2246a89a78fc3384eed3cb
+    image: ghcr.io/runcitadel/manager:deno@sha256:896b98ab270355d053203c8e4a31df449b447ff1ef91ef86b1b0907400db1bd6
     depends_on:
     - tor
     - redis
-    command:
-    - ./start.sh
     restart: on-failure
-    init: true
     stop_grace_period: 5m30s
     volumes:
     - ${PWD}/info.json:/info.json
@@ -127,7 +124,6 @@ services:
     - jwt-public-key:/jwt-public-key
     - jwt-private-key:/jwt-private-key
     environment:
-      PORT: '3006'
       USER_PASSWORD_FILE: /db/user.json
       JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
       JWT_PRIVATE_KEY_FILE: /jwt-private-key/jwt.key

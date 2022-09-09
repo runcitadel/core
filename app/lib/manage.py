@@ -16,6 +16,7 @@ import shutil
 import json
 import yaml
 import subprocess
+import traceback
 try:
     import semver
 except Exception:
@@ -214,7 +215,7 @@ def update(verbose: bool = False):
                             print("Wrote " + app + " to " + composeFile)
         except Exception as err:
             print("Failed to convert app {}".format(app))
-            print(err)
+            print(traceback.format_exc())
         
     joinThreads(threads)
     print("Generated configuration successfully")
