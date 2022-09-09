@@ -17,6 +17,8 @@ import json
 import yaml
 import subprocess
 import traceback
+import re
+
 try:
     import semver
 except Exception:
