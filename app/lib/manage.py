@@ -85,11 +85,11 @@ def get_var(var_name):
         dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
     else:
         dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
-  if var_name in dotenv:
-    return str(dotenv[var_name])
-  else:
-    print("Error: {} is not defined!".format(var_name))
-    exit(1)
+    if var_name in dotenv:
+        return str(dotenv[var_name])
+    else:
+        print("Error: {} is not defined!".format(var_name))
+        exit(1)
 
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
