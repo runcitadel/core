@@ -112,6 +112,7 @@ services:
     - tor
     - redis
     restart: on-failure
+    init: true
     stop_grace_period: 5m30s
     volumes:
     - ${PWD}/info.json:/info.json
