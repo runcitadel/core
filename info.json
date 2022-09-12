@@ -1,7 +1,7 @@
 {
-    "version": "0.1.0-preview.3",
-    "name": "Citadel 0.10 Preview 3",
+    "version": "0.1.0-preview.4",
+    "name": "Citadel 0.1.0 Preview 4",
     "requires": ">=0.0.5",
     "isQuickUpdate": false,
-    "notes": "This update brings some of the new features for Citadel 0.1.0 and a lot of internal changes."
+    "notes": "WARNING: This update will reset any custom nginx.conf changes. If you made any such changes, please ensure you have a backup before proceeding with the update.\n\nThis update includes all changes from Citadel 0.0.9, and also updates Tor & makes the back-end faster."
 }
