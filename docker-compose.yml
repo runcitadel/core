@@ -158,7 +158,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:2aa20f31001ab9e61cda548acbd1864a598728731ad6121f050c6a41503866ae
+    image: ghcr.io/runcitadel/middleware:deno-manager@sha256:ff27301f4059a5b259bb5db79edcff682dfbf84864d24fc7fa49b11d1890e484
     depends_on:
     - bitcoin
     - lightning
