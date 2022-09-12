@@ -177,13 +177,13 @@ else:
 
   # Pull Tor image and generate Tor password
   print("Generating Tor password\n")
-  os.system('docker pull --quiet lncm/tor:0.4.6.8')
+  os.system('docker pull --quiet lncm/tor:0.4.7.9')
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
 
   # run 'docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "$TOR_PASS"' and get its output
   # this is the password that is used to connect to the Tor network
   # the password is stored in the .env file
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.6.8 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
+  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.7.9 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
