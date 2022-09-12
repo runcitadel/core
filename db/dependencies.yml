@@ -3,3 +3,4 @@ dashboard: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446
 manager: ghcr.io/runcitadel/manager:deno@sha256:fa5bd47fc5a19095a26f1660d8d64fb571d24b476cddf4f6e61ae0e7690caf87
 middleware: ghcr.io/runcitadel/middleware:deno-manager@sha256:ff27301f4059a5b259bb5db79edcff682dfbf84864d24fc7fa49b11d1890e484
 app-cli: ghcr.io/runcitadel/app-cli:main@sha256:c1073222d380797355678471155297f491a667d0bfde743271554c8d9c4c7e17
+tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92

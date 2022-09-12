@@ -177,13 +177,9 @@ else:
 
   # Pull Tor image and generate Tor password
   print("Generating Tor password\n")
-  os.system('docker pull --quiet lncm/tor:0.4.7.9')
+  os.system('docker pull --quiet {}'.format(dependencies["tor"]))
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
-
-  # run 'docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "$TOR_PASS"' and get its output
-  # this is the password that is used to connect to the Tor network
-  # the password is stored in the .env file
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.7.9 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
+  TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
@@ -373,6 +369,8 @@ with open("docker-compose.yml", 'r') as stream:
   compose = yaml.safe_load(stream)
 for service in ["manager", "middleware", "dashboard"]:
   compose["services"][service]["image"] = dependencies[service]
+for service in ["tor", "app-tor", "app-2-tor", "app-3-tor"]:
+  compose["services"][service]["image"] = dependencies["tor"]
 with open("docker-compose.yml", "w") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
