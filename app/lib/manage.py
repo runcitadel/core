@@ -92,7 +92,7 @@ def get_var(var_name):
         return str(dotenv[var_name])
     else:
         print("Error: {} is not defined!".format(var_name))
-    exit(1)
+        exit(1)
 
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
