@@ -160,7 +160,7 @@ def update(verbose: bool = False):
             appYml = os.path.join(appsDir, app, "app.yml")
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
-            if 'citadel_version' in appDefinition or ('version' in app and str(app['version']) == "3"):
+            if ('citadel_version' in appDefinition) or ('version' in appDefinition and str(appDefinition['version']) == "3"):
                 thread = threading.Thread(target=handleAppV3OrV4, args=(app,))
                 thread.start()
                 threads.append(thread)
