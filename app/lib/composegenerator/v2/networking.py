@@ -8,7 +8,7 @@ import json
 from os import path
 import os
 import random
-from lib.composegenerator.shared.networking import assignIp
+from lib.composegenerator.shared.networking import assignIp, getMainContainer
 from lib.citadelutils import FileLock
 
 def getFreePort(networkingFile: str, appId: str):
@@ -55,17 +55,6 @@ def getFreePort(networkingFile: str, appId: str):
         json.dump(networkingData, f)
 
     return port
-
-def getMainContainer(app: App) -> Container:
-    if len(app.containers) == 1:
-        return app.containers[0]
-    else:
-        for container in app.containers:
-            # Main is recommended, support web for easier porting from Umbrel
-            if container.name == 'main' or container.name == 'web':
-                return container
-    # Fallback to first container
-    return app.containers[0]
 
 def assignPort(container: dict, appId: str, networkingFile: str, envFile: str):
     # Strip leading/trailing whitespace from container.name

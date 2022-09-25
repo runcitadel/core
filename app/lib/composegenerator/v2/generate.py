@@ -10,7 +10,7 @@ from lib.composegenerator.shared.env import validateEnv
 from lib.citadelutils import classToDict
 import os
 
-def convertDataDirToVolumeGen2(app: App) -> AppStage2:
+def convertDataDirToVolume(app: App) -> AppStage2:
     for container in app.containers:
         # Loop through data dirs in container.data, if they don't contain a .., add them to container.volumes
         # Also, a datadir shouldn't start with a /
@@ -59,7 +59,7 @@ def createComposeConfigFromV2(app: dict, nodeRoot: str):
     newApp: App = generateApp(app)
     newApp = convertContainerPermissions(newApp)
     newApp = validateEnv(newApp)
-    newApp = convertDataDirToVolumeGen2(newApp)
+    newApp = convertDataDirToVolume(newApp)
     newApp = configureIps(newApp, networkingFile, envFile)
     newApp = configureMainPort(newApp, nodeRoot)
     newApp = configureHiddenServices(newApp, nodeRoot)
