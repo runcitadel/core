@@ -188,9 +188,9 @@ def getPortsV4App(app, appId):
         if "port" in appContainer:
             validatePort(appContainerName, appContainer, appContainer["port"], appId, 0)
         if "required_ports" in appContainer:
-            if "tcp" in appContainer["required_ports"]:
+            if "tcp" in appContainer["required_ports"] and appContainer["required_ports"]["tcp"] != None:
                 for port in appContainer["required_ports"]["tcp"].keys():
                     validatePort(appContainerName, appContainer, port, appId, 2)
-            if "udp" in appContainer["required_ports"]:
+            if "udp" in appContainer["required_ports"] and appContainer["required_ports"]["udp"] != None:
                 for port in appContainer["required_ports"]["udp"].keys():
                     validatePort(appContainerName, appContainer, port, appId, 2)
