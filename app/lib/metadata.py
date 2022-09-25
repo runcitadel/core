@@ -159,7 +159,7 @@ def getPortsV2App(app, appId):
 
 def getPortsV3App(app, appId):
     for appContainer in app["containers"]:
-        containerAsDataClass = from_dict(data_class=ContainerStage2, data=appContainer)
+        containerAsDataClass = from_dict(data_class=Container, data=appContainer)
         assignIp(appId)
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
