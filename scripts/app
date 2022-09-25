@@ -10,9 +10,32 @@ NODE_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 # Run the "${NODE_ROOT}/app/app-manager.py" for each of the other arguments.
 # Otherwise, run the "${NODE_ROOT}/app/app-manager.py" with the first argument as the command.
 if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" == "uninstall" ]; then
-    for app in "${@:2}"; do
-        "${NODE_ROOT}/app/app-manager.py" "$1" "$app"
-    done
+    if [ "$2" == "installed" ]; then
+        # Fail if the first argument is install
+        if [ "$1" == "install" ]; then
+            echo "Cannot install all installed apps"
+            exit 1
+        fi
+        # Print a warning if the first argument is uninstall
+        # And sleep for 15 seconds to give the user time to cancel
+        if [ "$1" == "uninstall" ]; then
+            echo "WARNING: Uninstalling all installed apps!"
+            echo "Press Ctrl+C to cancel"
+            echo "Waiting 15 seconds..."
+            sleep 15
+        fi
+        installed_apps=$("${NODE_ROOT}/app/app-manager.py" ls-installed)
+        if [[ ! -z "${installed_apps:-}" ]]; then
+            for app in ${installed_apps}; do
+                "${NODE_ROOT}/app/app-manager.py" "$1" "${app}" &
+            done
+            wait
+        fi
+    else
+        for app in "${@:2}"; do
+            "${NODE_ROOT}/app/app-manager.py" "$1" "$app"
+        done
+    fi
 elif  [ "$1" == "update" ] && [[ "$2" != "" ]]; then
     for app in "${@:2}"; do
         "${NODE_ROOT}/app/app-manager.py" --invoked-by-configure update "$app"
