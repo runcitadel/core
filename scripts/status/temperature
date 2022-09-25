@@ -10,4 +10,10 @@ if command -v vcgencmd &> /dev/null; then
     exit 0
 fi
 
-cat /sys/class/thermal/thermal_zone0/temp | awk '{print int($1/1000)}'
+
+RAW_TEMP=$(cat $(grep -sxl "coretemp" /sys/class/hwmon/hwmon*/name | sed 's|\(.*\)/.*|\1|')/temp*_input 2> /dev/null)
+if [[ -n $RAW_TEMP ]]; then
+    echo "$RAW_TEMP" | head -n1 | awk '{print int($1/1000)}'
+else
+    cat /sys/class/thermal/thermal_zone0/temp | awk '{print int($1/1000)}'
+fi
