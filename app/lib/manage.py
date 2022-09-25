@@ -31,7 +31,7 @@ from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
-from lib.citadelutils import FileLock
+from lib.citadelutils import FileLock, parse_dotenv
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
@@ -51,23 +51,6 @@ userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
-
-def parse_dotenv(file_path):
-  envVars: dict = {}
-  with open(file_path, 'r') as file:
-    for line in file:
-      line = line.strip()
-      if line.startswith('#') or len(line) == 0:
-        continue
-      if '=' in line:
-        key, value = line.split('=', 1)
-        value = value.strip('"').strip("'")
-        envVars[key] = value
-      else:
-        print("Error: Invalid line in {}: {}".format(file_path, line))
-        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
-        exit(1)
-  return envVars
 
 dotCitadelPath = os.path.join(nodeRoot, "..", ".citadel")
 dotenv = {}
