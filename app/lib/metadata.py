@@ -6,8 +6,10 @@ import os
 import yaml
 import traceback
 
-from lib.composegenerator.shared.networking import assignIpV4
+from lib.composegenerator.shared.networking import assignIp, assignIpV4
+from lib.composegenerator.v2.types import Container
 from lib.entropy import deriveEntropy
+from dacite import from_dict
 
 appPorts = {}
 appPortMap = {}
@@ -157,6 +159,8 @@ def getPortsV2App(app, appId):
 
 def getPortsV3App(app, appId):
     for appContainer in app["containers"]:
+        containerAsDataClass = from_dict(data_class=ContainerStage2, data=appContainer)
+        assignIp(appId)
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
                 validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 2)

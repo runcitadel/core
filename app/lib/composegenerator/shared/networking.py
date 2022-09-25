@@ -74,7 +74,9 @@ def assignIpV4(appId: str, containerName: str):
     with open(networkingFile, 'w') as f:
         json.dump(networkingData, f)
 
-def assignIp(container: ContainerStage2, appId: str, networkingFile: str, envFile: str) -> ContainerStage2:
+def assignIp(container: ContainerStage2, appId: str) -> ContainerStage2:
+    networkingFile = path.join(nodeRoot, "apps", "networking.json")
+    envFile = path.join(nodeRoot, ".env")
     # Strip leading/trailing whitespace from container.name
     container.name = container.name.strip()
     # If the name still contains a newline, throw an error
@@ -141,8 +143,7 @@ def configureIps(app: AppStage2, networkingFile: str, envFile: str):
             # Skip this iteration of the loop
             continue
 
-        container = assignIp(container, app.metadata.id,
-                             networkingFile, envFile)
+        container = assignIp(container, app.metadata.id)
 
     return app
 

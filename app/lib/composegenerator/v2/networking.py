@@ -125,8 +125,7 @@ def configureMainPort(app: AppStage2, nodeRoot: str) -> AppStage3:
             mainPort = portDetails['port']
 
     if mainContainer.network_mode != "host":
-        mainContainer = assignIp(mainContainer, app.metadata.id, path.join(
-            nodeRoot, "apps", "networking.json"), path.join(nodeRoot, ".env"))
+        mainContainer = assignIp(mainContainer, app.metadata.id)
 
     # Also set the port in metadata
     app.metadata.port = int(containerPort)
