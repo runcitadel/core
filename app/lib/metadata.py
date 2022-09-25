@@ -138,10 +138,13 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
                     print("App {} disabled because of port conflict".format(appId))
                 else:
                     newPort = getNewPort(appPorts, appId, containerName, True)
+                    internalPort = port
+                    if isDynamic:
+                        internalPort = newPort
                     #print("Port conflict! Moving app {}'s container {} to port {} (from {})".format(appId, containerName, newPort, port))
                     appPorts[newPort]  = {
                         "app": appId,
-                        "port": port,
+                        "port": internalPort,
                         "container": containerName,
                         "priority": priority,
                         "dynamic": isDynamic,
