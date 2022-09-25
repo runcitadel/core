@@ -75,6 +75,8 @@ def assignIpV4(appId: str, containerName: str):
         json.dump(networkingData, f)
 
 def assignIp(container: ContainerStage2, appId: str) -> ContainerStage2:
+    scriptDir = path.dirname(path.realpath(__file__))
+    nodeRoot = path.join(scriptDir, "..", "..", "..", "..")
     networkingFile = path.join(nodeRoot, "apps", "networking.json")
     envFile = path.join(nodeRoot, ".env")
     # Strip leading/trailing whitespace from container.name
