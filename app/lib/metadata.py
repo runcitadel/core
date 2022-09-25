@@ -62,8 +62,8 @@ def getAppRegistry(apps, app_path, portCache):
                         virtual_apps[implements] = []
                     virtual_apps[implements].append(app)
                 app_metadata.append(metadata)
-                if version < 3:
-                    getPortsOldApp(app_yml, app)
+                if version == 2:
+                    getPortsV2App(app_yml, app)
                 elif version == 3:
                     getPortsV3App(app_yml, app)
                 elif version == 4:
@@ -145,7 +145,7 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
                         "dynamic": isDynamic,
                     }
 
-def getPortsOldApp(app, appId):
+def getPortsV2App(app, appId):
     for appContainer in app["containers"]:
         if "port" in appContainer:
             validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)

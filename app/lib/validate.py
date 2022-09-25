@@ -13,8 +13,6 @@ nodeRoot = os.path.join(scriptDir, "..")
 
 with open(os.path.join(scriptDir, 'app-standard-v2.yml'), 'r') as f:
     schemaVersion2 = yaml.safe_load(f)
-with open(os.path.join(scriptDir, 'app-standard-v3.yml'), 'r') as f:
-    schemaVersion3 = yaml.safe_load(f)
 
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
@@ -31,13 +29,8 @@ def validateApp(app: dict):
             print(traceback.format_exc())
             return False
     elif 'version' in app and str(app['version']) == "3":
-        try:
-            validate(app, schemaVersion3)
-            return True
-        # Catch and log any errors, and return false
-        except Exception as e:
-            print(traceback.format_exc())
-            return False
+        # The app-cli does this validation now
+        return True
     elif 'version' not in app and 'citadel_version' not in app:
         print("Unsupported app version")
         return False

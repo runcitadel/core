@@ -28,7 +28,6 @@ except Exception:
     print("for example checking for app updates")
 
 from lib.composegenerator.v2.generate import createComposeConfigFromV2
-from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
@@ -100,7 +99,7 @@ def convert_to_upper(string):
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
-def handleAppV4(app):
+def handleAppV3OrV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
     os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
@@ -178,8 +177,8 @@ def update(verbose: bool = False):
             appYml = os.path.join(appsDir, app, "app.yml")
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
-            if 'citadel_version' in appDefinition:
-                thread = threading.Thread(target=handleAppV4, args=(app,))
+            if 'citadel_version' in appDefinition or ('version' in app and str(app['version']) == "3"):
+                thread = threading.Thread(target=handleAppV3OrV4, args=(app,))
                 thread.start()
                 threads.append(thread)
             else:
@@ -261,9 +260,6 @@ def getApp(app, appId: str):
     if 'version' in app and str(app['version']) == "2":
         print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
         return createComposeConfigFromV2(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "3":
-        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV3(app, nodeRoot)
     else:
         raise Exception("Error: Unsupported version of app.yml")
 

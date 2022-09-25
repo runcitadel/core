@@ -31,10 +31,6 @@ HiddenServicePort {} {}:{}
     )
 
 
-def getHiddenService(appName: str, appId: str, appIp: str, appPort: str) -> str:
-    return getHiddenServiceString(appName, appId, appPort, appIp, "80")
-
-
 def getContainerHiddenService(
     metadata: Metadata, container: Container, containerIp: str, isMainContainer: bool
 ) -> str:
