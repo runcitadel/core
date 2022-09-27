@@ -172,7 +172,7 @@ def getPortsV3App(app, appId):
                 validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 1)
             else:
                 validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
-        elif "requiredPorts" not in appContainer and "requiredUdpPorts" not in appContainer:
+        else:
                 # if the container does not define a port, assume 3000, and pass it to the container as env var
                 validatePort(appContainer["name"], appContainer, 3000, appId, 0, True)
         if "requiredPorts" in appContainer:
