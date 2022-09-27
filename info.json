@@ -1,7 +1,7 @@
 {
-    "version": "0.0.9",
-    "name": "Citadel 0.0.9",
+    "version": "0.1.0-preview.4",
+    "name": "Citadel 0.1.0 Preview 4",
     "requires": ">=0.0.5",
     "isQuickUpdate": false,
-    "notes": "This update includes a new version of the Citadel app system and includes a few new apps. With the new app system, Citadel can handle more apps and makes app development eaier."
+    "notes": "WARNING: This update will reset any custom nginx.conf changes. If you made any such changes, please ensure you have a backup before proceeding with the update.\n\nThis update includes all changes from Citadel 0.0.9, and also updates Tor & makes the back-end faster."
 }

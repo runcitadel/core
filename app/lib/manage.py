@@ -10,12 +10,15 @@ import random
 from typing import List
 from sys import argv
 import os
+import fcntl
 import requests
 import shutil
 import json
 import yaml
 import subprocess
+import traceback
 import re
+
 try:
     import semver
 except Exception:
@@ -92,6 +95,10 @@ def handleAppV3OrV4(app):
         yaml.dump(resultYml["spec"], dockerComposeFile)
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
+    if os.path.isfile(dotCitadelPath):
+        dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
+    else:
+        dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
         f.write(replace_vars(resultYml["new_tor_entries"]))
     mainPort = resultYml["port"]
@@ -173,7 +180,7 @@ def update(verbose: bool = False):
                             print("Wrote " + app + " to " + composeFile)
         except Exception as err:
             print("Failed to convert app {}".format(app))
-            print(err)
+            print(traceback.format_exc())
         
     joinThreads(threads)
     print("Generated configuration successfully")
