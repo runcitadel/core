@@ -190,7 +190,10 @@ def getPortsV4App(app, appId):
         assignIpV4(appId, appContainerName)
         if "port" in appContainer:
             validatePort(appContainerName, appContainer, appContainer["port"], appId, 0)
-        if "required_ports" in appContainer:
+        else:
+            # if the container does not define a port, assume 3000, and pass it to the container as env var
+            validatePort(appContainer["name"], appContainer, 3000, appId, 0, True)
+         if "required_ports" in appContainer:
             if "tcp" in appContainer["required_ports"] and appContainer["required_ports"]["tcp"] != None:
                 for port in appContainer["required_ports"]["tcp"].keys():
                     validatePort(appContainerName, appContainer, port, appId, 2)
