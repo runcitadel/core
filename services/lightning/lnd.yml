@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 lightning:
   container_name: lightning
   image: lightninglabs/lnd:v0.15.1-beta@sha256:b2a5f62806d1a295c4e600e0b99159cbfae1d5caf338db01bccfbc8393838275
