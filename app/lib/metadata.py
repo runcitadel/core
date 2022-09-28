@@ -8,7 +8,6 @@ import traceback
 
 from lib.citadelutils import parse_dotenv
 from lib.entropy import deriveEntropy
-from dacite import from_dict
 
 appPorts = {}
 appPortMap = {}
