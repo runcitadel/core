@@ -23,8 +23,6 @@ echo
 
 [[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
 
-IS_MIGRATING=0
-
 # If ${CITADEL_ROOT}/c-lightning exists, fail
 if [[ -d "${CITADEL_ROOT}/c-lightning" ]]; then
     echo "This update is not compatible with the c-lightning beta."
@@ -82,21 +80,6 @@ mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
 # Checkout to the new release
 cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
 
-# Configure new install
-echo "Configuring new release"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 40, "description": "Configuring new release", "updateTo": "$RELEASE"}
-EOF
-
-./scripts/configure || true
-
-# Pulling new containers
-echo "Pulling new containers"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 50, "description": "Pulling new containers", "updateTo": "$RELEASE"}
-EOF
-docker compose pull
-
 # Stopping karen
 echo "Stopping background daemon"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
@@ -134,21 +117,7 @@ echo "Fixing permissions"
 find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
-cd "$CITADEL_ROOT"
-echo "Updating installed apps"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 70, "description": "Updating installed apps", "updateTo": "$RELEASE"}
-EOF
-"${CITADEL_ROOT}/scripts/app" --invoked-by-configure update
-for app in $("$CITADEL_ROOT/scripts/app" ls-installed); do
-  if [[ "${app}" != "" ]]; then
-    echo "${app}..."
-    "${CITADEL_ROOT}/scripts/app" compose "${app}" pull
-  fi
-done
-wait
-
-# Remove the nginx config (only for 0.0.9)
+# Remove the nginx config (only for 0.0.10)
 # So it will be recreated
 rm -f nginx/nginx.conf
 
@@ -158,11 +127,16 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-./scripts/start
+./scripts/start &
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
 EOF
+
+# Let's just make the Citadel dashboard accessible as early as possible, even if the start script is still running
+# Or the apps failed to start
+# But pruning can only happen after the update
+wait
 
 # Make Citadel OS specific post-update changes
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
