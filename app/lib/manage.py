@@ -30,7 +30,6 @@ except Exception:
     print("Continuing anyway, but some features won't be available,")
     print("for example checking for app updates")
 
-from lib.composegenerator.v2.generate import createComposeConfigFromV2
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
@@ -172,12 +171,7 @@ def update(verbose: bool = False):
                 thread.start()
                 threads.append(thread)
             else:
-                appCompose = getApp(appDefinition, app)
-                with open(composeFile, "w") as f:
-                    if appCompose:
-                        f.write(yaml.dump(appCompose, sort_keys=False))
-                        if verbose:
-                            print("Wrote " + app + " to " + composeFile)
+                raise Exception("Error: Unsupported version of app.yml")
         except Exception as err:
             print("Failed to convert app {}".format(app))
             print(traceback.format_exc())
@@ -240,19 +234,6 @@ def stopInstalled():
         thread.start()
         threads.append(thread)
     joinThreads(threads)
-
-# Loads an app.yml and converts it to a docker-compose.yml
-def getApp(app, appId: str):
-    if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appId)
-    app["metadata"]["id"] = appId
-
-    if 'version' in app and str(app['version']) == "2":
-        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV2(app, nodeRoot)
-    else:
-        raise Exception("Error: Unsupported version of app.yml")
-
 
 def compose(app, arguments):
     if not os.path.isdir(os.path.join(appsDir, app)):
