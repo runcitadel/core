@@ -30,12 +30,10 @@ except Exception:
     print("Continuing anyway, but some features won't be available,")
     print("for example checking for app updates")
 
-from lib.composegenerator.v2.generate import createComposeConfigFromV2
-from lib.composegenerator.v3.generate import createComposeConfigFromV3
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
 from lib.entropy import deriveEntropy
-from lib.citadelutils import FileLock
+from lib.citadelutils import FileLock, parse_dotenv
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
@@ -55,23 +53,6 @@ userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
-
-def parse_dotenv(file_path):
-  envVars: dict = {}
-  with open(file_path, 'r') as file:
-    for line in file:
-      line = line.strip()
-      if line.startswith('#') or len(line) == 0:
-        continue
-      if '=' in line:
-        key, value = line.split('=', 1)
-        value = value.strip('"').strip("'")
-        envVars[key] = value
-      else:
-        print("Error: Invalid line in {}: {}".format(file_path, line))
-        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
-        exit(1)
-  return envVars
 
 dotenv = {}
 
@@ -99,10 +80,10 @@ def convert_to_upper(string):
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
-def handleAppV4(app):
+def handleAppV3OrV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
-    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
+    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services 'lnd' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:
@@ -178,17 +159,12 @@ def update(verbose: bool = False):
             appYml = os.path.join(appsDir, app, "app.yml")
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
-            if 'citadel_version' in appDefinition:
-                thread = threading.Thread(target=handleAppV4, args=(app,))
+            if ('citadel_version' in appDefinition) or ('version' in appDefinition and str(appDefinition['version']) == "3"):
+                thread = threading.Thread(target=handleAppV3OrV4, args=(app,))
                 thread.start()
                 threads.append(thread)
             else:
-                appCompose = getApp(appDefinition, app)
-                with open(composeFile, "w") as f:
-                    if appCompose:
-                        f.write(yaml.dump(appCompose, sort_keys=False))
-                        if verbose:
-                            print("Wrote " + app + " to " + composeFile)
+                raise Exception("Error: Unsupported version of app.yml")
         except Exception as err:
             print("Failed to convert app {}".format(app))
             print(traceback.format_exc())
@@ -251,22 +227,6 @@ def stopInstalled():
         thread.start()
         threads.append(thread)
     joinThreads(threads)
-
-# Loads an app.yml and converts it to a docker-compose.yml
-def getApp(app, appId: str):
-    if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appId)
-    app["metadata"]["id"] = appId
-
-    if 'version' in app and str(app['version']) == "2":
-        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV2(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "3":
-        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV3(app, nodeRoot)
-    else:
-        raise Exception("Error: Unsupported version of app.yml")
-
 
 def compose(app, arguments):
     if not os.path.isdir(os.path.join(appsDir, app)):
