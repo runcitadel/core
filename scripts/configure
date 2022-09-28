@@ -91,6 +91,8 @@ if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
 with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
   CITADEL_VERSION=json.load(file)['version']
 
+status_dir = os.path.join(CITADEL_ROOT, 'statuses')
+
 print("\n======================================")
 if os.path.isfile(status_dir+'/configured'):
   print("=========== RECONFIGURING ============")
