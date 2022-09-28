@@ -201,7 +201,7 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
 
 def getPortsV3App(app, appId):
     for appContainer in app["containers"]:
-        assignIp(appId, appContainer["name"])
+        assignIpV4(appId, appContainer["name"])
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
                 validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 2)
