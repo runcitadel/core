@@ -119,7 +119,7 @@ chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
 # Remove the nginx config (only for 0.0.10)
 # So it will be recreated
-rm -f nginx/nginx.conf
+#rm -f nginx/nginx.conf
 
 # Start updated containers
 echo "Starting new containers"
