@@ -155,7 +155,6 @@ def update(verbose: bool = False):
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
         try:
-            composeFile = os.path.join(appsDir, app, "docker-compose.yml")
             appYml = os.path.join(appsDir, app, "app.yml")
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
