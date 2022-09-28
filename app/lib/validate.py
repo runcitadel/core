@@ -26,5 +26,6 @@ def findAndValidateApps(dir: str):
             os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli preprocess --app-name '{}' /apps/{}/app.yml.jinja /apps/{}/app.yml --services 'lnd'".format(dir, dependencies['app-cli'], subdir.name, subdir.name, subdir.name))
         if not os.path.isfile(os.path.join(app_dir, "app.yml")):
             print("App {} has no app.yml".format(subdir.name))
-
+        else:
+            apps.append(subdir.name)
     return apps
