@@ -41,12 +41,14 @@ def findAndValidateApps(dir: str):
                 allowed_app_files -= 1
                 os.chown(subfile.path, 1000, 1000)
                 os.system(
-                    "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} --services 'lnd' --seed-file /seed".format(
+                    "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} /apps/{}/{} --services 'lnd' --seed-file /seed".format(
                         os.path.join(nodeRoot, "citadel-seed", "seed"),
                         os.path.join(nodeRoot, ".env"),
                         dir,
                         dependencies["app-cli"],
                         subdir.name,
+                        subdir.name,
+                        "app.yml",
                         subdir.name,
                         subfile.name,
                         subdir.name,
