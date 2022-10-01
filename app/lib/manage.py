@@ -10,7 +10,6 @@ import random
 from typing import List
 from sys import argv
 import os
-import fcntl
 import requests
 import shutil
 import json
@@ -18,17 +17,7 @@ import yaml
 import subprocess
 import traceback
 import re
-
-try:
-    import semver
-except Exception:
-    print("Semver for python isn't installed")
-    print("On Debian/Ubuntu, you can install it using")
-    print("    sudo apt install -y python3-semver")
-    print("On other systems, please use")
-    print("     sudo pip3 install semver")
-    print("Continuing anyway, but some features won't be available,")
-    print("for example checking for app updates")
+import semver
 
 from lib.validate import findAndValidateApps
 from lib.metadata import getAppRegistry
@@ -39,7 +28,6 @@ from lib.citadelutils import FileLock, parse_dotenv
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
-
 
 # The directory with this script
 scriptDir = os.path.dirname(os.path.realpath(__file__))
@@ -187,45 +175,6 @@ def getUserData():
         with open(userFile, "r") as f:
             userData = json.load(f)
     return userData
-
-def startInstalled():
-    # If userfile doesn't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    #threads = []
-    for app in userData["installedApps"]:
-        if not os.path.isdir(os.path.join(appsDir, app)):
-            print("Warning: App {} doesn't exist on Citadel".format(app))
-            continue
-        print("Starting app {}...".format(app))
-        # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        #thread = threading.Thread(target=compose, args=(app, "up --detach"))
-        #thread.start()
-        #threads.append(thread)
-        compose(app, "up --detach")
-    #joinThreads(threads)
-
-
-def stopInstalled():
-    # If userfile doesn't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    threads = []
-    for app in userData["installedApps"]:
-        if not os.path.isdir(os.path.join(appsDir, app)):
-            print("Warning: App {} doesn't exist on Citadel".format(app))
-            continue
-        print("Stopping app {}...".format(app))
-        # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        thread = threading.Thread(
-            target=compose, args=(app, "rm --force --stop"))
-        thread.start()
-        threads.append(thread)
-    joinThreads(threads)
 
 def compose(app, arguments):
     if not os.path.isdir(os.path.join(appsDir, app)):

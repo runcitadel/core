@@ -9,7 +9,7 @@ NODE_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/.."
 # If the first argument is stop, start, install or uninstall, and there are multiple other arguments,
 # Run the "${NODE_ROOT}/app/app-manager.py" for each of the other arguments.
 # Otherwise, run the "${NODE_ROOT}/app/app-manager.py" with the first argument as the command.
-if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" == "uninstall" ]; then
+if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" == "uninstall" ] || [ "$1" == "restart" ]; then
     if [ "$2" == "installed" ]; then
         # Fail if the first argument is install
         if [ "$1" == "install" ]; then

@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
-from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos, download, getAvailableUpdates
+from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, update, deriveEntropy, updateRepos, download, getAvailableUpdates
 from lib.validate import findAndValidateApps
 import os
 import argparse
@@ -123,10 +123,6 @@ elif args.action == 'stop':
         print("No app provided")
         exit(1)
     userData = getUserData()
-    if args.app == "installed":
-        if "installedApps" in userData:
-            stopInstalled()
-        exit(0)
     print("Stopping app {}...".format(args.app))
     compose(args.app, "rm --force --stop")
 elif args.action == 'start':
@@ -135,11 +131,6 @@ elif args.action == 'start':
         exit(1)
 
     userData = getUserData()
-    if args.app == "installed":
-        if "installedApps" in userData:
-            startInstalled()
-        exit(0)
-
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
         exit(1)
@@ -149,10 +140,6 @@ elif args.action == 'restart':
     if not args.app:
         print("No app provided")
         exit(1)
-    if args.app == "installed":
-        stopInstalled()
-        startInstalled()
-        exit(0)
 
     userData = getUserData()
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
