@@ -197,9 +197,9 @@ def compose(app, arguments):
         for implementation in implementations:
             if "installedApps" in userData and implementation in userData["installedApps"]:
                 if get_var_safe("APP_{}_SERVICE_IP".format(implementation)):
-                    os.environ["APP_{}_IP".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_IP".format(implementation))  # type: ignore
+                    os.environ["APP_{}_IP".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_IP".format(implementation.upper()))  # type: ignore
                 if get_var_safe("APP_{}_SERVICE_PORT".format(implementation)):
-                    os.environ["APP_{}_PORT".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_PORT".format(implementation))  # type: ignore
+                    os.environ["APP_{}_PORT".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_PORT".format(implementation.upper()))  # type: ignore
                 break
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
