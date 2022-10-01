@@ -196,9 +196,9 @@ def compose(app, arguments):
         implementations = virtual_apps[virtual_app]
         for implementation in implementations:
             if "installedApps" in userData and implementation in userData["installedApps"]:
-                if get_var_safe("APP_{}_SERVICE_IP".format(implementation)):
+                if get_var_safe("APP_{}_SERVICE_IP".format(convert_to_uppercase(implementation))):
                     os.environ["APP_{}_IP".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_IP".format(convert_to_uppercase(implementation)))  # type: ignore
-                if get_var_safe("APP_{}_SERVICE_PORT".format(implementation)):
+                if get_var_safe("APP_{}_SERVICE_PORT".format(convert_to_uppercase(implementation))):
                     os.environ["APP_{}_PORT".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_PORT".format(convert_to_uppercase(implementation)))  # type: ignore
                 break
     # Runs a compose command in the app dir
