@@ -147,7 +147,7 @@ citadelPorts = [
     # LND REST
     8080,
     # Electrum Server
-    50001,
+    # 50001,
     # Tor Proxy
     9050,
 ]
