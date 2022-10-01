@@ -40,21 +40,21 @@ def findAndValidateApps(dir: str):
             ):
                 allowed_app_files -= 1
                 os.chown(subfile.path, 1000, 1000)
-                os.system(
-                    "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} /apps/{}/{} --services 'lnd' --seed-file /seed".format(
-                        os.path.join(nodeRoot, "citadel-seed", "seed"),
-                        os.path.join(nodeRoot, ".env"),
-                        dir,
-                        dependencies["app-cli"],
-                        subdir.name,
-                        subdir.name,
-                        "app.yml",
-                        subdir.name,
-                        subfile.name,
-                        subdir.name,
-                        subfile.name[:-6],
-                    )
+                cmd = "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} /apps/{}/{} --services 'lnd' --seed-file /seed".format(
+                    os.path.join(nodeRoot, "citadel-seed", "seed"),
+                    os.path.join(nodeRoot, ".env"),
+                    dir,
+                    dependencies["app-cli"],
+                    subdir.name,
+                    subdir.name,
+                    "app.yml",
+                    subdir.name,
+                    subfile.name,
+                    subdir.name,
+                    subfile.name[:-6],
                 )
+                print(cmd)
+                os.system(cmd)
 
         if not os.path.isfile(os.path.join(app_dir, "app.yml")):
             print("App {} has no app.yml".format(subdir.name))
