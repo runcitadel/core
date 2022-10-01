@@ -148,12 +148,6 @@ if [[ "${1}" == "--run" ]]; then
     docker compose logs --tail=30 lightning
 
     echo
-    echo "Electrum logs"
-    echo "-------------"
-    echo
-    docker compose logs --tail=30 electrum
-
-    echo
     echo "Tor logs"
     echo "--------"
     echo

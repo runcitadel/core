@@ -252,7 +252,6 @@ NEUTRINO_SWITCHER_IP="10.21.21.6"
 DASHBOARD_NEW_IP="10.21.21.7"
 BITCOIN_IP="10.21.21.8"
 LND_IP="10.21.21.9"
-ELECTRUM_IP="10.21.21.10"
 TOR_PROXY_IP="10.21.21.11"
 APPS_TOR_IP="10.21.21.12"
 APPS_2_TOR_IP="10.21.21.13"
@@ -268,7 +267,6 @@ BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
 BITCOIN_ZMQ_SEQUENCE_PORT="28335"
 LND_GRPC_PORT="10009"
 LND_REST_PORT="8080"
-ELECTRUM_PORT="50001"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
 
@@ -288,10 +286,6 @@ LND_FEE_URL=""
 # If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
 if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
    LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
-
-BITCOIN_NETWORK_ELECTRS = BITCOIN_NETWORK
-if BITCOIN_NETWORK_ELECTRS == "mainnet":
-  BITCOIN_NETWORK_ELECTRS = "bitcoin"
 
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
@@ -323,8 +317,6 @@ templates_to_build = {
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
-  "./templates/electrs-sample.toml": "./electrs/electrs.toml",
-  "./templates/fulcrum-sample.conf": "./fulcrum/fulcrum.conf",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf"
 }
 
