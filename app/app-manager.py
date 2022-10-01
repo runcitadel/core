@@ -105,8 +105,8 @@ elif args.action == 'install':
         if args.app in implementations:
             for implementation in implementations:
                 if "installedApps" in userData and implementation in userData["installedApps"]:
-                    print("Another implementation of {} is already installed: {}. Uninstall it first to install this app.".format(implementation))
-                    exit(0)
+                    print("Another implementation of {} is already installed: {}. Uninstall it first to install this app.".format(virtual_app, implementation))
+                    exit(1)
     createDataDir(args.app)
     compose(args.app, "pull")
     compose(args.app, "up --detach")
