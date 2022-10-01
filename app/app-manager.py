@@ -97,6 +97,16 @@ elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        implementations = virtual_apps[virtual_app]
+        if args.app in implementations:
+            for implementation in implementations:
+                if "installedApps" in userData and implementation in userData["installedApps"]:
+                    print("Another implementation of {} is already installed: {}. Uninstall it first to install this app.".format(implementation))
+                    exit(0)
     createDataDir(args.app)
     compose(args.app, "pull")
     compose(args.app, "up --detach")

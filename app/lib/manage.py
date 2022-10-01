@@ -51,10 +51,18 @@ def getArguments():
         arguments += argv[i] + " "
     return arguments
 
-def get_var(var_name):
+def get_var_safe(var_name):
     dotenv = parse_dotenv(os.path.join(nodeRoot, ".env"))
     if var_name in dotenv:
         return str(dotenv[var_name])
+    else:
+        print("Error: {} is not defined!".format(var_name))
+        return False
+
+def get_var(var_name):
+    var_value = get_var_safe(var_name)
+    if var_value:
+        return var_value
     else:
         print("Error: {} is not defined!".format(var_name))
         exit(1)
@@ -178,8 +186,21 @@ def getUserData():
 
 def compose(app, arguments):
     if not os.path.isdir(os.path.join(appsDir, app)):
-        print("Warning: App {} doesn't exist on Citadel".format(app))
+        print("Warning: App {} doesn't exist on this node!".format(app))
         return
+    virtual_apps = {}
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        implementations = virtual_apps[virtual_app]
+        for implementation in implementations:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                if get_var_safe("APP_{}_SERVICE_IP".format(implementation)):
+                    os.environ["APP_{}_IP".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_IP".format(implementation))  # type: ignore
+                if get_var_safe("APP_{}_SERVICE_PORT".format(implementation)):
+                    os.environ["APP_{}_PORT".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_PORT".format(implementation))  # type: ignore
+                break
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
