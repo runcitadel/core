@@ -4,7 +4,6 @@
 
 import os
 import yaml
-import traceback
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 nodeRoot = os.path.join(scriptDir, "..")
