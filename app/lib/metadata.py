@@ -162,7 +162,7 @@ def getNewPort(usedPorts, appId, containerName, allowExisting):
         lastPort2 = lastPort2 + 1
     return lastPort2
 
-def validatePort(containerName, appContainer, port, appId, priority: int, isDynamic = False): 
+def validatePort(containerName, port, appId, priority: int, isDynamic = False, implements = ""): 
     if port not in appPorts and port not in citadelPorts and port != 0:
         appPorts[port] = {
             "app": appId,
@@ -170,6 +170,7 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
             "container": containerName,
             "priority": priority,
             "dynamic": isDynamic,
+            "implements": implements,
         }
     else:
         if port in citadelPorts or appPorts[port]["app"] != appId or appPorts[port]["container"] != containerName:
@@ -183,9 +184,13 @@ def validatePort(containerName, appContainer, port, appId, priority: int, isDyna
                     "container": containerName,
                     "priority": priority,
                     "dynamic": isDynamic,
+                    "implements": implements,
                 }
             else:
-                if "requiresPort" in appContainer and appContainer["requiresPort"]:
+                # Apps implement the same service and can't be installed together, so we an safely ignore a port conflict
+                if implements != "" and implements == appPorts[port]["implements"]:
+                    return
+                if priority == 2:
                     disabledApps.append(appId)
                     print("App {} disabled because of port conflict".format(appId))
                 else:
@@ -207,37 +212,40 @@ def getPortsV3App(app, appId):
         assignIpV4(appId, appContainer["name"])
         if "port" in appContainer:
             if "preferredOutsidePort" in appContainer and "requiresPort" in appContainer and appContainer["requiresPort"]:
-                validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 2)
+                validatePort(appContainer["name"], appContainer["preferredOutsidePort"], appId, 2)
             elif "preferredOutsidePort" in appContainer:
             
-                validatePort(appContainer["name"], appContainer, appContainer["preferredOutsidePort"], appId, 1)
+                validatePort(appContainer["name"], appContainer["preferredOutsidePort"], appId, 1)
             else:
-                validatePort(appContainer["name"], appContainer, appContainer["port"], appId, 0)
+                validatePort(appContainer["name"], appContainer["port"], appId, 0)
         else:
                 # if the container does not define a port, assume 3000, and pass it to the container as env var
-                validatePort(appContainer["name"], appContainer, 3000, appId, 0, True)
+                validatePort(appContainer["name"], 3000, appId, 0, True)
         if "requiredPorts" in appContainer:
             for port in appContainer["requiredPorts"]:
-                validatePort(appContainer["name"], appContainer, port, appId, 2)
+                validatePort(appContainer["name"], port, appId, 2)
         if "requiredUdpPorts" in appContainer:
             for port in appContainer["requiredUdpPorts"]:
-                validatePort(appContainer["name"], appContainer, port, appId, 2)
+                validatePort(appContainer["name"], port, appId, 2)
 
 def getPortsV4App(app, appId):
+    implements = ""
+    if "implements" in app["metadata"]:
+        implements = app["metadata"]["implements"]
     for appContainerName in app["services"].keys():
         appContainer = app["services"][appContainerName]
         if "enable_networking" in appContainer and not appContainer["enable_networking"]:
             return
         assignIpV4(appId, appContainerName)
         if "port" in appContainer:
-            validatePort(appContainerName, appContainer, appContainer["port"], appId, 0)
+            validatePort(appContainerName, appContainer["port"], appId, 0, False, implements)
         else:
             # if the container does not define a port, assume 3000, and pass it to the container as env var
-            validatePort(appContainerName, appContainer, 3000, appId, 0, True)
+            validatePort(appContainerName, 3000, appId, 0, True, implements)
         if "required_ports" in appContainer:
             if "tcp" in appContainer["required_ports"] and appContainer["required_ports"]["tcp"] != None:
                 for port in appContainer["required_ports"]["tcp"].keys():
-                    validatePort(appContainerName, appContainer, port, appId, 2)
+                    validatePort(appContainerName, port, appId, 2, False, implements)
             if "udp" in appContainer["required_ports"] and appContainer["required_ports"]["udp"] != None:
                 for port in appContainer["required_ports"]["udp"].keys():
-                    validatePort(appContainerName, appContainer, port, appId, 2)
+                    validatePort(appContainerName, port, appId, 2, False, implements)
