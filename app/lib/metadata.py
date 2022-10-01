@@ -188,7 +188,7 @@ def validatePort(containerName, port, appId, priority: int, isDynamic = False, i
                 }
             else:
                 # Apps implement the same service and can't be installed together, so we an safely ignore a port conflict
-                if implements != "" and implements == appPorts[port]["implements"]:
+                if port in appPorts and implements != "" and implements == appPorts[port]["implements"]:
                     return
                 if priority == 2:
                     disabledApps.append(appId)
