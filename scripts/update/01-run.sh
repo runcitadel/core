@@ -77,8 +77,7 @@ fi
 # Help migration from earlier versions
 mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
 
-# Checkout to the new release
-cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
+cd "$CITADEL_ROOT"
 
 # Stopping karen
 echo "Stopping background daemon"
@@ -91,7 +90,6 @@ echo "Stopping installed apps"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 60, "description": "Stopping installed apps", "updateTo": "$RELEASE"}
 EOF
-cd "$CITADEL_ROOT"
 ./scripts/app stop installed || true
 
 # Stop old containers
@@ -101,6 +99,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 ./scripts/stop || true
 
+electrum_implementation=$(cat services/installed.yml | grep "electrum:" | sed "s/electrum: //g")
 
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
@@ -127,16 +126,28 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-./scripts/start &
+./scripts/start
+
+# Install the electrum implementation as app
+echo "Installing electrum implementation as app"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 85, "description": "Installing electrum server", "updateTo": "$RELEASE"}
+EOF
+./scripts/app install "$electrum_implementation"
+./scripts/app stop "$electrum_implementation"
+
+rm -rf "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
+
+mv "$CITADEL_ROOT"/"$electrum_implementation" "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
+
+rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/electrs.toml
+rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/fulcrum.conf
+
+./scripts/app start "$electrum_implementation"
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
 EOF
-
-# Let's just make the Citadel dashboard accessible as early as possible, even if the start script is still running
-# Or the apps failed to start
-# But pruning can only happen after the update
-wait
 
 # Make Citadel OS specific post-update changes
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
