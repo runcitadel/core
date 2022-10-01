@@ -1,6 +1,6 @@
 {
-    "version": "0.1.0-preview.5",
-    "name": "Citadel 0.1.0 Preview 5",
+    "version": "0.1.0-preview.6",
+    "name": "Citadel 0.1.0 Preview 6",
     "requires": ">=0.0.5",
     "isQuickUpdate": false,
     "notes": "This update includes multiple improvements for the app store and update process to improve speed."
