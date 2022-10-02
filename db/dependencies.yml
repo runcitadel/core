@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 compose: v2.10.2
-dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:c908cee1f0ceda29f2a04bccaeb408e1d29ea3cba033837d332f29737f6235b3
+dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:50472b007ce4057d61a6e9365a576269706b0b2d001ab7d1ebcd94e8f6d63097
 manager: ghcr.io/runcitadel/manager:main@sha256:acae0fae6b3b0c45c877fc7549180ce71c979ef3fb84cc3a2b6871e392124dba
 middleware: ghcr.io/runcitadel/middleware:deno-manager@sha256:ff27301f4059a5b259bb5db79edcff682dfbf84864d24fc7fa49b11d1890e484
 app-cli: ghcr.io/runcitadel/app-cli:main@sha256:ccc7fd666927e1d6e73317c34c010eecc6e386aa3da35f4f3e1f755293f0be22
