@@ -4,7 +4,7 @@
 
 compose: v2.10.2
 dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:20a2b44590b716aeee6fb8a85b2dba19ea2581fcbb184f09a77fd21851a13785
-manager: ghcr.io/runcitadel/manager:deno@sha256:fa5bd47fc5a19095a26f1660d8d64fb571d24b476cddf4f6e61ae0e7690caf87
+manager: ghcr.io/runcitadel/manager:main@sha256:acae0fae6b3b0c45c877fc7549180ce71c979ef3fb84cc3a2b6871e392124dba
 middleware: ghcr.io/runcitadel/middleware:deno-manager@sha256:ff27301f4059a5b259bb5db79edcff682dfbf84864d24fc7fa49b11d1890e484
 app-cli: ghcr.io/runcitadel/app-cli:main@sha256:ccc7fd666927e1d6e73317c34c010eecc6e386aa3da35f4f3e1f755293f0be22
 tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
