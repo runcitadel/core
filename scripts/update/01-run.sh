@@ -126,7 +126,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-./scripts/start
+./scripts/start || true
 
 # Install the electrum implementation as app
 echo "Installing electrum implementation as app"
