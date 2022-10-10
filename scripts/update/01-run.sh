@@ -99,8 +99,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 ./scripts/stop || true
 
-electrum_implementation=$(cat services/installed.yml | grep "electrum:" | sed "s/electrum: //g")
-
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
@@ -116,10 +114,6 @@ echo "Fixing permissions"
 find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
-# Remove the nginx config (only for 0.0.10)
-# So it will be recreated
-rm -f nginx/nginx.conf
-
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
@@ -127,23 +121,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 cd "$CITADEL_ROOT"
 ./scripts/start || true
-
-# Install the electrum implementation as app
-echo "Installing electrum implementation as app"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 85, "description": "Installing electrum server", "updateTo": "$RELEASE"}
-EOF
-./scripts/app install "$electrum_implementation"
-./scripts/app stop "$electrum_implementation"
-
-rm -rf "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
-
-mv "$CITADEL_ROOT"/"$electrum_implementation" "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
-
-rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/electrs.toml
-rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/fulcrum.conf
-
-./scripts/app start "$electrum_implementation"
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
