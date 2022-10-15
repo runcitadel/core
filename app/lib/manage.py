@@ -2,27 +2,28 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
+import os
+import random
+import re
+import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import threading
-import random
-from typing import List
-from sys import argv
-import os
-import requests
-import shutil
-import json
-import yaml
-import subprocess
 import traceback
-import re
-import semver
+from sys import argv
+from typing import List
 
-from lib.validate import findAndValidateApps
-from lib.metadata import getAppRegistry
-from lib.entropy import deriveEntropy
+import requests
+import semver
+import yaml
 from lib.citadelutils import FileLock, parse_dotenv
+from lib.entropy import deriveEntropy
+from lib.metadata import getAppRegistry
+from lib.validate import findAndValidateApps
+
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
@@ -79,7 +80,8 @@ def replace_vars(file_content: str):
 def handleAppV3OrV4(app):
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
-    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services 'lnd' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
+    if not os.path.isfile(os.path.join(appsDir, app, "result.yml")):
+        os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services 'lnd' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:
@@ -351,11 +353,11 @@ def updateRepos():
                     "githubRepo": gitUrl.removeprefix("https://github.com/").removesuffix(".git").removesuffix("/"),
                     "branch": branch,
                 }
-            if os.path.isdir(os.path.join(appsDir, app)):
-                shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
             if os.path.isdir(os.path.join(tempDir, "apps", app)):
+                if os.path.isdir(os.path.join(appsDir, app)):
+                    shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
                 shutil.copytree(os.path.join(tempDir, "apps", app), os.path.join(appsDir, app),
-                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))
+                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore", "result.yml"))
                 alreadyInstalled.append(app)
         # Remove the temporary dir
         shutil.rmtree(tempDir)

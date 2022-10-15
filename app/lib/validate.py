@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-from re import S
+
 import yaml
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
@@ -30,6 +30,9 @@ def findAndValidateApps(dir: str):
                     dir, dependencies["app-cli"], subdir.name, subdir.name, subdir.name
                 )
             )
+            # App should be re-converted considering this may have changed the app.yml
+            if os.path.isfile(os.path.join(app_dir, "result.yml")):
+                os.remove(os.path.join(app_dir, "result.yml"))
         for subfile in os.scandir(subdir):
             if allowed_app_files == 0:
                 break
