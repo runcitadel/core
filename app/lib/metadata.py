@@ -2,13 +2,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import os
-from os import path
-import random
 import json
-import yaml
+import os
+import random
 import traceback
+from os import path
 
+import yaml
 from lib.citadelutils import parse_dotenv
 from lib.entropy import deriveEntropy
 
@@ -89,8 +89,7 @@ def appPortsToMap():
 # Also check the path and defaultPassword and set them to an empty string if they don't exist
 # In addition, set id on the metadata to the name of the app
 # Return a list of all app's metadata
-def getAppRegistry(apps, app_path, portCache):
-    app_metadata = []
+def getAppMetadata(apps, app_path, portCache):
     virtual_apps = {}
     appPorts = portCache
     for app in apps:
@@ -105,19 +104,11 @@ def getAppRegistry(apps, app_path, portCache):
                 elif 'citadel_version' in app_yml:
                     version = int(app_yml['citadel_version'])
                 metadata: dict = app_yml['metadata']
-                metadata['id'] = app
-                metadata['path'] = metadata.get('path', '')
-                metadata['defaultPassword'] = metadata.get('defaultPassword', '')
-                if metadata['defaultPassword'] == "$APP_SEED":
-                    metadata['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
-                if "mainContainer" in metadata:
-                    metadata.pop("mainContainer")
                 if "implements" in metadata:
                     implements = metadata["implements"]
                     if implements not in virtual_apps:
                         virtual_apps[implements] = []
                     virtual_apps[implements].append(app)
-                app_metadata.append(metadata)
                 if version == 3:
                     getPortsV3App(app_yml, app)
                 elif version == 4:
@@ -128,7 +119,6 @@ def getAppRegistry(apps, app_path, portCache):
     appPortsToMap()
     return {
         "virtual_apps": virtual_apps,
-        "metadata": app_metadata,
         "ports": appPortMap,
         "portCache": appPorts,
     }

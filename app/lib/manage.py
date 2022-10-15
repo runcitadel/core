@@ -21,7 +21,7 @@ import semver
 import yaml
 from lib.citadelutils import FileLock, parse_dotenv
 from lib.entropy import deriveEntropy
-from lib.metadata import getAppRegistry
+from lib.metadata import getAppMetadata
 from lib.validate import findAndValidateApps
 
 
@@ -94,10 +94,9 @@ def handleAppV3OrV4(app):
         yaml.dump(resultYml["spec"], dockerComposeFile)
     torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
-    dotenv = parse_dotenv(os.path.join(nodeRoot, ".env"))
     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
         f.write(replace_vars(resultYml["new_tor_entries"]))
-    mainPort = resultYml["port"]
+
     registryFile = os.path.join(nodeRoot, "apps", "registry.json")
     registry: list = []
     lock = FileLock("citadel_registry_lock", dir="/tmp")
@@ -105,13 +104,13 @@ def handleAppV3OrV4(app):
     if os.path.isfile(registryFile):
         with open(registryFile, 'r') as f:
             registry = json.load(f)
-    else:
-        raise Exception("Registry file not found")
 
-    for registryApp in registry:
-        if registryApp['id'] == app:
-            registry[registry.index(registryApp)]['port'] = mainPort
-            break
+    resultYml["metadata"]['port'] = resultYml["port"]
+    resultYml["metadata"]['defaultPassword'] = resultYml["metadata"].get('defaultPassword', '')
+    if resultYml["metadata"]['defaultPassword'] == "$APP_SEED":
+        resultYml["metadata"]['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
+
+    registry.append(resultYml["metadata"])
 
     with open(registryFile, 'w') as f:
         json.dump(registry, f, indent=4, sort_keys=True)
@@ -142,17 +141,18 @@ def update(verbose: bool = False):
         with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
             portCache = json.load(f)
     except Exception: pass
-    # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir, portCache)
-    with open(os.path.join(appsDir, "registry.json"), "w") as f:
-        json.dump(registry["metadata"], f, sort_keys=True)
+
+    registry = getAppMetadata(apps, appsDir, portCache)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
         json.dump(registry["portCache"], f, sort_keys=True)
     with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
         json.dump(registry["virtual_apps"], f, sort_keys=True)
-    print("Wrote registry to registry.json")
+    print("Processed app metadata")
+
+    # Delete the registry so it's regenerated
+    os.remove(os.path.join(nodeRoot, "apps", "registry.json"))
 
     os.system("docker pull {}".format(dependencies['app-cli']))
     threads = list()
