@@ -4,11 +4,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, update, deriveEntropy, updateRepos, download, getAvailableUpdates
-from lib.validate import findAndValidateApps
-import os
 import argparse
+import json
+import os
+
+from lib.manage import (compose, createDataDir, deleteData, deriveEntropy,
+                        download, getAvailableUpdates, getUserData,
+                        setInstalled, setRemoved, update, updateRepos)
+from lib.validate import findAndValidateApps
 
 # Print an error if user is not root
 if os.getuid() != 0:
