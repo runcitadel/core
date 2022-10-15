@@ -78,10 +78,16 @@ def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
 def handleAppV3OrV4(app):
+    # Currently part of Citadel
+    services = ["lnd", "bitcoin"]
+    userData = getUserData()
+    if not "installedApps" in userData:
+        userData["installedApps"] = []
+    services.extend(userData["installedApps"])
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
     if not os.path.isfile(os.path.join(appsDir, app, "result.yml")):
-        os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services 'lnd' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
+        os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services '{}' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, ",".join(services), app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:

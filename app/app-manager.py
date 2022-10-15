@@ -125,7 +125,7 @@ elif args.action == 'install':
                         # Delete the app's result.yml file
                         os.remove(os.path.join(nodeRoot, "apps", app.name, "result.yml"))
                 # Else, it should be a list, so check if the app we're installing is in it
-                else if isinstance(dependency, list):
+                elif isinstance(dependency, list):
                     for dep in dependency:
                         if dep == args.app or args.app in virtual_apps[dep]:
                             # Delete the app's result.yml file
