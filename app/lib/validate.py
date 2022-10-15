@@ -5,6 +5,7 @@
 import os
 
 import yaml
+from lib.manage import getUserData
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 nodeRoot = os.path.join(scriptDir, "..")
@@ -16,6 +17,12 @@ with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file:
 # A folder is valid if it contains an app.yml file
 # A folder is invalid if it doesn't contain an app.yml file
 def findAndValidateApps(dir: str):
+    services = ["lnd", "bitcoin"]
+    userData = getUserData()
+    if not "installedApps" in userData:
+        userData["installedApps"] = []
+    services.extend(userData["installedApps"])
+    service_str = ",".join(services)
     apps = []
     for subdir in os.scandir(dir):
         if not subdir.is_dir():
@@ -26,8 +33,8 @@ def findAndValidateApps(dir: str):
             allowed_app_files += 1
             os.chown(app_dir, 1000, 1000)
             os.system(
-                "docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli preprocess --app-name '{}' /apps/{}/app.yml.jinja /apps/{}/app.yml --services 'lnd'".format(
-                    dir, dependencies["app-cli"], subdir.name, subdir.name, subdir.name
+                "docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli preprocess --app-name '{}' /apps/{}/app.yml.jinja /apps/{}/app.yml --services '{}'".format(
+                    dir, dependencies["app-cli"], subdir.name, subdir.name, subdir.name, service_str
                 )
             )
             # App should be re-converted considering this may have changed the app.yml
@@ -43,7 +50,7 @@ def findAndValidateApps(dir: str):
             ):
                 allowed_app_files -= 1
                 os.chown(app_dir, 1000, 1000)
-                cmd = "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} /apps/{}/{} --services 'lnd' --seed-file /seed".format(
+                cmd = "docker run --rm -v {}:/seed -v {}:/.env -v {}:/apps -u 1000:1000 {} /app-cli preprocess-config-file --env-file /.env --app-name '{}' --app-file '/apps/{}/{}' /apps/{}/{} /apps/{}/{} --services '{}' --seed-file /seed".format(
                     os.path.join(nodeRoot, "db", "citadel-seed", "seed"),
                     os.path.join(nodeRoot, ".env"),
                     dir,
@@ -55,6 +62,7 @@ def findAndValidateApps(dir: str):
                     subfile.name,
                     subdir.name,
                     subfile.name[:-6],
+                    service_str,
                 )
                 print(cmd)
                 os.system(cmd)
