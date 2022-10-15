@@ -184,7 +184,6 @@ def download(app: str):
     else:
         print("Warning: Could not download " + app)
 
-
 def getUserData():
     userData = {}
     if os.path.isfile(userFile):

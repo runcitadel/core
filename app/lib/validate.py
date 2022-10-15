@@ -2,16 +2,24 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
 import os
 
 import yaml
-from lib.manage import getUserData
 
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 nodeRoot = os.path.join(scriptDir, "..")
+userFile = os.path.join(nodeRoot, "db", "user.json")
 
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file:
     dependencies = yaml.safe_load(file)
+
+def getUserData():
+    userData = {}
+    if os.path.isfile(userFile):
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+    return userData
 
 # Lists all folders in a directory and checks if they are valid
 # A folder is valid if it contains an app.yml file
