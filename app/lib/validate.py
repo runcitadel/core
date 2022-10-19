@@ -40,7 +40,7 @@ def getInstalledVirtualApps():
 # A folder is valid if it contains an app.yml file
 # A folder is invalid if it doesn't contain an app.yml file
 def findAndValidateApps(dir: str):
-    services = ["lnd", "bitcoin"]
+    services = ["lnd", "bitcoind"]
     userData = getUserData()
     if not "installedApps" in userData:
         userData["installedApps"] = []
