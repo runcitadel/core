@@ -68,6 +68,17 @@ def get_var(var_name):
         print("Error: {} is not defined!".format(var_name))
         exit(1)
 
+def getInstalledVirtualApps():
+    installedApps = []
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        for implementation in virtual_apps[virtual_app]:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                installedApps.append(virtual_app)
+    return installedApps
+
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
   return string.upper().replace('-', '_')
@@ -84,6 +95,7 @@ def handleAppV3OrV4(app):
     if not "installedApps" in userData:
         userData["installedApps"] = []
     services.extend(userData["installedApps"])
+    services.extend(getInstalledVirtualApps())
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
     if not os.path.isfile(os.path.join(appsDir, app, "result.yml")):

@@ -10,6 +10,7 @@ import yaml
 scriptDir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "..")
 nodeRoot = os.path.join(scriptDir, "..")
 userFile = os.path.join(nodeRoot, "db", "user.json")
+appsDir = os.path.join(nodeRoot, "apps")
 
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file:
     dependencies = yaml.safe_load(file)
@@ -21,6 +22,20 @@ def getUserData():
             userData = json.load(f)
     return userData
 
+def getInstalledVirtualApps():
+    installedApps = []
+    try:
+        with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+            virtual_apps = json.load(f)
+        userData = getUserData()
+        for virtual_app in virtual_apps.keys():
+            for implementation in virtual_apps[virtual_app]:
+                if "installedApps" in userData and implementation in userData["installedApps"]:
+                    installedApps.append(virtual_app)
+    except: pass
+    return installedApps
+
+
 # Lists all folders in a directory and checks if they are valid
 # A folder is valid if it contains an app.yml file
 # A folder is invalid if it doesn't contain an app.yml file
@@ -30,6 +45,7 @@ def findAndValidateApps(dir: str):
     if not "installedApps" in userData:
         userData["installedApps"] = []
     services.extend(userData["installedApps"])
+    services.extend(getInstalledVirtualApps())
     service_str = ",".join(services)
     apps = []
     for subdir in os.scandir(dir):
