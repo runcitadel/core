@@ -49,13 +49,12 @@ echo "Deriving keys..."
 backup_id=$(derive_entropy "citadel_backup_id")
 encryption_key=$(derive_entropy "citadel_backup_encryption_key")
 
-
+echo "Your node id is: "
+echo $(derive_entropy "citadel_backup_id")
 
 # If the first argument is not given, fail
 if [[ -z "$1" ]]; then
   echo "Usage: $0 <backup-id>"
-  echo "Your node id is: "
-  echo $(derive_entropy "citadel_backup_id")
   exit 1
 fi
 
