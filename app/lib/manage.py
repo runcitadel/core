@@ -90,7 +90,7 @@ def replace_vars(file_content: str):
 
 def handleAppV3OrV4(app):
     # Currently part of Citadel
-    services = ["lnd", "bitcoin"]
+    services = ["lnd", "bitcoind"]
     userData = getUserData()
     if not "installedApps" in userData:
         userData["installedApps"] = []
