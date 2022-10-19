@@ -30,12 +30,6 @@ echo "Backups can only be restored on mainnet"
   exit
 fi
 
-# If the first argument is not given, fail
-if [[ -z "$1" ]]; then
-  echo "Usage: $0 <backup-id>"
-  exit 1
-fi
-
 # Deterministically derives 128 bits of cryptographically secure entropy
 derive_entropy () {
   identifier="${1}"
@@ -54,6 +48,16 @@ echo "Deriving keys..."
 
 backup_id=$(derive_entropy "citadel_backup_id")
 encryption_key=$(derive_entropy "citadel_backup_encryption_key")
+
+
+
+# If the first argument is not given, fail
+if [[ -z "$1" ]]; then
+  echo "Usage: $0 <backup-id>"
+  echo "Your node id is: "
+  echo $(derive_entropy "citadel_backup_id")
+  exit 1
+fi
 
 echo "Downloading backup..."
 
