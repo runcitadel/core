@@ -1,7 +1,7 @@
 {
-    "version": "0.1.0-preview.9",
-    "name": "Citadel 0.1.0 Preview 9",
-    "requires": ">=0.1.0-preview.6",
+    "version": "0.1.0",
+    "name": "Citadel 0.1.0",
+    "requires": ">=0.0.10",
     "isQuickUpdate": false,
-    "notes": "This update reduces the load the dashboard puts on your browser and improves localization of the dashboard. This means that number formats have been adjusted and your balance is displayed in BTC and your local currency instad of USD."
+    "notes": "This update contains a lot of fixes and improvements. Read more on https://blog.runcitadel.space."
 }
