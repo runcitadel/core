@@ -2,43 +2,33 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
+import os
+import random
+import re
+import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import threading
-import random
-from typing import List
+import traceback
 from sys import argv
-import os
-import requests
-import shutil
-import json
-import yaml
-import subprocess
-import re
-try:
-    import semver
-except Exception:
-    print("Semver for python isn't installed")
-    print("On Debian/Ubuntu, you can install it using")
-    print("    sudo apt install -y python3-semver")
-    print("On other systems, please use")
-    print("     sudo pip3 install semver")
-    print("Continuing anyway, but some features won't be available,")
-    print("for example checking for app updates")
+from typing import List
 
-from lib.composegenerator.v2.generate import createComposeConfigFromV2
-from lib.composegenerator.v3.generate import createComposeConfigFromV3
-from lib.validate import findAndValidateApps
-from lib.metadata import getAppRegistry
+import requests
+import semver
+import yaml
+from lib.citadelutils import FileLock, parse_dotenv
 from lib.entropy import deriveEntropy
-from lib.citadelutils import FileLock
+from lib.metadata import getAppMetadata
+from lib.validate import findAndValidateApps
+
 
 # For an array of threads, join them and wait for them to finish
 def joinThreads(threads: List[threading.Thread]):
     for thread in threads:
         thread.join()
-
 
 # The directory with this script
 scriptDir = os.path.dirname(os.path.realpath(__file__))
@@ -53,24 +43,6 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
 
-def parse_dotenv(file_path):
-  envVars: dict = {}
-  with open(file_path, 'r') as file:
-    for line in file:
-      line = line.strip()
-      if line.startswith('#') or len(line) == 0:
-        continue
-      if '=' in line:
-        key, value = line.split('=', 1)
-        value = value.strip('"').strip("'")
-        envVars[key] = value
-      else:
-        print("Error: Invalid line in {}: {}".format(file_path, line))
-        print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
-        exit(1)
-  return envVars
-
-dotCitadelPath = os.path.join(nodeRoot, "..", ".citadel")
 dotenv = {}
 
 # Returns a list of every argument after the second one in sys.argv joined into a string by spaces
@@ -80,16 +52,32 @@ def getArguments():
         arguments += argv[i] + " "
     return arguments
 
-def get_var(var_name):
-    if os.path.isfile(dotCitadelPath):
-        dotenv=parse_dotenv(os.path.join(nodeRoot, "..", ".env"))
-    else:
-        dotenv=parse_dotenv(os.path.join(nodeRoot, ".env"))
+def get_var_safe(var_name):
+    dotenv = parse_dotenv(os.path.join(nodeRoot, ".env"))
     if var_name in dotenv:
         return str(dotenv[var_name])
     else:
         print("Error: {} is not defined!".format(var_name))
+        return False
+
+def get_var(var_name):
+    var_value = get_var_safe(var_name)
+    if var_value:
+        return var_value
+    else:
+        print("Error: {} is not defined!".format(var_name))
         exit(1)
+
+def getInstalledVirtualApps():
+    installedApps = []
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        for implementation in virtual_apps[virtual_app]:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                installedApps.append(virtual_app)
+    return installedApps
 
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
@@ -100,10 +88,18 @@ def convert_to_upper(string):
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
-def handleAppV4(app):
+def handleAppV3OrV4(app):
+    # Currently part of Citadel
+    services = ["lnd", "bitcoind"]
+    userData = getUserData()
+    if not "installedApps" in userData:
+        userData["installedApps"] = []
+    services.extend(userData["installedApps"])
+    services.extend(getInstalledVirtualApps())
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
     os.chown(os.path.join(appsDir, app), 1000, 1000)
-    os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, app, app))
+    if not os.path.isfile(os.path.join(appsDir, app, "result.yml")):
+        os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services '{}' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, ",".join(services), app, app))
     with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
         resultYml = yaml.safe_load(resultFile)
     with open(composeFile, "w") as dockerComposeFile:
@@ -112,7 +108,7 @@ def handleAppV4(app):
     torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
     with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
         f.write(replace_vars(resultYml["new_tor_entries"]))
-    mainPort = resultYml["port"]
+
     registryFile = os.path.join(nodeRoot, "apps", "registry.json")
     registry: list = []
     lock = FileLock("citadel_registry_lock", dir="/tmp")
@@ -120,13 +116,13 @@ def handleAppV4(app):
     if os.path.isfile(registryFile):
         with open(registryFile, 'r') as f:
             registry = json.load(f)
-    else:
-        raise Exception("Registry file not found")
 
-    for registryApp in registry:
-        if registryApp['id'] == app:
-            registry[registry.index(registryApp)]['port'] = mainPort
-            break
+    resultYml["metadata"]['port'] = resultYml["port"]
+    resultYml["metadata"]['defaultPassword'] = resultYml["metadata"].get('defaultPassword', '')
+    if resultYml["metadata"]['defaultPassword'] == "$APP_SEED":
+        resultYml["metadata"]['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
+
+    registry.append(resultYml["metadata"])
 
     with open(registryFile, 'w') as f:
         json.dump(registry, f, indent=4, sort_keys=True)
@@ -157,41 +153,36 @@ def update(verbose: bool = False):
         with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
             portCache = json.load(f)
     except Exception: pass
-    # The compose generation process updates the registry, so we need to get it set up with the basics before that
-    registry = getAppRegistry(apps, appsDir, portCache)
-    with open(os.path.join(appsDir, "registry.json"), "w") as f:
-        json.dump(registry["metadata"], f, sort_keys=True)
+
+    registry = getAppMetadata(apps, appsDir, portCache)
     with open(os.path.join(appsDir, "ports.json"), "w") as f:
         json.dump(registry["ports"], f, sort_keys=True)
     with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
         json.dump(registry["portCache"], f, sort_keys=True)
     with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
         json.dump(registry["virtual_apps"], f, sort_keys=True)
-    print("Wrote registry to registry.json")
+    print("Processed app metadata")
+
+    # Delete the registry so it's regenerated
+    os.remove(os.path.join(nodeRoot, "apps", "registry.json"))
 
     os.system("docker pull {}".format(dependencies['app-cli']))
     threads = list()
     # Loop through the apps and generate valid compose files from them, then put these into the app dir
     for app in apps:
         try:
-            composeFile = os.path.join(appsDir, app, "docker-compose.yml")
             appYml = os.path.join(appsDir, app, "app.yml")
             with open(appYml, 'r') as f:
                 appDefinition = yaml.safe_load(f)
-            if 'citadel_version' in appDefinition:
-                thread = threading.Thread(target=handleAppV4, args=(app,))
+            if ('citadel_version' in appDefinition) or ('version' in appDefinition and str(appDefinition['version']) == "3"):
+                thread = threading.Thread(target=handleAppV3OrV4, args=(app,))
                 thread.start()
                 threads.append(thread)
             else:
-                appCompose = getApp(appDefinition, app)
-                with open(composeFile, "w") as f:
-                    if appCompose:
-                        f.write(yaml.dump(appCompose, sort_keys=False))
-                        if verbose:
-                            print("Wrote " + app + " to " + composeFile)
+                raise Exception("Error: Unsupported version of app.yml")
         except Exception as err:
             print("Failed to convert app {}".format(app))
-            print(err)
+            print(traceback.format_exc())
         
     joinThreads(threads)
     print("Generated configuration successfully")
@@ -205,7 +196,6 @@ def download(app: str):
     else:
         print("Warning: Could not download " + app)
 
-
 def getUserData():
     userData = {}
     if os.path.isfile(userFile):
@@ -213,65 +203,23 @@ def getUserData():
             userData = json.load(f)
     return userData
 
-def startInstalled():
-    # If userfile doesn't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    #threads = []
-    for app in userData["installedApps"]:
-        if not os.path.isdir(os.path.join(appsDir, app)):
-            print("Warning: App {} doesn't exist on Citadel".format(app))
-            continue
-        print("Starting app {}...".format(app))
-        # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        #thread = threading.Thread(target=compose, args=(app, "up --detach"))
-        #thread.start()
-        #threads.append(thread)
-        compose(app, "up --detach")
-    #joinThreads(threads)
-
-
-def stopInstalled():
-    # If userfile doesn't exist, just do nothing
-    userData = {}
-    if os.path.isfile(userFile):
-        with open(userFile, "r") as f:
-            userData = json.load(f)
-    threads = []
-    for app in userData["installedApps"]:
-        if not os.path.isdir(os.path.join(appsDir, app)):
-            print("Warning: App {} doesn't exist on Citadel".format(app))
-            continue
-        print("Stopping app {}...".format(app))
-        # Run compose(args.app, "up --detach") asynchrounously for all apps, then exit(0) when all are finished
-        thread = threading.Thread(
-            target=compose, args=(app, "rm --force --stop"))
-        thread.start()
-        threads.append(thread)
-    joinThreads(threads)
-
-# Loads an app.yml and converts it to a docker-compose.yml
-def getApp(app, appId: str):
-    if not "metadata" in app:
-        raise Exception("Error: Could not find metadata in " + appId)
-    app["metadata"]["id"] = appId
-
-    if 'version' in app and str(app['version']) == "2":
-        print("Warning: App {} uses version 2 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV2(app, nodeRoot)
-    elif 'version' in app and str(app['version']) == "3":
-        print("Warning: App {} uses version 3 of the app.yml format, which is scheduled for removal in Citadel 0.1.5".format(appId))
-        return createComposeConfigFromV3(app, nodeRoot)
-    else:
-        raise Exception("Error: Unsupported version of app.yml")
-
-
 def compose(app, arguments):
     if not os.path.isdir(os.path.join(appsDir, app)):
-        print("Warning: App {} doesn't exist on Citadel".format(app))
+        print("Warning: App {} doesn't exist on this node!".format(app))
         return
+    virtual_apps = {}
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        implementations = virtual_apps[virtual_app]
+        for implementation in implementations:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                if get_var_safe("APP_{}_SERVICE_IP".format(convert_to_upper(implementation))):
+                    os.environ["APP_{}_IP".format(convert_to_upper(virtual_app))] = get_var_safe("APP_{}_SERVICE_IP".format(convert_to_upper(implementation)))  # type: ignore
+                #if get_var_safe("APP_{}_SERVICE_PORT".format(convert_to_upper(implementation))):
+                    #os.environ["APP_{}_PORT".format(virtual_app)] = get_var_safe("APP_{}_SERVICE_PORT".format(convert_to_upper(implementation)))  # type: ignore
+                break
     # Runs a compose command in the app dir
     # Before that, check if a docker-compose.yml exists in the app dir
     composeFile = os.path.join(appsDir, app, "docker-compose.yml")
@@ -422,11 +370,11 @@ def updateRepos():
                     "githubRepo": gitUrl.removeprefix("https://github.com/").removesuffix(".git").removesuffix("/"),
                     "branch": branch,
                 }
-            if os.path.isdir(os.path.join(appsDir, app)):
-                shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
             if os.path.isdir(os.path.join(tempDir, "apps", app)):
+                if os.path.isdir(os.path.join(appsDir, app)):
+                    shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
                 shutil.copytree(os.path.join(tempDir, "apps", app), os.path.join(appsDir, app),
-                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore"))
+                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore", "result.yml"))
                 alreadyInstalled.append(app)
         # Remove the temporary dir
         shutil.rmtree(tempDir)

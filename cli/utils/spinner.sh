@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Author: Tasos Latsas
+# SPDX-FileCopyrightText: 2021 Tasos Latsas
+#
+# SPDX-License-Identifier: MIT
 
 # spinner.sh
 #

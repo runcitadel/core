@@ -1,5 +1,10 @@
-compose: v2.10.2
-dashboard: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
-manager: ghcr.io/runcitadel/manager:v0.0.17@sha256:ba436a07d6f96282217851756d8c81aeaa03c42dfa2246a89a78fc3384eed3cb
-middleware: ghcr.io/runcitadel/middleware:main@sha256:2aa20f31001ab9e61cda548acbd1864a598728731ad6121f050c6a41503866ae
-app-cli: ghcr.io/runcitadel/app-cli:main@sha256:c1073222d380797355678471155297f491a667d0bfde743271554c8d9c4c7e17
+# SPDX-FileCopyrightText: 2022 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+compose: v2.11.2
+dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:7ce1f0080ef9a6ef0bb990c979a422839592e165ae57c2a6df19cccb9154aef7
+manager: ghcr.io/runcitadel/manager:main@sha256:0ebc76556ec9f1f37e86e55778e7d073df87ebce1a5c6cb6c70e2f5fde882722
+middleware: ghcr.io/runcitadel/middleware:main@sha256:5b01a0a94152c5cf29a1d645e9186b16f72fb0b349940ad534dec62ea4a2a2dc
+app-cli: ghcr.io/runcitadel/app-cli:main@sha256:7c440e728bc800a37f39f5ec7fc81279b5eaa180e4919d7aac516ae40e1b416f
+tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92

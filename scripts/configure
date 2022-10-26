@@ -78,13 +78,6 @@ os.chdir(CITADEL_ROOT)
 with open("./db/dependencies.yml", "r") as file: 
   dependencies = yaml.safe_load(file)
 
-updating = False
-status_dir = os.path.join(CITADEL_ROOT, 'statuses')
-# Make sure to use the main status dir for updates
-if os.path.isfile('../.citadel'):
-    status_dir = os.path.join(CITADEL_ROOT, '..', 'statuses')
-    updating = True
-
 # Configure for appropriate network depending
 # upon the user-supplied value of $NETWORK
 # If the network is not specified, then use the mainnet
@@ -98,10 +91,12 @@ if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
 with open(os.path.join(CITADEL_ROOT, "info.json"), 'r') as file:
   CITADEL_VERSION=json.load(file)['version']
 
+status_dir = os.path.join(CITADEL_ROOT, 'statuses')
+
 print("\n======================================")
 if os.path.isfile(status_dir+'/configured'):
   print("=========== RECONFIGURING ============")
-  reconfiguring=True
+  reconfiguring=os.path.isfile('./.env')
 else:
   print("============ CONFIGURING =============")
   reconfiguring=False
@@ -141,10 +136,7 @@ NGINX_SSL_PORT=os.environ.get('NGINX_SSL_PORT') or "443"
 UPDATE_CHANNEL="stable"
 
 if reconfiguring:
-  if os.path.isfile('../.citadel'):
-    dotenv=parse_dotenv('../.env')
-  else:
-    dotenv=parse_dotenv('./.env')
+  dotenv=parse_dotenv('./.env')
 
   BITCOIN_NETWORK=os.environ.get('OVERWRITE_NETWORK') or dotenv['BITCOIN_NETWORK']
   # Check if network neither mainnet nor testnet nor regtest
@@ -177,13 +169,9 @@ else:
 
   # Pull Tor image and generate Tor password
   print("Generating Tor password\n")
-  os.system('docker pull --quiet lncm/tor:0.4.6.8')
+  os.system('docker pull --quiet {}'.format(dependencies["tor"]))
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
-
-  # run 'docker run --rm lncm/tor:0.4.6.7 --quiet --hash-password "$TOR_PASS"' and get its output
-  # this is the password that is used to connect to the Tor network
-  # the password is stored in the .env file
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm lncm/tor:0.4.6.8 --quiet --hash-password "{}"'.format(TOR_PASSWORD)).read()[:-1]
+  TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
@@ -239,11 +227,7 @@ neutrino.addpeer=testnet2-btcd.zaphq.io
 elif BITCOIN_NETWORK == "signet":
   BITCOIN_RPC_PORT=38332
   BITCOIN_P2P_PORT=38333
-  NEUTRINO_PEERS='''
-[neutrino]
-neutrino.addpeer=testnet1-btcd.zaphq.io
-neutrino.addpeer=testnet2-btcd.zaphq.io
-  '''
+  BITCOIN_NODE="bitcoind"
 elif BITCOIN_NETWORK == "regtest":
   BITCOIN_RPC_PORT=18334
   BITCOIN_P2P_PORT=18335
@@ -268,7 +252,6 @@ NEUTRINO_SWITCHER_IP="10.21.21.6"
 DASHBOARD_NEW_IP="10.21.21.7"
 BITCOIN_IP="10.21.21.8"
 LND_IP="10.21.21.9"
-ELECTRUM_IP="10.21.21.10"
 TOR_PROXY_IP="10.21.21.11"
 APPS_TOR_IP="10.21.21.12"
 APPS_2_TOR_IP="10.21.21.13"
@@ -284,7 +267,6 @@ BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
 BITCOIN_ZMQ_SEQUENCE_PORT="28335"
 LND_GRPC_PORT="10009"
 LND_REST_PORT="8080"
-ELECTRUM_PORT="50001"
 TOR_PROXY_PORT="9050"
 TOR_CONTROL_PORT="29051"
 
@@ -304,10 +286,6 @@ LND_FEE_URL=""
 # If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
 if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
    LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
-
-BITCOIN_NETWORK_ELECTRS = BITCOIN_NETWORK
-if BITCOIN_NETWORK_ELECTRS == "mainnet":
-  BITCOIN_NETWORK_ELECTRS = "bitcoin"
 
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
@@ -339,8 +317,6 @@ templates_to_build = {
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
-  "./templates/electrs-sample.toml": "./electrs/electrs.toml",
-  "./templates/fulcrum-sample.conf": "./fulcrum/fulcrum.conf",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf"
 }
 
@@ -377,13 +353,15 @@ with open("docker-compose.yml", 'r') as stream:
   compose = yaml.safe_load(stream)
 for service in ["manager", "middleware", "dashboard"]:
   compose["services"][service]["image"] = dependencies[service]
+for service in ["tor", "app-tor", "app-2-tor", "app-3-tor"]:
+  compose["services"][service]["image"] = dependencies["tor"]
 with open("docker-compose.yml", "w") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
 if not reconfiguring:
   print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure update')
-elif not updating:
+else:
   print("Updating apps...\n")
   os.system('./scripts/app --invoked-by-configure generate')
 print("Configuring permissions...\n")

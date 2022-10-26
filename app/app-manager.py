@@ -4,11 +4,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-from lib.manage import compose, createDataDir, deleteData, getUserData, setInstalled, setRemoved, startInstalled, stopInstalled, update, deriveEntropy, updateRepos, download, getAvailableUpdates
-from lib.validate import findAndValidateApps
-import os
 import argparse
+import json
+import os
+
+from lib.manage import (compose, createDataDir, deleteData, deriveEntropy,
+                        download, getAvailableUpdates, getUserData,
+                        setInstalled, setRemoved, update, updateRepos)
+from lib.validate import findAndValidateApps
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -97,10 +100,49 @@ elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    for virtual_app in virtual_apps.keys():
+        implementations = virtual_apps[virtual_app]
+        if args.app in implementations:
+            for implementation in implementations:
+                if "installedApps" in userData and implementation in userData["installedApps"]:
+                    print("Another implementation of {} is already installed: {}. Uninstall it first to install this app.".format(virtual_app, implementation))
+                    exit(1)
     createDataDir(args.app)
     compose(args.app, "pull")
     compose(args.app, "up --detach")
     setInstalled(args.app)
+    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
+    registry: list = []
+    if os.path.isfile(registryFile):
+        with open(registryFile, 'r') as f:
+            registry = json.load(f)
+    for app in registry:
+        if not app.compatible:
+            for dependency in app.missing_dependencies:
+                # If dependency is a string, check if it's the app we're installing or the app we're installing implements
+                if isinstance(dependency, str):
+                    if dependency == args.app or args.app in virtual_apps[dependency]:
+                        # Delete the app's result.yml file
+                        os.remove(os.path.join(nodeRoot, "apps", app.name, "result.yml"))
+                # Else, it should be a list, so check if the app we're installing is in it
+                elif isinstance(dependency, list):
+                    for dep in dependency:
+                        if dep == args.app or args.app in virtual_apps[dep]:
+                            # Delete the app's result.yml file
+                            os.remove(os.path.join(nodeRoot, "apps", app.name, "result.yml"))
+    # Reconfigure
+    os.system(os.path.join(nodeRoot, "scripts", "configure"))
+    os.chdir(nodeRoot)
+    os.system("docker compose stop app-tor")
+    os.system("docker compose start app-tor")
+    os.system("docker compose stop app-2-tor")
+    os.system("docker compose start app-2-tor")
+    os.system("docker compose stop app-3-tor")
+    os.system("docker compose start app-3-tor")
+
 elif args.action == 'uninstall':
     if not args.app:
         print("No app provided")
@@ -123,10 +165,6 @@ elif args.action == 'stop':
         print("No app provided")
         exit(1)
     userData = getUserData()
-    if args.app == "installed":
-        if "installedApps" in userData:
-            stopInstalled()
-        exit(0)
     print("Stopping app {}...".format(args.app))
     compose(args.app, "rm --force --stop")
 elif args.action == 'start':
@@ -135,11 +173,6 @@ elif args.action == 'start':
         exit(1)
 
     userData = getUserData()
-    if args.app == "installed":
-        if "installedApps" in userData:
-            startInstalled()
-        exit(0)
-
     if not "installedApps" in userData or args.app not in userData["installedApps"]:
         print("App {} is not yet installed".format(args.app))
         exit(1)
@@ -149,10 +182,6 @@ elif args.action == 'restart':
     if not args.app:
         print("No app provided")
         exit(1)
-    if args.app == "installed":
-        stopInstalled()
-        startInstalled()
-        exit(0)
 
     userData = getUserData()
     if not "installedApps" in userData or args.app not in userData["installedApps"]:

@@ -23,8 +23,6 @@ echo
 
 [[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
 
-IS_MIGRATING=0
-
 # If ${CITADEL_ROOT}/c-lightning exists, fail
 if [[ -d "${CITADEL_ROOT}/c-lightning" ]]; then
     echo "This update is not compatible with the c-lightning beta."
@@ -73,29 +71,13 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
 
     echo "source ~/citadel/setenv" | tee -a /home/citadel/.bashrc
 
-    sudo apt install -y python3-dacite python3-semver
+    sudo apt install -y python3-semver
 fi
 
 # Help migration from earlier versions
 mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
 
-# Checkout to the new release
-cd "$CITADEL_ROOT"/.citadel-"$RELEASE"
-
-# Configure new install
-echo "Configuring new release"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 40, "description": "Configuring new release", "updateTo": "$RELEASE"}
-EOF
-
-./scripts/configure || true
-
-# Pulling new containers
-echo "Pulling new containers"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 50, "description": "Pulling new containers", "updateTo": "$RELEASE"}
-EOF
-docker compose pull
+cd "$CITADEL_ROOT"
 
 # Stopping karen
 echo "Stopping background daemon"
@@ -108,7 +90,6 @@ echo "Stopping installed apps"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 60, "description": "Stopping installed apps", "updateTo": "$RELEASE"}
 EOF
-cd "$CITADEL_ROOT"
 ./scripts/app stop installed || true
 
 # Stop old containers
@@ -118,6 +99,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 ./scripts/stop || true
 
+electrum_implementation=$(cat services/installed.yml | grep "electrum:" | sed "s/electrum: //g")
 
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
@@ -134,33 +116,32 @@ echo "Fixing permissions"
 find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
 chmod -R 700 "$CITADEL_ROOT"/tor/data/*
 
-cd "$CITADEL_ROOT"
-echo "Updating installed apps"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 70, "description": "Updating installed apps", "updateTo": "$RELEASE"}
-EOF
-"${CITADEL_ROOT}/scripts/app" --invoked-by-configure update
-for app in $("$CITADEL_ROOT/scripts/app" ls-installed); do
-  if [[ "${app}" != "" ]]; then
-    echo "${app}..."
-    "${CITADEL_ROOT}/scripts/app" compose "${app}" pull
-  fi
-done
-wait
-
-# If CITADEL_ROOT doesn't contain services/installed.json, then put '["electrs"]' into it.
-# This is to ensure that the 0.5.0 update doesn't remove electrs.
-if [[ ! -f "${CITADEL_ROOT}/services/installed.json" ]]; then
-  echo '["electrs"]' > "${CITADEL_ROOT}/services/installed.json"
-fi
-
 # Start updated containers
 echo "Starting new containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-./scripts/start
+# Only for 0.1.0, remove after
+rm -f nginx/nginx.conf || true
+./scripts/start || true
+
+# Install the electrum implementation as app
+echo "Installing electrum implementation as app"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 85, "description": "Installing electrum server", "updateTo": "$RELEASE"}
+EOF
+./scripts/app install "$electrum_implementation"
+./scripts/app stop "$electrum_implementation"
+
+rm -rf "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
+
+mv "$CITADEL_ROOT"/"$electrum_implementation" "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
+
+rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/electrs.toml
+rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/fulcrum.conf
+
+./scripts/app start "$electrum_implementation"
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}

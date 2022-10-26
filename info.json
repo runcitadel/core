@@ -1,7 +1,7 @@
 {
-    "version": "0.0.10",
-    "name": "An important bug fix update",
-    "requires": ">=0.0.5",
+    "version": "0.1.0",
+    "name": "Citadel 0.1.0",
+    "requires": ">=0.0.10",
     "isQuickUpdate": false,
-    "notes": "This update fixes an issue causing LND to crash."
+    "notes": "This update contains a lot of fixes and improvements. Read more on https://blog.runcitadel.space."
 }
