@@ -74,9 +74,6 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     sudo apt install -y python3-semver
 fi
 
-# Help migration from earlier versions
-mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
-
 cd "$CITADEL_ROOT"
 
 # Stopping karen
@@ -122,26 +119,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
-# Only for 0.1.0, remove after
-rm -f nginx/nginx.conf || true
 ./scripts/start || true
-
-# Install the electrum implementation as app
-echo "Installing electrum implementation as app"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 85, "description": "Installing electrum server", "updateTo": "$RELEASE"}
-EOF
-./scripts/app install "$electrum_implementation"
-./scripts/app stop "$electrum_implementation"
-
-rm -rf "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
-
-mv "$CITADEL_ROOT"/"$electrum_implementation" "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data
-
-rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/electrs.toml
-rm -f "$CITADEL_ROOT"/app-data/"$electrum_implementation"/data/fulcrum.conf
-
-./scripts/app start "$electrum_implementation"
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}

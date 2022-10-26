@@ -1,7 +1,7 @@
 {
-    "version": "0.1.0",
-    "name": "Citadel 0.1.0",
-    "requires": ">=0.0.10",
+    "version": "0.1.1",
+    "name": "Citadel 0.1.1",
+    "requires": ">=0.1.0",
     "isQuickUpdate": false,
-    "notes": "This update contains a lot of fixes and improvements. Read more on https://blog.runcitadel.space."
+    "notes": "This update ensures future Citadel updates can be installed without issues."
 }
