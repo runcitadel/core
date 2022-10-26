@@ -120,19 +120,19 @@ elif args.action == 'install':
         with open(registryFile, 'r') as f:
             registry = json.load(f)
     for app in registry:
-        if not app.compatible:
-            for dependency in app.missing_dependencies:
+        if not app['compatible']:
+            for dependency in app['missing_dependencies']:
                 # If dependency is a string, check if it's the app we're installing or the app we're installing implements
                 if isinstance(dependency, str):
                     if dependency == args.app or args.app in virtual_apps[dependency]:
                         # Delete the app's result.yml file
-                        os.remove(os.path.join(nodeRoot, "apps", app.name, "result.yml"))
+                        os.remove(os.path.join(nodeRoot, "apps", app['id'], "result.yml"))
                 # Else, it should be a list, so check if the app we're installing is in it
                 elif isinstance(dependency, list):
                     for dep in dependency:
                         if dep == args.app or args.app in virtual_apps[dep]:
                             # Delete the app's result.yml file
-                            os.remove(os.path.join(nodeRoot, "apps", app.name, "result.yml"))
+                            os.remove(os.path.join(nodeRoot, "apps", app['id'], "result.yml"))
     # Reconfigure
     os.system(os.path.join(nodeRoot, "scripts", "configure"))
     os.chdir(nodeRoot)
