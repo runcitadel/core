@@ -195,6 +195,7 @@ def validatePort(containerName, port, appId, priority: int, isDynamic = False, i
                         "container": containerName,
                         "priority": priority,
                         "dynamic": isDynamic,
+                        "implements": implements,
                     }
 
 def getPortsV3App(app, appId):
