@@ -302,6 +302,8 @@ def updateRepos():
         shutil.rmtree(tempDir)
     with open(os.path.join(appsDir, "sourceMap.json"), "w") as f:
         json.dump(sourceMap, f)
+    # Fix permissions
+    subprocess.call("chown -R 1000:1000 {}".format(appsDir), shell=True)
 
 
 def getAvailableUpdates():
