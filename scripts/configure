@@ -329,7 +329,8 @@ templates_to_build = {
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf",
-  "./templates/i2p-sample.conf": "./i2p/i2pd.conf"
+  "./templates/i2p-sample.conf": "./i2p/i2pd.conf",
+  "./templates/i2p-tunnels-sample.conf": "./i2p/tunnels.conf"
 }
 
 print("Generating configuration files...")
