@@ -113,7 +113,6 @@ services:
     image: ghcr.io/runcitadel/manager:deno@sha256:fa5bd47fc5a19095a26f1660d8d64fb571d24b476cddf4f6e61ae0e7690caf87
     depends_on:
     - tor
-    - redis
     restart: on-failure
     init: true
     stop_grace_period: 5m30s
@@ -152,9 +151,6 @@ services:
       TOR_PROXY_PORT: ${TOR_PROXY_PORT}
       TOR_HIDDEN_SERVICE_DIR: /var/lib/tor
       IS_CITADEL_OS: ${IS_CITADEL_OS:-"true"}
-      REDIS_PASSWORD: freedom
-      REDIS_IP: $REDIS_IP
-      REDIS_PORT: 6379
       UNSAFE_REMOVE_CORS_CHECK: true
     networks:
       default:
@@ -165,7 +161,6 @@ services:
     depends_on:
     - bitcoin
     - lightning
-    - redis
     command: sh -c "./wait-for-manager.sh $MANAGER_IP && ././start.sh"
     restart: on-failure
     volumes:
@@ -205,20 +200,19 @@ services:
     networks:
       default:
         ipv4_address: $NEUTRINO_SWITCHER_IP
-  redis:
-    container_name: redis
+  i2p:
+    container_name: i2p
     user: 1000:1000
-    image: redis:7.0.0-bullseye@sha256:ad0705f2e2344c4b642449e658ef4669753d6eb70228d46267685045bf932303
+    image: purplei2p/i2pd:latest@sha256:d8e1a28a8428ed9bda15bbf773e355cf46c89c652dcaa6cd9131606ee308ae47
     working_dir: /data
     volumes:
-    - ${PWD}/redis:/data
-    command: redis-server --requirepass freedom
+    - ${PWD}/i2p:/home/i2pd/data
     restart: on-failure
     stop_grace_period: 1m
     init: true
     networks:
       default:
-        ipv4_address: $REDIS_IP
+        ipv4_address: $I2P_IP
 
 networks:
   default:
