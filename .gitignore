@@ -24,7 +24,7 @@ apps
 electrs/*
 fulcrum/*
 nginx/*
-redis/*
+i2p/*
 docker-compose.override.yml
 
 # Commit these empty directories
@@ -42,7 +42,7 @@ db/citadel-seed/*
 !tor/.gitkeep
 !db/.gitkeep
 !nginx/.gitkeep
-!redis/.gitkeep
+!i2p/.gitkeep
 !fulcrum/.gitkeep
 
 !**/*.license
