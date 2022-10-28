@@ -85,34 +85,7 @@ elif args.action == 'install':
     compose(args.app, "pull")
     compose(args.app, "up --detach")
     setInstalled(args.app)
-    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
-    registry: list = []
-    if os.path.isfile(registryFile):
-        with open(registryFile, 'r') as f:
-            registry = json.load(f)
-    for app in registry:
-        if not app['compatible']:
-            for dependency in app['missing_dependencies']:
-                # If dependency is a string, check if it's the app we're installing or the app we're installing implements
-                if isinstance(dependency, str):
-                    if dependency == args.app or args.app in virtual_apps[dependency]:
-                        # Delete the app's result.yml file
-                        os.remove(os.path.join(nodeRoot, "apps", app['id'], "result.yml"))
-                # Else, it should be a list, so check if the app we're installing is in it
-                elif isinstance(dependency, list):
-                    for dep in dependency:
-                        if dep == args.app or args.app in virtual_apps[dep]:
-                            # Delete the app's result.yml file
-                            os.remove(os.path.join(nodeRoot, "apps", app['id'], "result.yml"))
-    # Reconfigure
-    os.system(os.path.join(nodeRoot, "scripts", "configure"))
-    os.chdir(nodeRoot)
-    os.system("docker compose stop app-tor")
-    os.system("docker compose start app-tor")
-    os.system("docker compose stop app-2-tor")
-    os.system("docker compose start app-2-tor")
-    os.system("docker compose stop app-3-tor")
-    os.system("docker compose start app-3-tor")
+    update(args.verbose)
 
 elif args.action == 'uninstall':
     if not args.app:
