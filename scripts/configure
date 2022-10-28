@@ -357,14 +357,15 @@ for service in ["tor", "app-tor", "app-2-tor", "app-3-tor"]:
 with open("docker-compose.yml", "w") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
+print("Configuring permissions...\n")
+os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+
 if not reconfiguring:
   print("Updating apps...\n")
   os.system('./scripts/app update')
 else:
   print("Updating apps...\n")
   os.system('./scripts/app generate')
-print("Configuring permissions...\n")
-os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
