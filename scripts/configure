@@ -12,6 +12,12 @@ import subprocess
 import json
 import shutil
 import yaml
+from binascii import hexlify
+from os import urandom
+
+def generate_password(size):
+    """Create size byte hex salt"""
+    return hexlify(urandom(size)).decode()
 
 # Print an error if the user isn't running on Linux.
 if sys.platform != 'linux':
@@ -162,7 +168,7 @@ if reconfiguring:
   if 'I2P_PASSWORD' in dotenv:
     I2P_PASSWORD=dotenv['I2P_PASSWORD']
   else:
-    I2P_PASSWORD=get_data('i2p')['password']
+    I2P_PASSWORD=generate_password(64)
 else:
   # Generate RPC credentials
   print("Generating auth credentials\n")
@@ -176,7 +182,7 @@ else:
   os.system('docker pull --quiet {}'.format(dependencies["tor"]))
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
   TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
-  I2P_PASSWORD=get_data('i2p')['password']
+  I2P_PASSWORD=generate_password(64)
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
