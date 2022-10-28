@@ -312,7 +312,6 @@ def replace_vars(file_path):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
 templates_to_build = {
-  "./templates/torrc-empty": ["./tor/torrc-apps", "./tor/torrc-apps-2", "./tor/torrc-apps-3"],
   "./templates/torrc-core-sample": "./tor/torrc-core",
   "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
@@ -360,10 +359,10 @@ with open("docker-compose.yml", "w") as stream:
 
 if not reconfiguring:
   print("Updating apps...\n")
-  os.system('./scripts/app --invoked-by-configure update')
+  os.system('./scripts/app update')
 else:
   print("Updating apps...\n")
-  os.system('./scripts/app --invoked-by-configure generate')
+  os.system('./scripts/app generate')
 print("Configuring permissions...\n")
 os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
 # Touch status_dir/configured

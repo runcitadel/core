@@ -38,7 +38,7 @@ if [ "$1" == "stop" ] || [ "$1" == "start" ] || [ "$1" == "install" ] || [ "$1" 
     fi
 elif  [ "$1" == "update" ] && [[ "$2" != "" ]]; then
     for app in "${@:2}"; do
-        "${NODE_ROOT}/app/app-manager.py" --invoked-by-configure update "$app"
+        "${NODE_ROOT}/app/app-manager.py" update "$app"
     done
     "${NODE_ROOT}/app/app-manager.py" generate
     for app in "${@:2}"; do

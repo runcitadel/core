@@ -21,8 +21,6 @@ import semver
 import yaml
 from lib.citadelutils import FileLock, parse_dotenv
 from lib.entropy import deriveEntropy
-from lib.metadata import getAppMetadata
-from lib.validate import findAndValidateApps
 
 
 # For an array of threads, join them and wait for them to finish
@@ -88,45 +86,6 @@ def convert_to_upper(string):
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
-def handleAppV3OrV4(app):
-    # Currently part of Citadel
-    services = ["lnd", "bitcoind"]
-    userData = getUserData()
-    if not "installedApps" in userData:
-        userData["installedApps"] = []
-    services.extend(userData["installedApps"])
-    services.extend(getInstalledVirtualApps())
-    composeFile = os.path.join(appsDir, app, "docker-compose.yml")
-    os.chown(os.path.join(appsDir, app), 1000, 1000)
-    if not os.path.isfile(os.path.join(appsDir, app, "result.yml")):
-        os.system("docker run --rm -v {}:/apps -u 1000:1000 {} /app-cli convert --app-name '{}' --port-map /apps/ports.json --services '{}' /apps/{}/app.yml /apps/{}/result.yml".format(appsDir, dependencies['app-cli'], app, ",".join(services), app, app))
-    with open(os.path.join(appsDir, app, "result.yml"), "r") as resultFile:
-        resultYml = yaml.safe_load(resultFile)
-    with open(composeFile, "w") as dockerComposeFile:
-        yaml.dump(resultYml["spec"], dockerComposeFile)
-    torDaemons = ["torrc-apps", "torrc-apps-2", "torrc-apps-3"]
-    torFileToAppend = torDaemons[random.randint(0, len(torDaemons) - 1)]
-    with open(os.path.join(nodeRoot, "tor", torFileToAppend), 'a') as f:
-        f.write(replace_vars(resultYml["new_tor_entries"]))
-
-    registryFile = os.path.join(nodeRoot, "apps", "registry.json")
-    registry: list = []
-    lock = FileLock("citadel_registry_lock", dir="/tmp")
-    lock.acquire()
-    if os.path.isfile(registryFile):
-        with open(registryFile, 'r') as f:
-            registry = json.load(f)
-
-    resultYml["metadata"]['port'] = resultYml["port"]
-    resultYml["metadata"]['defaultPassword'] = resultYml["metadata"].get('defaultPassword', '')
-    if resultYml["metadata"]['defaultPassword'] == "$APP_SEED":
-        resultYml["metadata"]['defaultPassword'] = deriveEntropy("app-{}-seed".format(app))
-
-    registry.append(resultYml["metadata"])
-
-    with open(registryFile, 'w') as f:
-        json.dump(registry, f, indent=4, sort_keys=True)
-    lock.release()
 
 def getAppYml(name):
     with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
@@ -147,44 +106,7 @@ def getAppYml(name):
         return False
 
 def update(verbose: bool = False):
-    apps = findAndValidateApps(appsDir)
-    portCache = {}
-    try:
-        with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
-            portCache = json.load(f)
-    except Exception: pass
-
-    registry = getAppMetadata(apps, appsDir, portCache)
-    with open(os.path.join(appsDir, "ports.json"), "w") as f:
-        json.dump(registry["ports"], f, sort_keys=True)
-    with open(os.path.join(appsDir, "ports.cache.json"), "w") as f:
-        json.dump(registry["portCache"], f, sort_keys=True)
-    with open(os.path.join(appsDir, "virtual-apps.json"), "w") as f:
-        json.dump(registry["virtual_apps"], f, sort_keys=True)
-    print("Processed app metadata")
-
-    # Delete the registry so it's regenerated
-    os.remove(os.path.join(nodeRoot, "apps", "registry.json"))
-
-    os.system("docker pull {}".format(dependencies['app-cli']))
-    threads = list()
-    # Loop through the apps and generate valid compose files from them, then put these into the app dir
-    for app in apps:
-        try:
-            appYml = os.path.join(appsDir, app, "app.yml")
-            with open(appYml, 'r') as f:
-                appDefinition = yaml.safe_load(f)
-            if ('citadel_version' in appDefinition) or ('version' in appDefinition and str(appDefinition['version']) == "3"):
-                thread = threading.Thread(target=handleAppV3OrV4, args=(app,))
-                thread.start()
-                threads.append(thread)
-            else:
-                raise Exception("Error: Unsupported version of app.yml")
-        except Exception as err:
-            print("Failed to convert app {}".format(app))
-            print(traceback.format_exc())
-        
-    joinThreads(threads)
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 

@@ -11,7 +11,6 @@ import os
 from lib.manage import (compose, createDataDir, deleteData, deriveEntropy,
                         download, getAvailableUpdates, getUserData,
                         setInstalled, setRemoved, update, updateRepos)
-from lib.validate import findAndValidateApps
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -28,10 +27,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "list", "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
-# Add the --invoked-by-configure option, which is hidden from the user in --help
-parser.add_argument('--invoked-by-configure',
-                    action='store_true', help=argparse.SUPPRESS)
+                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
     'app', help='Optional, the app to perform an action on. (For install, uninstall, stop, start and compose)', nargs='?')
@@ -43,12 +39,7 @@ args = parser.parse_args()
 if args.action is None:
     args.action = 'list'
 
-if args.action == 'list':
-    apps = findAndValidateApps(appsDir)
-    for app in apps:
-        print(app)
-    exit(0)
-elif args.action == "list-updates":
+if args.action == "list-updates":
     availableUpdates = getAvailableUpdates()
     print(json.dumps(availableUpdates))
     exit(0)
@@ -56,17 +47,7 @@ elif args.action == 'download':
     updateRepos()
     exit(0)
 elif args.action == 'generate':
-    if args.invoked_by_configure:
-        update(args.app)
-    else:
-        os.system(os.path.join(nodeRoot, "scripts", "configure"))
-        os.chdir(nodeRoot)
-        os.system("docker compose stop app-tor")
-        os.system("docker compose start app-tor")
-        os.system("docker compose stop app-2-tor")
-        os.system("docker compose start app-2-tor")
-        os.system("docker compose stop app-3-tor")
-        os.system("docker compose start app-3-tor")
+    update(args.app)
     exit(0)
 elif args.action == 'update':
     if args.app is None:
@@ -75,17 +56,7 @@ elif args.action == 'update':
     else:
         download(args.app)
         print("Downloaded latest {} version".format(args.app))
-    if args.invoked_by_configure:
-        update(args.verbose)
-    else:
-        os.system(os.path.join(nodeRoot, "scripts", "configure"))
-        os.chdir(nodeRoot)
-        os.system("docker compose stop app-tor")
-        os.system("docker compose start app-tor")
-        os.system("docker compose stop app-2-tor")
-        os.system("docker compose start app-2-tor")
-        os.system("docker compose stop app-3-tor")
-        os.system("docker compose start app-3-tor")
+    update(args.verbose)
     exit(0)
 elif args.action == 'ls-installed':
     # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps
