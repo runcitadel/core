@@ -159,6 +159,10 @@ if reconfiguring:
     NGINX_SSL_PORT="443"
   if 'UPDATE_CHANNEL' in dotenv and dotenv['UPDATE_CHANNEL'] != "main" and dotenv['UPDATE_CHANNEL'] != "migration":
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
+  if 'I2P_PASSWORD' in dotenv:
+    I2P_PASSWORD=dotenv['I2P_PASSWORD']
+  else:
+    I2P_PASSWORD=get_data('i2p')['password']
 else:
   # Generate RPC credentials
   print("Generating auth credentials\n")
@@ -172,6 +176,7 @@ else:
   os.system('docker pull --quiet {}'.format(dependencies["tor"]))
   TOR_PASSWORD=get_data('itdoesntmatter')['password']
   TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
+  I2P_PASSWORD=get_data('i2p')['password']
 
 BITCOIN_NODE="neutrino"
 ALIAS_AND_COLOR=""
