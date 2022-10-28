@@ -74,6 +74,7 @@ elif args.action == 'install':
     with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
         virtual_apps = json.load(f)
     userData = getUserData()
+    implements_service = False
     for virtual_app in virtual_apps.keys():
         implementations = virtual_apps[virtual_app]
         if args.app in implementations:
@@ -81,10 +82,13 @@ elif args.action == 'install':
                 if "installedApps" in userData and implementation in userData["installedApps"]:
                     print("Another implementation of {} is already installed: {}. Uninstall it first to install this app.".format(virtual_app, implementation))
                     exit(1)
+            implements_service = virtual_app
     createDataDir(args.app)
     compose(args.app, "pull")
     compose(args.app, "up --detach")
     setInstalled(args.app)
+    if virtual_app:
+        setInstalled(virtual_app)
     update(args.verbose)
 
 elif args.action == 'uninstall':
@@ -104,6 +108,14 @@ elif args.action == 'uninstall':
         pass
     print("Removing from the list of installed apps...")
     setRemoved(args.app)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    implements_service = False
+    for virtual_app in virtual_apps.keys():
+        implementations = virtual_apps[virtual_app]
+        if args.app in implementations:
+            setRemoved(virtual_app)
+
 elif args.action == 'stop':
     if not args.app:
         print("No app provided")
