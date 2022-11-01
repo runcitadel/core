@@ -1,7 +1,7 @@
 {
-    "version": "0.1.2",
-    "name": "Citadel 0.1.2",
+    "version": "0.1.3",
+    "name": "Citadel 0.1.3",
     "requires": ">=0.1.0",
     "isQuickUpdate": false,
-    "notes": "This update fixes a few more app-related bugs."
+    "notes": "This update fixes the LND issues, the LNDg app, updates BTCPay, adds a few more app icons, and allows I2P managment (beta)."
 }
