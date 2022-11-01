@@ -102,7 +102,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:v0.0.17@sha256:4416254a023b3060338529446068b97b2d95834c59119b75bdeae598c5c81d0e
+    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:de8a3ed4fbacaa68f76787f38f54da782036890be9052f7c5a35f4814f7e1027
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -110,7 +110,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/runcitadel/manager:deno@sha256:fa5bd47fc5a19095a26f1660d8d64fb571d24b476cddf4f6e61ae0e7690caf87
+    image: ghcr.io/runcitadel/manager:main@sha256:771761435bd21432c8febd4d87a036c95e9ac49be72de4cf3efede4567cc38bd
     depends_on:
     - tor
     restart: on-failure
@@ -152,6 +152,8 @@ services:
       TOR_HIDDEN_SERVICE_DIR: /var/lib/tor
       IS_CITADEL_OS: ${IS_CITADEL_OS:-"true"}
       UNSAFE_REMOVE_CORS_CHECK: true
+      I2P_PASSWORD: $I2P_PASSWORD
+      I2P_USERNAME: i2pd
     networks:
       default:
         ipv4_address: $MANAGER_IP

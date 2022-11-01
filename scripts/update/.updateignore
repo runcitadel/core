@@ -4,10 +4,9 @@ bitcoin/*
 lnd/*
 statuses
 tor/*
-electrs/*
 logs/*
 app-data/*
 nginx/*
 services/installed.yml
 apps/*
-fulcrum/*
+i2p/*
