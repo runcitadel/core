@@ -113,8 +113,8 @@ rsync --archive \
 
 # Fix permissions
 echo "Fixing permissions"
-find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} +
-chmod -R 700 "$CITADEL_ROOT"/tor/data/*
+find "$CITADEL_ROOT" -path "$CITADEL_ROOT/app-data" -prune -o -exec chown 1000:1000 {} + || true
+chmod -R 700 "$CITADEL_ROOT"/tor/data/* || true
 
 # Start updated containers
 echo "Starting new containers"
