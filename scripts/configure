@@ -372,7 +372,9 @@ with open("docker-compose.yml", "w") as stream:
     yaml.dump(compose, stream, sort_keys=False)
 
 print("Configuring permissions...\n")
-os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+try:
+  os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+except: pass
 
 if not reconfiguring:
   print("Updating apps...\n")
