@@ -115,6 +115,7 @@ elif args.action == 'uninstall':
         implementations = virtual_apps[virtual_app]
         if args.app in implementations:
             setRemoved(virtual_app)
+    update(args.verbose)
 
 elif args.action == 'stop':
     if not args.app:
