@@ -12,7 +12,7 @@ services:
     - ${PWD}/tor/torrc-core:/etc/tor/torrc
     - ${PWD}/tor/data:/var/lib/tor/
     ports:
-    - 127.0.0.1:$TOR_PROXY_PORT:$TOR_PROXY_PORT
+    - localhost:$TOR_PROXY_PORT:$TOR_PROXY_PORT
     networks:
       default:
         ipv4_address: $TOR_PROXY_IP
