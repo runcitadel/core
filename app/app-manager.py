@@ -10,7 +10,7 @@ import os
 
 from lib.manage import (compose, createDataDir, deleteData, deriveEntropy,
                         download, getAvailableUpdates, getUserData,
-                        setInstalled, setRemoved, update, updateRepos)
+                        setInstalled, setRemoved, update, updateRepos, get_var_safe, convert_to_upper)
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -27,7 +27,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "entropy"])
+                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "get-ip"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
     'app', help='Optional, the app to perform an action on. (For install, uninstall, stop, start and compose)', nargs='?')
@@ -153,11 +153,22 @@ elif args.action == 'compose':
         exit(1)
     compose(args.app, " ".join(args.other))
 
-elif args.action == "entropy":
+elif args.action == "get-ip":
     if args.app == "":
-        print("Missing identifier for entropy")
+        print("Missing app")
         exit(1)
-    print(deriveEntropy(args.app))
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    implements_service = False
+    if args.app in virtual_apps:
+        for implementation in virtual_apps[args.app]:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                print(get_var_safe("APP_{}_SERVICE_IP".format(convert_to_upper(implementation))))
+                exit(0)
+    else:
+        print("Not an virtual app")
+        exit(1)
 
 else:
     print("Error: Unknown action")

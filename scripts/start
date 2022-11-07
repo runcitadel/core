@@ -111,6 +111,7 @@ echo
 echo
 echo "Starting Docker services..."
 echo
+export APP_ELECTRUM_IP=$(./scripts/app get-ip electrum || echo)
 docker compose up --detach --build --remove-orphans || {
   echo "Failed to start containers"
   exit 1
