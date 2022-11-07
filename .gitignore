@@ -21,8 +21,6 @@ db/*
 statuses/*
 app-data
 apps
-electrs/*
-fulcrum/*
 nginx/*
 i2p/*
 docker-compose.override.yml
@@ -43,7 +41,6 @@ db/citadel-seed/*
 !db/.gitkeep
 !nginx/.gitkeep
 !i2p/.gitkeep
-!fulcrum/.gitkeep
 
 !**/*.license
 services/installed.json
