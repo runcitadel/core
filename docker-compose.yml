@@ -219,7 +219,7 @@ services:
       default:
         ipv4_address: $I2P_IP
   grpc-proxy:
-    image: ghcr.io/runcitadel/grpc-web-proxy:main@sha256:90193435d2e2bd310316244e8e6d1179350dc8e7e470495d72f480f3f64d85ed
+    image: ghcr.io/runcitadel/grpc-web-proxy:main@sha256:c5ebe8753090f4a7e67990cf1464e134cd553cd06794e5cae6896f537c6e317e
     # This prox is only used internally, so no TLS needed 
     command: /grpcwebproxy --backend_addr=$LND_IP:$LND_GRPC_PORT --run_tls_server=false --backend_max_call_recv_msg_size=20971520 --backend_tls_noverify
     stop_grace_period: 20s
