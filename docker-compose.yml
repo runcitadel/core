@@ -110,7 +110,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:f3f60df3d154578aa4d8a7f7b4fa40ce749ceba94cc8b484e1d6ae63fcb5b79e
+    image: ghcr.io/citadel-core/api:main@sha256:9418bcb77c79ee1be5d6ddf64f9fa3abbacfcd8c99b18aa3844a92c85a701b85
     depends_on:
     - tor
     restart: on-failure
@@ -135,6 +135,7 @@ services:
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
       SEED_FILE: /db/citadel-seed/seed
+      BITCOIN_HOST: $BITCOIN_IP
       BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIN_RPC_USER: $BITCOIN_RPC_USER
@@ -155,6 +156,7 @@ services:
       I2P_USERNAME: i2pd
       ELECTRUM_HOST: $APP_ELECTRUM_IP
       ELECTRUM_PORT: 50001
+      LND_SERVER: ${GRPC_PROXY_IP}:8080
     networks:
       default:
         ipv4_address: $MANAGER_IP
@@ -216,7 +218,14 @@ services:
     networks:
       default:
         ipv4_address: $I2P_IP
-
+  grpc-proxy:
+    image: ghcr.io/runcitadel/grpc-web-proxy:main@sha256:90193435d2e2bd310316244e8e6d1179350dc8e7e470495d72f480f3f64d85ed
+    # This prox is only used internally, so no TLS needed 
+    command: /grpcwebproxy --backend_addr=$LND_IP:$LND_GRPC_PORT --run_tls_server=false --backend_max_call_recv_msg_size=20971520 --backend_tls_noverify
+    stop_grace_period: 20s
+    networks:
+      default:
+        ipv4_address: $GRPC_PROXY_IP
 networks:
   default:
     name: citadel_main_network
