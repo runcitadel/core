@@ -14,8 +14,4 @@ SPDX-License-Identifier: GPL-3.0-or-later
 ![License](https://img.shields.io/github/license/runcitadel/core?style=flat-square)
 
 Citadel Core contains simple, minimalistic host system components for running a Citadel server.
-It uses docker and docker-compose to orchestrate containers for the core system and apps.
-
-This repository also contains `karen`, a background daemon responsible for communication between Citadel docker containers and the Citadel Core.
-
-Citadel Core is a fully FLOSS project which replaces the previous `compose` and `compose-nonfree` repositories.
+It uses docker to orchestrate containers for the core system and apps.
