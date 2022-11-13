@@ -156,7 +156,6 @@ services:
       I2P_USERNAME: i2pd
       ELECTRUM_HOST: $APP_ELECTRUM_IP
       ELECTRUM_PORT: 50001
-      LND_SERVER: ${GRPC_PROXY_IP}:8080
     networks:
       default:
         ipv4_address: $MANAGER_IP
@@ -218,15 +217,7 @@ services:
     networks:
       default:
         ipv4_address: $I2P_IP
-  grpc-proxy:
-    image: ghcr.io/runcitadel/grpc-web-proxy:main@sha256:c5ebe8753090f4a7e67990cf1464e134cd553cd06794e5cae6896f537c6e317e
-    entrypoint: /grpcwebproxy
-    # This proxy is only used by other containers and not exposed publicly, so no TLS needed 
-    command: --backend_addr=$LND_IP:$LND_GRPC_PORT --run_tls_server=false --backend_max_call_recv_msg_size=20971520 --backend_tls_noverify
-    stop_grace_period: 20s
-    networks:
-      default:
-        ipv4_address: $GRPC_PROXY_IP
+
 networks:
   default:
     name: citadel_main_network
