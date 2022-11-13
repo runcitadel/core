@@ -102,7 +102,7 @@ services:
         ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:de8a3ed4fbacaa68f76787f38f54da782036890be9052f7c5a35f4814f7e1027
+    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:8920719b77a1db517e60742d72a4b63230f170d980d116f8e01974247e8da148
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -110,7 +110,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:9418bcb77c79ee1be5d6ddf64f9fa3abbacfcd8c99b18aa3844a92c85a701b85
+    image: ghcr.io/citadel-core/api:main@sha256:39f1caca276bb7b439613ce9e9a33a5a942143feb5ac6abbe079a9c85e19d56d
     depends_on:
     - tor
     restart: on-failure
@@ -162,7 +162,7 @@ services:
         ipv4_address: $MANAGER_IP
   middleware:
     container_name: middleware
-    image: ghcr.io/runcitadel/middleware:deno-manager@sha256:ff27301f4059a5b259bb5db79edcff682dfbf84864d24fc7fa49b11d1890e484
+    image: ghcr.io/runcitadel/middleware:v0.1.0@sha256:6ce2b482781053996234646be7bdf51647086d089beea926e7c4b0ba5c3168de
     depends_on:
     - bitcoin
     - lightning

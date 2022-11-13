@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 compose: v2.12.2
-dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:de8a3ed4fbacaa68f76787f38f54da782036890be9052f7c5a35f4814f7e1027
-manager: ghcr.io/citadel-core/api:main@sha256:9418bcb77c79ee1be5d6ddf64f9fa3abbacfcd8c99b18aa3844a92c85a701b85
-middleware: ghcr.io/runcitadel/middleware:main@sha256:5b01a0a94152c5cf29a1d645e9186b16f72fb0b349940ad534dec62ea4a2a2dc
-app-cli: ghcr.io/citadel-core/app-manager:main@sha256:a5cd35f738df46ef07cfdfa9d2c2bc87c39d4435de8a66fdf787dac30aedef13
+dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:8920719b77a1db517e60742d72a4b63230f170d980d116f8e01974247e8da148
+manager: ghcr.io/citadel-core/api:main@sha256:39f1caca276bb7b439613ce9e9a33a5a942143feb5ac6abbe079a9c85e19d56d
+middleware: ghcr.io/runcitadel/middleware:v0.1.0@sha256:6ce2b482781053996234646be7bdf51647086d089beea926e7c4b0ba5c3168de
+app-cli: ghcr.io/citadel-core/app-manager:main@sha256:e95d9eca5d6d6bac4aaaf3d3630f6c119eef5a5524314f6c697662cd98fe66ed
 tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
