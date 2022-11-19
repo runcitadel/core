@@ -8,9 +8,10 @@ import argparse
 import json
 import os
 
-from lib.manage import (compose, createDataDir, deleteData, deriveEntropy,
-                        download, getAvailableUpdates, getUserData,
-                        setInstalled, setRemoved, update, updateRepos, get_var_safe, convert_to_upper)
+from lib.manage import (compose, convert_to_upper, createDataDir, deleteData,
+                        download, downloadAll, get_var_safe,
+                        getAvailableUpdates, getUserData, setInstalled,
+                        setRemoved, update)
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -40,23 +41,22 @@ if args.action is None:
     args.action = 'list'
 
 if args.action == "list-updates":
-    availableUpdates = getAvailableUpdates()
-    print(json.dumps(availableUpdates))
+    getAvailableUpdates()
     exit(0)
 elif args.action == 'download':
-    updateRepos()
+    downloadAll()
     exit(0)
 elif args.action == 'generate':
-    update(args.app)
+    update()
     exit(0)
 elif args.action == 'update':
     if args.app is None:
-        updateRepos()
+        downloadAll()
         print("Downloaded all updates")
     else:
         download(args.app)
         print("Downloaded latest {} version".format(args.app))
-    update(args.verbose)
+    update()
     exit(0)
 elif args.action == 'ls-installed':
     # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps
@@ -87,9 +87,9 @@ elif args.action == 'install':
     compose(args.app, "pull")
     compose(args.app, "up --detach")
     setInstalled(args.app)
-    if virtual_app:
-        setInstalled(virtual_app)
-    update(args.verbose)
+    if implements_service:
+        setInstalled(implements_service)
+    update()
 
 elif args.action == 'uninstall':
     if not args.app:
@@ -115,7 +115,7 @@ elif args.action == 'uninstall':
         implementations = virtual_apps[virtual_app]
         if args.app in implementations:
             setRemoved(virtual_app)
-    update(args.verbose)
+    update()
 
 elif args.action == 'stop':
     if not args.app:

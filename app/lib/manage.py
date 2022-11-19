@@ -4,22 +4,16 @@
 
 import json
 import os
-import random
 import re
 import shutil
 import stat
 import subprocess
-import sys
-import tempfile
 import threading
-import traceback
 from sys import argv
 from typing import List
 
-import requests
-import semver
 import yaml
-from lib.citadelutils import FileLock, parse_dotenv
+from lib.citadelutils import parse_dotenv
 from lib.entropy import deriveEntropy
 
 
@@ -87,36 +81,21 @@ def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
 
-def getAppYml(name):
-    with open(os.path.join(appsDir, "sourceMap.json"), "r") as f:
-        sourceMap = json.load(f)
-    if not name in sourceMap:
-        print("Warning: App {} is not in the source map".format(name), file=sys.stderr)
-        sourceMap = {
-            name: {
-                "githubRepo": "runcitadel/apps",
-                "branch": "v4-stable"
-            }
-        }
-    url = 'https://raw.githubusercontent.com/{}/{}/apps/{}/app.yml'.format(sourceMap[name]["githubRepo"], sourceMap[name]["branch"], name)
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.text
-    else:
-        return False
-
-def update(verbose: bool = False):
+def update():
     os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
+def downloadAll():
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-apps /citadel".format(nodeRoot, dependencies['app-cli']))
+    print("Generated configuration successfully")
 
-def download(app: str):
-    data = getAppYml(app)
-    if data:
-        with open(os.path.join(appsDir, app, "app.yml"), 'w') as f:
-            f.write(data)
-    else:
-        print("Warning: Could not download " + app)
+def download(app_id):
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download {} --citadel-root /citadel".format(nodeRoot, dependencies['app-cli'], app_id))
+    print("Generated configuration successfully")
+
+def getAvailableUpdates():
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli check-updates /citadel".format(nodeRoot, dependencies['app-cli']))
+    print("Generated configuration successfully")
 
 def getUserData():
     userData = {}
@@ -237,126 +216,3 @@ def getAppHiddenServices(app: str):
         if subdir.startswith("app-{}-".format(app)):
             results.append(subdir[len("app-{}-".format(app)):])
     return results
-
-
-# Parse the sources.list repo file, which contains a list of sources in the format
-# <git-url> <branch>
-# For every line, clone the repo to a temporary dir and checkout the branch
-# Then, check that repos apps in the temporary dir/apps and for every app,
-# overwrite the current app dir with the contents of the temporary dir/apps/app
-# Also, keep a list of apps from every repo, a repo later in the file may not overwrite an app from a repo earlier in the file
-def updateRepos():
-    # Get the list of repos
-    repos = []
-    ignoreApps = []
-    with open(sourcesList) as f:
-        repos = f.readlines()
-    try:
-        with open(updateIgnore) as f:
-            ignoreApps = f.readlines()
-    except: pass
-    # For each repo, clone the repo to a temporary dir, checkout the branch,
-    # and overwrite the current app dir with the contents of the temporary dir/apps/app
-    # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
-    # but apps specified in updateignore have the highest priority
-    alreadyInstalled = [s.strip() for s in ignoreApps]
-    # A map of apps to their source repo
-    sourceMap = {}
-    for repo in repos:
-        repo = repo.strip()
-        if repo == "":
-            continue
-        # Also ignore comments
-        if repo.startswith("#"):
-            continue
-        # Split the repo into the git url and the branch
-        repo = repo.split(" ")
-        if len(repo) != 2:
-            print("Error: Invalid repo format in " + sourcesList)
-            exit(1)
-        gitUrl = repo[0]
-        branch = repo[1]
-        # Clone the repo to a temporary dir
-        tempDir = tempfile.mkdtemp()
-        print("Cloning the repository")
-        # Git clone with a depth of 1 to avoid cloning the entire repo
-        # Don't print anything to stdout, as we don't want to see the git clone output
-        subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
-        # Overwrite the current app dir with the contents of the temporary dir/apps/app
-        for app in os.listdir(os.path.join(tempDir, "apps")):
-            # if the app is already installed (or a simple file instead of a valid app), skip it
-            if app in alreadyInstalled or not os.path.isdir(os.path.join(tempDir, "apps", app)):
-                continue
-            if gitUrl.startswith("https://github.com"):
-                sourceMap[app] = {
-                    "githubRepo": gitUrl.removeprefix("https://github.com/").removesuffix(".git").removesuffix("/"),
-                    "branch": branch,
-                }
-            if os.path.isdir(os.path.join(tempDir, "apps", app)):
-                if os.path.isdir(os.path.join(appsDir, app)):
-                    shutil.rmtree(os.path.join(appsDir, app), onerror=remove_readonly)
-                shutil.copytree(os.path.join(tempDir, "apps", app), os.path.join(appsDir, app),
-                                symlinks=False, ignore=shutil.ignore_patterns(".gitignore", "result.yml"))
-                alreadyInstalled.append(app)
-        # Remove the temporary dir
-        shutil.rmtree(tempDir)
-    with open(os.path.join(appsDir, "sourceMap.json"), "w") as f:
-        json.dump(sourceMap, f)
-    # Fix permissions
-    subprocess.call("chown -R 1000:1000 {}".format(appsDir), shell=True)
-
-
-def getAvailableUpdates():
-    availableUpdates = {}
-    repos = []
-    ignoreApps = []
-    with open(sourcesList) as f:
-        repos = f.readlines()
-    try:
-        with open(updateIgnore) as f:
-            ignoreApps = f.readlines()
-    except: pass
-    # For each repo, clone the repo to a temporary dir, checkout the branch,
-    # and overwrite the current app dir with the contents of the temporary dir/apps/app
-    # Set this to ignoreApps. Normally, it keeps track of apps already installed from repos higher in the list,
-    # but apps specified in updateignore have the highest priority
-    alreadyDefined = [s.strip() for s in ignoreApps]
-    for repo in repos:
-        repo = repo.strip()
-        if repo == "":
-            continue
-        # Also ignore comments
-        if repo.startswith("#"):
-            continue
-        # Split the repo into the git url and the branch
-        repo = repo.split(" ")
-        if len(repo) != 2:
-            print("Error: Invalid repo format in " + sourcesList, file=sys.stderr)
-            exit(1)
-        gitUrl = repo[0]
-        branch = repo[1]
-        # Clone the repo to a temporary dir
-        tempDir = tempfile.mkdtemp()
-        # Git clone with a depth of 1 to avoid cloning the entire repo
-        # Don't print anything to stdout, as we don't want to see the git clone output
-        subprocess.run("git clone --depth 1 --branch {} {} {}".format(branch, gitUrl, tempDir), shell=True, stdout=subprocess.DEVNULL)
-        # Overwrite the current app dir with the contents of the temporary dir/apps/app
-        for app in os.listdir(os.path.join(tempDir, "apps")):
-            try:
-                # if the app is already installed (or a simple file instead of a valid app), skip it
-                if app in alreadyDefined or not os.path.isdir(os.path.join(tempDir, "apps", app)):
-                    continue
-                with open(os.path.join(appsDir, app, "app.yml"), "r") as f:
-                    originalAppYml = yaml.safe_load(f)
-                with open(os.path.join(tempDir, "apps", app, "app.yml"), "r") as f:
-                    latestAppYml = yaml.safe_load(f)
-                if semver.compare(latestAppYml["metadata"]["version"], originalAppYml["metadata"]["version"]) > 0:
-                    availableUpdates[app] = {
-                        "updateFrom": originalAppYml["metadata"]["version"],
-                        "updateTo": latestAppYml["metadata"]["version"]
-                    }
-            except Exception:
-                print("Warning: Can't check app {} (yet)".format(app), file=sys.stderr)
-        # Remove the temporary dir
-        shutil.rmtree(tempDir)
-    return availableUpdates
