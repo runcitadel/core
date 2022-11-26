@@ -27,11 +27,9 @@ scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
 appSystemDir = os.path.join(nodeRoot, "app-system")
-sourcesList = os.path.join(appSystemDir, "sources.list")
 updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
-legacyScript = os.path.join(nodeRoot, "scripts", "app")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
 
@@ -165,14 +163,12 @@ def remove_readonly(func, path, _):
     os.chmod(path, stat.S_IWRITE)
     func(path)
 
-
 def deleteData(app: str):
     dataDir = os.path.join(appDataDir, app)
     try:
         shutil.rmtree(dataDir, onerror=remove_readonly)
     except FileNotFoundError:
         pass
-
 
 def createDataDir(app: str):
     dataDir = os.path.join(appDataDir, app)
