@@ -122,6 +122,8 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 80, "description": "Starting new containers", "updateTo": "$RELEASE"}
 EOF
 cd "$CITADEL_ROOT"
+# Delete old nginx.conf
+rm -rf nginx/nginx.conf
 ./scripts/start || true
 
 
