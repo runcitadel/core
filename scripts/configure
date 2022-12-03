@@ -155,8 +155,6 @@ if reconfiguring:
   BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
   BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
   BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
-  TOR_PASSWORD=dotenv['TOR_PASSWORD']
-  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
   NGINX_PORT=dotenv['NGINX_PORT']
   NGINX_SSL_PORT="443"
   if 'NGINX_SSL_PORT' in dotenv:
@@ -176,12 +174,6 @@ else:
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
-
-  # Pull Tor image and generate Tor password
-  print("Generating Tor password\n")
-  os.system('docker pull --quiet {}'.format(dependencies["tor"]))
-  TOR_PASSWORD=get_data('itdoesntmatter')['password']
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
   I2P_PASSWORD=generate_password(64)
 
 BITCOIN_NODE="neutrino"
@@ -193,35 +185,6 @@ BASEFEE = "bitcoin.basefee=0"
 EXTERNAL_IP = ""
 if os.path.isfile('./tor/data/bitcoin-p2p/hostname'):
   EXTERNAL_IP="externalip=" + open('./tor/data/bitcoin-p2p/hostname').read()
-
-if os.path.isfile("./lnd/lnd.conf"):
-  with open("./lnd/lnd.conf", 'r') as file:
-    # We generally don't want to allow changing lnd.conf, but we keep as many custom settings as possible
-    for line in file:
-      if line.startswith("bitcoin.node="):
-        BITCOIN_NODE = line.split("=")[1].strip()
-      if line.startswith("alias="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("color="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("bitcoin.basefee"):
-        BASEFEE = line.strip()
-      if line.startswith("bitcoin.feerate"):
-        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
-      if line.startswith("minchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxpendingchannels"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("db.bolt.auto-compact"):
-        BOLT_DB_OPTIONS += "\n" + line.strip()
-
-if BOLT_DB_OPTIONS != "":
-  BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
-
-if CHANNEL_LIMITATIONS == "":
-  CHANNEL_LIMITATIONS = "maxpendingchannels=3\nminchansize=10000"
 
 NEUTRINO_PEERS=""
 if BITCOIN_NETWORK == "mainnet":
@@ -258,16 +221,12 @@ GATEWAY_IP="10.21.21.1"
 NGINX_IP="10.21.21.2"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
-MIDDLEWARE_IP="10.21.21.5"
-NEUTRINO_SWITCHER_IP="10.21.21.6"
-DASHBOARD_NEW_IP="10.21.21.7"
-BITCOIN_IP="10.21.21.8"
-LND_IP="10.21.21.9"
-TOR_PROXY_IP="10.21.21.11"
-APPS_TOR_IP="10.21.21.12"
-APPS_2_TOR_IP="10.21.21.13"
-APPS_3_TOR_IP="10.21.21.14"
-I2P_IP="10.21.21.15"
+BITCOIN_IP="10.21.21.5"
+TOR_PROXY_IP="10.21.21.6"
+APPS_TOR_IP="10.21.21.7"
+APPS_2_TOR_IP="10.21.21.8"
+APPS_3_TOR_IP="10.21.21.9"
+I2P_IP="10.21.21.10"
 
 # Ports
 BITCOIN_RPC_PORT="8332"
@@ -276,8 +235,6 @@ BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
 BITCOIN_ZMQ_RAWTX_PORT="28333"
 BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
 BITCOIN_ZMQ_SEQUENCE_PORT="28335"
-LND_GRPC_PORT="10009"
-LND_REST_PORT="8080"
 TOR_PROXY_PORT="9050"
 I2P_SAM_PORT="7656"
 TOR_CONTROL_PORT="29051"
@@ -292,12 +249,6 @@ except:
 DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
 # Get the real path by following symlinks
 DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
-
-# Set LND fee URL for neutrino on mainnet
-LND_FEE_URL=""
-# If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
-if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
-   LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
 
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
@@ -325,7 +276,6 @@ def replace_vars(file_path):
 
 templates_to_build = {
   "./templates/torrc-core-sample": "./tor/torrc-core",
-  "./templates/lnd-sample.conf": "./lnd/lnd.conf",
   "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
   "./templates/.env-sample": "./.env",
   "./templates/nginx-sample.conf": "./nginx/nginx.conf",
