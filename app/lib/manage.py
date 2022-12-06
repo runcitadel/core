@@ -26,7 +26,7 @@ def joinThreads(threads: List[threading.Thread]):
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
-appSystemDir = os.path.join(nodeRoot, "app-system")
+appSystemDir = os.path.join(nodeRoot, "app")
 updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
