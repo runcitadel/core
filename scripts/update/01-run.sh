@@ -99,8 +99,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 ./scripts/stop || true
 
-electrum_implementation=$(cat services/installed.yml | grep "electrum:" | sed "s/electrum: //g")
-
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
