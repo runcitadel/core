@@ -28,9 +28,6 @@ check_dependencies () {
 # Check system's dependencies
 check_dependencies readlink dirname ip docker
 
-# Check karen's dependencies
-check_dependencies fswatch
-
 # Check OTA update scripts' dependencies
 check_dependencies rsync jq curl
 

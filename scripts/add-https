@@ -9,10 +9,10 @@ try:
 except ImportError:
     print("Crossplane not found. Please run 'sudo pip3 install crossplane'")
     exit(1)
-import os
 import argparse
-import shutil
 import json
+import os
+import shutil
 
 
 def parse_dotenv(file_path):

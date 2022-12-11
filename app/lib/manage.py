@@ -127,10 +127,12 @@ def compose(app, arguments):
         "hostname -s 2>/dev/null || echo 'citadel'", shell=True).decode("utf-8").strip() + ".local"
     os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
         os.path.join(nodeRoot, "tor", "data", "app-{}/hostname".format(app))), shell=True).decode("utf-8").strip()
-    os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
-    # Allow more app seeds, with random numbers from 1-5 assigned in a loop
-    for i in range(1, 6):
-        os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
+    try:
+        os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
+        # Allow more app seeds, with random numbers from 1-5 assigned in a loop
+        for i in range(1, 6):
+            os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
+    except: pass
     os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app)
     # Chown and chmod dataDir to have the owner 1000:1000 and the same permissions as appDir
     subprocess.call("chown -R 1000:1000 {}".format(os.path.join(appDataDir, app)), shell=True)

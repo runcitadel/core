@@ -4,8 +4,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import socket
 import os
+import socket
 
 rootDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(rootDir)

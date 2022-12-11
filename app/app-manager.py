@@ -28,7 +28,7 @@ legacyScript = os.path.join(nodeRoot, "scripts", "app")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "get-ip"])
+                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "get-ip", "get-implementation"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
     'app', help='Optional, the app to perform an action on. (For install, uninstall, stop, start and compose)', nargs='?')
@@ -170,7 +170,21 @@ elif args.action == "get-ip":
         print("Not an virtual app")
         exit(1)
 
-else:
-    print("Error: Unknown action")
-    print("See --help for usage")
+elif args.action == "get-implementation":
+    if args.app == "":
+        print("Missing app")
+        exit(1)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    implements_service = False
+    if args.app in virtual_apps:
+        for implementation in virtual_apps[args.app]:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                print(implementation)
+                exit(0)
+    else:
+        print("Not an virtual app")
+        exit(1)
+    print("Virtual app not found")
     exit(1)

@@ -6,5 +6,5 @@ compose: v2.12.2
 dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:8920719b77a1db517e60742d72a4b63230f170d980d116f8e01974247e8da148
 manager: ghcr.io/citadel-core/api:main@sha256:720a6ab0c0ada97e57186519b6c22f5a1d58ab5301e967363b905113a6cbe068
 middleware: ghcr.io/runcitadel/middleware:main@sha256:b18065b02fffca0facef456109cf0de1b6cb4391f6b2186b6cd467ce6caf7642
-app-cli: ghcr.io/citadel-core/app-manager:main@sha256:0e029661c7918921c3fcc4b18b9a07ed431ab47d608f35d2365da20eb58667a9
+app-cli: ghcr.io/citadel-core/app-manager:next@sha256:6436b61ca29ed66529d3d52260ddaf69a00edc297d854aab9824d72759efa71b
 tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
