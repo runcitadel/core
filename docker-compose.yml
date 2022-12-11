@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: 2022 Citadel and contributors
-#
-# SPDX-License-Identifier: GPL-3.0-or-later
-
 services:
   tor:
     container_name: tor
@@ -148,7 +144,6 @@ services:
     networks:
       default:
         ipv4_address: $I2P_IP
-
 networks:
   default:
     name: citadel_main_network
