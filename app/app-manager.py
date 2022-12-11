@@ -63,7 +63,13 @@ elif args.action == 'ls-installed':
     with open(userFile, "r") as f:
         userData = json.load(f)
     if "installedApps" in userData:
-        print("\n".join(userData["installedApps"]))
+        with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+            virtual_apps = json.load(f)
+        # Print the apps
+        # Filter out virtual apps (virtual_apps.keys())
+        for app in userData["installedApps"]:
+            if app not in virtual_apps.keys():
+                print(app)
     else:
         # To match the behavior of the old script, print a newline if there are no apps installed
         print("\n")
