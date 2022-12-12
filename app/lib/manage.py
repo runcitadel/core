@@ -16,31 +16,17 @@ import yaml
 from lib.citadelutils import parse_dotenv
 from lib.entropy import deriveEntropy
 
-
-# For an array of threads, join them and wait for them to finish
-def joinThreads(threads: List[threading.Thread]):
-    for thread in threads:
-        thread.join()
-
 # The directory with this script
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
 appSystemDir = os.path.join(nodeRoot, "app")
-updateIgnore = os.path.join(appsDir, ".updateignore")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
 
 dotenv = {}
-
-# Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-def getArguments():
-    arguments = ""
-    for i in range(3, len(argv)):
-        arguments += argv[i] + " "
-    return arguments
 
 def get_var_safe(var_name):
     dotenv = parse_dotenv(os.path.join(nodeRoot, ".env"))
@@ -58,17 +44,6 @@ def get_var(var_name):
         print("Error: {} is not defined!".format(var_name))
         exit(1)
 
-def getInstalledVirtualApps():
-    installedApps = []
-    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
-        virtual_apps = json.load(f)
-    userData = getUserData()
-    for virtual_app in virtual_apps.keys():
-        for implementation in virtual_apps[virtual_app]:
-            if "installedApps" in userData and implementation in userData["installedApps"]:
-                installedApps.append(virtual_app)
-    return installedApps
-
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
   return string.upper().replace('-', '_')
@@ -77,7 +52,6 @@ def convert_to_upper(string):
 # in the config file. Check for such occurences and replace them with the actual variable
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
-
 
 def update():
     os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
