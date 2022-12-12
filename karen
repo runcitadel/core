@@ -10,11 +10,11 @@ import socket
 rootDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(rootDir)
 
-if os.path.exists("events/karen"):
-  os.remove("events/karen")
+if os.path.exists("karen.socket"):
+  os.remove("karen.socket")
 
 server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-server.bind("events/karen")
+server.bind("karen.socket")
 
 while True:
   server.listen(1)
@@ -27,5 +27,5 @@ while True:
         trigger = instructions[1]
         instructions.pop(0)
         instructions.pop(0)
-        os.system("events/triggers/{} {}".format(trigger, " ".join(instructions)))
+        os.system("scripts/triggers/{} {}".format(trigger, " ".join(instructions)))
     conn.close()

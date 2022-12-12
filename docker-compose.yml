@@ -94,7 +94,7 @@ services:
     volumes:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
-    - ${PWD}/events:/events
+    - ${PWD}/karen.socket:/karen.socket
     - ${PWD}/apps:/apps
     - ${PWD}/statuses:/statuses
     - ${PWD}/tor/data:/var/lib/tor/

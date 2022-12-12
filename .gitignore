@@ -40,8 +40,6 @@ db/citadel-seed/*
 !nginx/.gitkeep
 !i2p/.gitkeep
 
-!**/*.license
-services/installed.json
-services/installed.yml
+!**/*.License
 
-events/karen
+karen.socket
