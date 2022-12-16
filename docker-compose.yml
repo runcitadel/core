@@ -85,7 +85,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:720a6ab0c0ada97e57186519b6c22f5a1d58ab5301e967363b905113a6cbe068
+    image: ghcr.io/citadel-core/api:main@sha256:7e531d0cad6f222d541a1f23e585aed75f7c0224d481220d0e95e1d21f079984
     depends_on:
     - tor
     restart: on-failure
@@ -128,6 +128,7 @@ services:
       I2P_USERNAME: i2pd
       ELECTRUM_HOST: $APP_ELECTRUM_IP
       ELECTRUM_PORT: 50001
+      KAREN_SOCKET: /karen.socket
     networks:
       default:
         ipv4_address: $MANAGER_IP
