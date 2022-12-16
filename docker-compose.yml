@@ -152,5 +152,7 @@ networks:
       config:
       - subnet: $NETWORK_IP/24
 volumes:
-  jwt-public-key: null
-  jwt-private-key: null
+  jwt-public-key:
+    name: citadel-jwt-public-key
+  jwt-private-key:
+    name: citadel-jwt-private-key

@@ -10,3 +10,4 @@ networks:
 volumes:
   jwt-public-key:
     external: true
+    name: citadel-jwt-public-key
