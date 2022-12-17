@@ -341,6 +341,12 @@ os.system('./scripts/app generate')
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
+
+print("Configuring permissions...\n")
+try:
+  os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+except: pass
+
 print("Configuration successful\n")
 print("You can now start Citadel by running:")
 print("  sudo ./scripts/start")

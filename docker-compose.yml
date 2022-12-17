@@ -85,7 +85,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:7e531d0cad6f222d541a1f23e585aed75f7c0224d481220d0e95e1d21f079984
+    image: ghcr.io/citadel-core/api:main@sha256:413094c5be99bee5a8fa5e7c64feba1bcb2bf1f87453c800c58bc0481ee33fbc
     depends_on:
     - tor
     restart: on-failure
@@ -108,6 +108,7 @@ services:
       DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
       DEVICE_HOSTNAME: ${DEVICE_HOSTNAME:-""}
       MIDDLEWARE_API_URL: http://$MIDDLEWARE_IP
+      MIDDLEWARE_API_PORT: 3000
       SEED_FILE: /db/citadel-seed/seed
       BITCOIN_HOST: $BITCOIN_IP
       BITCOIN_P2P_PORT: $BITCOIN_P2P_PORT
