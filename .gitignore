@@ -20,7 +20,7 @@ db/*
 statuses/*
 app-data
 apps
-nginx/*
+caddy/*
 i2p/*
 docker-compose.override.yml
 
@@ -37,7 +37,7 @@ db/citadel-seed/*
 !tor/run/.gitkeep
 !tor/.gitkeep
 !db/.gitkeep
-!nginx/.gitkeep
+!caddy/data/.gitkeep
 !i2p/.gitkeep
 
 !**/*.License

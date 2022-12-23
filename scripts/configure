@@ -140,8 +140,8 @@ def parse_dotenv(file_path):
 ############ Generate configuration variables ############
 ##########################################################
 
-NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
-NGINX_SSL_PORT=os.environ.get('NGINX_SSL_PORT') or "443"
+CADDY_PORT=os.environ.get('CADDY_PORT') or "80"
+CADDY_HTTPS_PORT=os.environ.get('CADDY_PORT') or "443"
 UPDATE_CHANNEL="stable"
 
 if reconfiguring:
@@ -158,12 +158,12 @@ if reconfiguring:
   BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
   BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
   BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
-  NGINX_PORT=dotenv['NGINX_PORT']
-  NGINX_SSL_PORT="443"
-  if 'NGINX_SSL_PORT' in dotenv:
-    NGINX_SSL_PORT=dotenv['NGINX_SSL_PORT']
-  if NGINX_SSL_PORT == "80" and NGINX_PORT == "80":
-    NGINX_SSL_PORT="443"
+  CADDY_PORT=dotenv['CADDY_PORT']
+  CADDY_HTTPS_PORT="443"
+  if 'CADDY_HTTPS_PORT' in dotenv:
+    CADDY_HTTPS_PORT=dotenv['CADDY_HTTPS_PORT']
+  if CADDY_HTTPS_PORT == "80" and CADDY_PORT == "80":
+    CADDY_HTTPS_PORT="443"
   if 'UPDATE_CHANNEL' in dotenv and dotenv['UPDATE_CHANNEL'] != "main" and dotenv['UPDATE_CHANNEL'] != "migration":
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
   if 'I2P_PASSWORD' in dotenv:
@@ -209,7 +209,7 @@ if BITCOIN_NETWORK == "testnet":
 # IP addresses for services
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
-NGINX_IP="10.21.21.2"
+CADDY_IP="10.21.21.2"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
 BITCOIN_IP="10.21.21.5"
@@ -329,10 +329,7 @@ except:
 dotenv=parse_dotenv('./.env')
 MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper())]
 
-if not os.path.isfile("./nginx/nginx.conf"):
-  print("Generating nginx configuration...\n")
-  build_template("./templates/nginx-sample.conf", "./nginx/nginx.conf")
-
+build_template("./templates/Caddyfile.sample", "./caddy/Caddyfile")
 build_template("./templates/.env-sample", "./.env")
 
 print("Updating app configuration...\n")

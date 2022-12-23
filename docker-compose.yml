@@ -45,22 +45,21 @@ services:
     networks:
       default:
         ipv4_address: $APPS_3_TOR_IP
-  nginx:
-    container_name: nginx
-    image: nginx:1.21.6@sha256:2834dc507516af02784808c5f48b7cbe38b8ed5d0f4837f16e78d00deb7e7767
-    depends_on:
-    - dashboard
+  caddy:
+    container_name: caddy
+    image: caddy:2.6.2-alpine@sha256:25a0097607868fb05a89a5ab9fea2f2ea4cecdc89d887d7dcee8c778a21b9e1f
     volumes:
-    - ${PWD}/nginx:/etc/nginx
+    - ${PWD}/caddy/data:/data
+    - ${PWD}/caddy/Caddyfile:/etc/caddy/Caddyfile
     restart: on-failure
     stop_grace_period: 30s
     ports:
-    - ${NGINX_PORT}:80
-    - 433:433
-    - ${NGINX_SSL_PORT}:443
+    - ${CADDY_PORT}:80
+    - ${CADDY_HTTPS_PORT}:443
+    - ${CADDY_HTTPS_PORT}:443/udp
     networks:
       default:
-        ipv4_address: $NGINX_IP
+        ipv4_address: $CADDY_IP
   bitcoin:
     container_name: bitcoin
     image: ghcr.io/runcitadel/bitcoinknots:main@sha256:5fbee0f6f0d09d42aacc11c373ffe6162210c42ce21e6eba294e547e3ad80219

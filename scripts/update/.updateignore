@@ -6,7 +6,7 @@ statuses
 tor/*
 logs/*
 app-data/*
-nginx/*
+caddy/*
 services/installed.yml
 apps/*
 i2p/*

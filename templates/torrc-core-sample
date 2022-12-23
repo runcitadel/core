@@ -9,7 +9,7 @@ SocksPort   <tor-proxy-ip>:<tor-proxy-port>
 
 # Dashboard Hidden Service
 HiddenServiceDir /var/lib/tor/web
-HiddenServicePort 80 <nginx-ip>:80
+HiddenServicePort 80 <caddy-ip>:80
 
 # Bitcoin Core P2P Hidden Service
 HiddenServiceDir /var/lib/tor/bitcoin-p2p

@@ -330,9 +330,9 @@ if [[ "$command" = "configure" ]]; then
     exit
   fi
 
-  if [[ "$2" = "nginx" ]]; then
-    edit_file $CITADEL_ROOT/nginx/nginx.conf
-    prompt_apply_config nginx false
+  if [[ "$2" = "caddy" ]]; then
+    edit_file $CITADEL_ROOT/caddy/Caddyfile
+    prompt_apply_config caddy false
     exit
   fi
 
