@@ -6,38 +6,16 @@
 
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/app-update-status.json
 {"state": "installing", "progress": 20, "description": "Downloading updates", "updateTo": "$RELEASE"}
 EOF
-"${CITADEL_ROOT}/scripts/app" update &
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 30, "description": "Downloading updates", "updateTo": "$RELEASE"}
-EOF
-sleep 2
-
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 50, "description": "Downloading updates", "updateTo": "$RELEASE"}
-EOF
-
+"${CITADEL_ROOT}/scripts/app" update
 wait
 
-"${CITADEL_ROOT}/scripts/app" start installed &
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+cat <<EOF > "$CITADEL_ROOT"/statuses/app-update-status.json
 {"state": "installing", "progress": 60, "description": "Starting apps", "updateTo": "$RELEASE"}
 EOF
-sleep 15
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 70, "description": "Starting apps", "updateTo": "$RELEASE"}
-EOF
-sleep 10
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 80, "description": "Starting apps", "updateTo": "$RELEASE"}
-EOF
-sleep 5
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 90, "description": "Starting apps", "updateTo": "$RELEASE"}
-EOF
-wait
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+"${CITADEL_ROOT}/scripts/app" start installed
+cat <<EOF > "$CITADEL_ROOT"/statuses/app-update-status.json
 {"state": "success", "progress": 100, "description": "Update successful", "updateTo": "$RELEASE"}
 EOF

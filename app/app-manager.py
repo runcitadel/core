@@ -9,7 +9,7 @@ import json
 import os
 
 from lib.manage import (compose, convert_to_upper, createDataDir, deleteData,
-                        download, downloadAll, get_var_safe,
+                        download, downloadAll, downloadNew, get_var_safe,
                         getAvailableUpdates, getUserData, setInstalled,
                         setRemoved, update)
 
@@ -45,6 +45,9 @@ if args.action == "list-updates":
     exit(0)
 elif args.action == 'download':
     downloadAll()
+    exit(0)
+elif args.action == 'download-new':
+    downloadNew()
     exit(0)
 elif args.action == 'generate':
     update()

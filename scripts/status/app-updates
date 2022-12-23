@@ -7,3 +7,4 @@
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
 "${CITADEL_ROOT}/scripts/app" list-updates
+"${CITADEL_ROOT}/scripts/app" download-new

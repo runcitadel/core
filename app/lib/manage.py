@@ -57,6 +57,10 @@ def update():
     os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
+def downloadNew():
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-nwq /citadel".format(nodeRoot, dependencies['app-cli']))
+    print("Generated configuration successfully")
+
 def downloadAll():
     os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-apps /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
