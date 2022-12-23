@@ -70,7 +70,7 @@ ip_env_var = "APP_{}_WEB_IP".format(
     service.upper().replace("-", "_")
 )
 
-ip_alt_env_var = "APP_{}_MAIN_IP".format(
+ip_alt_env_var = "APP_{}_MAIN_LND_IP".format(
     service.upper().replace("-", "_")
 )
 
@@ -93,6 +93,13 @@ else:
     print("Error: No IP found for {}".format(service))
     exit(1)
 
+
+if service == "lnbits":
+    port = 5000
+
+if service == "lnme":
+    port = 1323
+
 if port == None:
     if port_env_var in env:
         port = env[port_env_var]
@@ -101,12 +108,6 @@ if port == None:
     else:
         print("Error: No port found for {}".format(service))
         exit(1)
-
-if service == "btcpay-server":
-    port = 1234
-
-if service == "lnme":
-    port = 1323
 
 actual_url="http://{}:{}".format(ip, port)
 
