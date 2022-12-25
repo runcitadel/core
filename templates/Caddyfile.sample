@@ -1,3 +1,5 @@
+<caddy-https-config>
+
 :80 {
 	route /api/* {
 		uri strip_prefix /api
@@ -11,4 +13,3 @@
 
 	reverse_proxy <dashboard-ip>:3000
 }
-

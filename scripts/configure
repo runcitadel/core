@@ -329,6 +329,13 @@ except:
 dotenv=parse_dotenv('./.env')
 MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper())]
 
+CADDY_HTTPS_CONFIG = ""
+
+with open("db/user.json", 'r') as stream:
+  userJson = json.load(stream)
+  if "https" in userJson and "email" in userJson["https"] and "agreed_lets_encrypt_tos" in userJson["https"] and userJson["https"]["agreed_lets_encrypt_tos"]:
+    CADDY_HTTPS_CONFIG = "{\n  acme_ca https://acme-v02.api.letsencrypt.org/directory\n  tls " + userJson["https"]["email"] + "\n}"
+
 build_template("./templates/Caddyfile.sample", "./caddy/Caddyfile")
 build_template("./templates/.env-sample", "./.env")
 
