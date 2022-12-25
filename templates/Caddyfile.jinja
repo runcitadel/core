@@ -16,7 +16,7 @@
 		reverse_proxy {{MANAGER_IP}}:3000
 	}
 
-	reverse_proxy {{DASHBOARD_IP}}:3000
+	reverse_proxy {{DASHBOARD_IP}}:3004
 }
 
 {% for app_id, entries in caddy_entries %}
