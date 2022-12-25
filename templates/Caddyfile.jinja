@@ -1,0 +1,40 @@
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email %}
+{
+	acme_ca https://acme-v02.api.letsencrypt.org/directory
+	tls {{ https_options.email }}
+}
+{% endif %}
+
+:{{CADDY_PORT}} {
+	route /api/* {
+		uri strip_prefix /api
+		reverse_proxy {{MIDDLEWARE_IP}}:3000
+	}
+
+	route /api-v2/* {
+		uri strip_prefix /api-v2
+		reverse_proxy {{MANAGER_IP}}:3000
+	}
+
+	reverse_proxy {{DASHBOARD_IP}}:3000
+}
+
+{% for app_id, entries in caddy_entries %}
+	{% for entry in entries %}
+:{{entry.public_port}} {
+	reverse_proxy {{ app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-") }}:{{ entry.internal_port }}
+}
+	{% endfor %}
+{% endfor %}
+
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email %}
+	{% for app_id, domain in https_options.app_domains %}
+		{% for entry in caddy_entries[app_id] %}
+			{% if entry.is_primary %}
+{{domain}} {
+	reverse_proxy {{ app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-") }}:{{ entry.internal_port }}
+}
+			{% endif %}
+		{% endfor %}
+	{% endfor %}
+{% endif %}
