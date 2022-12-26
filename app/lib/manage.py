@@ -112,6 +112,7 @@ def compose(app, arguments):
             os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
     except: pass
     os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app)
+    os.environ["CITADEL_APP_DATA"] = appDataDir
     # Chown and chmod dataDir to have the owner 1000:1000 and the same permissions as appDir
     subprocess.call("chown -R 1000:1000 {}".format(os.path.join(appDataDir, app)), shell=True)
     try:
