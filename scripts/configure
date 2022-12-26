@@ -158,7 +158,10 @@ if reconfiguring:
   BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
   BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
   BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
-  CADDY_PORT=dotenv['CADDY_PORT']
+  if 'NGINX_PORT' in dotenv:
+    CADDY_PORT=dotenv['NGINX_PORT']
+  if 'CADDY_PORT' in dotenv:
+    CADDY_PORT=dotenv['CADDY_PORT']
   CADDY_HTTPS_PORT="443"
   if 'CADDY_HTTPS_PORT' in dotenv:
     CADDY_HTTPS_PORT=dotenv['CADDY_HTTPS_PORT']
