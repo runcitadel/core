@@ -22,7 +22,7 @@
 {% for app_id, entries in caddy_entries %}
 	{% for entry in entries %}
 :{{entry.public_port}} {
-	reverse_proxy {{ app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-") }}:{{ entry.internal_port }}
+	reverse_proxy {{ ip_map[app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-")] }}:{{ entry.internal_port }}
 }
 	{% endfor %}
 {% endfor %}
@@ -32,7 +32,7 @@
 		{% for entry in caddy_entries[app_id] %}
 			{% if entry.is_primary %}
 {{domain}} {
-	reverse_proxy {{ app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-") }}:{{ entry.internal_port }}
+	reverse_proxy {{ ip_map[app_id ~ "-" ~ entry.container_name ~ "-1" | lower | replace(from="_", to="-")] }}:{{ entry.internal_port }}
 }
 			{% endif %}
 		{% endfor %}
