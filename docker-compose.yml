@@ -23,6 +23,8 @@ services:
     networks:
       default:
         ipv4_address: $APPS_TOR_IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   app-2-tor:
     container_name: app-2-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
@@ -34,6 +36,8 @@ services:
     networks:
       default:
         ipv4_address: $APPS_2_TOR_IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   app-3-tor:
     container_name: app-3-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
@@ -45,6 +49,8 @@ services:
     networks:
       default:
         ipv4_address: $APPS_3_TOR_IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   caddy:
     container_name: caddy
     image: caddy:2.6.2-alpine@sha256:25a0097607868fb05a89a5ab9fea2f2ea4cecdc89d887d7dcee8c778a21b9e1f
@@ -53,13 +59,7 @@ services:
     - ${PWD}/caddy/Caddyfile:/etc/caddy/Caddyfile
     restart: on-failure
     stop_grace_period: 30s
-    ports:
-    - ${CADDY_PORT}:80
-    - ${CADDY_HTTPS_PORT}:443
-    - ${CADDY_HTTPS_PORT}:443/udp
-    networks:
-      default:
-        ipv4_address: $CADDY_IP
+    network_mode: host
   bitcoin:
     container_name: bitcoin
     image: ghcr.io/runcitadel/bitcoinknots:main@sha256:5fbee0f6f0d09d42aacc11c373ffe6162210c42ce21e6eba294e547e3ad80219
