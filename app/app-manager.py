@@ -86,8 +86,8 @@ elif args.action == 'install':
     if registryEntry is None:
         print("App {} does not seem to exist".format(args.app))
         exit(1)
-    if isinstance(registryEntry.hiddenServices, list):
-        for entry in registryEntry.hiddenServices:
+    if isinstance(registryEntry['hiddenServices'], list):
+        for entry in registryEntry['hiddenServices']:
             if not os.path.exists(os.path.join(torDataDir, entry, "hostname")):
                 print("Restarting Tor containers...")
                 try:
