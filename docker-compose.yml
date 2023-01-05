@@ -12,6 +12,8 @@ services:
     networks:
       default:
         ipv4_address: $TOR_PROXY_IP
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   app-tor:
     container_name: app-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
