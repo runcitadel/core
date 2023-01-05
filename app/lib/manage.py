@@ -124,7 +124,7 @@ def compose(app, arguments):
         subprocess.call("chmod -R 770 {}".format(os.path.join(appDataDir, app, "data", "nextcloud")), shell=True)
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     # List all hidden services for an app and put their hostname in the environment
-    hiddenServices: List[str] = getAppHiddenServices(app)
+    hiddenServices: List[str] = getAppRegistryEntry(app).get("hiddenServices", [])
     for service in hiddenServices:
         appHiddenServiceFile = os.path.join(
             nodeRoot, "tor", "data", "app-{}-{}/hostname".format(app, service))
@@ -181,17 +181,6 @@ def setRemoved(app: str):
     userData["installedApps"].remove(app)
     with open(userFile, "w") as f:
         json.dump(userData, f)
-
-
-def getAppHiddenServices(app: str):
-    torDir = os.path.join(nodeRoot, "tor", "data")
-    # List all subdirectories of torDir which start with app-${APP}-
-    # but return them without the app-${APP}- prefix
-    results = []
-    for subdir in os.listdir(torDir):
-        if subdir.startswith("app-{}-".format(app)):
-            results.append(subdir[len("app-{}-".format(app)):])
-    return results
 
 # Gets the app's registry entry from the registry.json file
 # The file is an array of objects, each object is an app's registry entry

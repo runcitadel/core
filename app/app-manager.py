@@ -11,7 +11,7 @@ import os
 from lib.manage import (compose, convert_to_upper, createDataDir, deleteData,
                         download, downloadAll, downloadNew, get_var_safe,
                         getAvailableUpdates, getUserData, setInstalled,
-                        setRemoved, update)
+                        setRemoved, update, getAppRegistryEntry)
 
 # Print an error if user is not root
 if os.getuid() != 0:
