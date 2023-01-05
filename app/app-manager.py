@@ -25,6 +25,7 @@ appsDir = os.path.join(nodeRoot, "apps")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
+torDataDir = os.path.join(nodeRoot, "tor", "data")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
@@ -80,6 +81,29 @@ elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
+    registryEntry = getAppRegistryEntry(args.app)
+    # If registryEntry is None, fail
+    if registryEntry is None:
+        print("App {} does not seem to exist".format(args.app))
+        exit(1)
+    if isinstance(registryEntry.hidden_services, list):
+        for entry in registryEntry.hidden_services:
+            if not os.path.exists(os.path.join(torDataDir, entry, "hostname")):
+                print("Restarting Tor containers...")
+                try:
+                    os.system("docker restart app-tor app-2-tor app-3-tor")
+                except:
+                    print("Failed to restart Tor containers")
+                    exit(1)
+                print("Waiting for Tor containers to restart...")
+                for i in range(60):
+                    if os.path.exists(os.path.join(torDataDir, entry, "hostname")):
+                        break
+                    time.sleep(1)
+                else:
+                    print("Tor containers did not restart in time")
+                    exit(1)
+    update()
     with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
         virtual_apps = json.load(f)
     userData = getUserData()

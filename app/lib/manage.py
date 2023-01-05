@@ -192,3 +192,14 @@ def getAppHiddenServices(app: str):
         if subdir.startswith("app-{}-".format(app)):
             results.append(subdir[len("app-{}-".format(app)):])
     return results
+
+# Gets the app's registry entry from the registry.json file
+# The file is an array of objects, each object is an app's registry entry
+# We can filter by the "id" property to get the app's registry entry
+def getAppRegistryEntry(app: str):
+    with open(os.path.join(appsDir, "registry.json")) as f:
+        registry = json.load(f)
+    for appRegistryEntry in registry:
+        if appRegistryEntry["id"] == app:
+            return appRegistryEntry
+    return None
