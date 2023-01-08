@@ -329,7 +329,7 @@ except:
 
 # Get APP_<IMPLEMENTATION>_MIDDLEWARE_IP from the .env file
 dotenv=parse_dotenv('./.env')
-MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper())]
+MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper().replace("-", "_"))]
 
 build_template("./templates/.env-sample", "./.env")
 
