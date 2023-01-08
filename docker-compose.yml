@@ -13,7 +13,7 @@ services:
       default:
         ipv4_address: $TOR_PROXY_IP
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+    - host.docker.internal:host-gateway
   app-tor:
     container_name: app-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
@@ -26,7 +26,7 @@ services:
       default:
         ipv4_address: $APPS_TOR_IP
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+    - host.docker.internal:host-gateway
   app-2-tor:
     container_name: app-2-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
@@ -39,7 +39,7 @@ services:
       default:
         ipv4_address: $APPS_2_TOR_IP
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+    - host.docker.internal:host-gateway
   app-3-tor:
     container_name: app-3-tor
     image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
@@ -52,10 +52,10 @@ services:
       default:
         ipv4_address: $APPS_3_TOR_IP
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+    - host.docker.internal:host-gateway
   caddy:
     container_name: caddy
-    image: caddy:2.6.2-alpine@sha256:25a0097607868fb05a89a5ab9fea2f2ea4cecdc89d887d7dcee8c778a21b9e1f
+    image: ghcr.io/runcitadel/caddy:main@sha256:49341f2044993fa0a766b096e131e35e25d002c80ff91e39e8a843d77be687c2
     volumes:
     - ${PWD}/caddy/data:/data
     - ${PWD}/caddy/Caddyfile:/etc/caddy/Caddyfile
@@ -78,7 +78,7 @@ services:
         ipv4_address: $BITCOIN_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:8920719b77a1db517e60742d72a4b63230f170d980d116f8e01974247e8da148
+    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:3873c5671aa181843f47f06aebf0cb7be10a92e1dac6a755c92da9404624af05
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -86,7 +86,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:413094c5be99bee5a8fa5e7c64feba1bcb2bf1f87453c800c58bc0481ee33fbc
+    image: ghcr.io/citadel-core/api:main@sha256:5c2ac63ab45af07aac1d0fbecb4fcb1084a0207b9a9b5b70df2bb4059a4c748f
     depends_on:
     - tor
     restart: on-failure
