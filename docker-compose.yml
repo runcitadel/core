@@ -131,6 +131,7 @@ services:
       ELECTRUM_HOST: $APP_ELECTRUM_IP
       ELECTRUM_PORT: 50001
       KAREN_SOCKET: /karen.socket
+      IP_ADDR: $DEVICE_IP
     networks:
       default:
         ipv4_address: $MANAGER_IP

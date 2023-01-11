@@ -72,6 +72,7 @@ if [[ -f "${CITADEL_ROOT}/tor/data/web/hostname" ]]; then
 fi
 export DEVICE_HOSTS=$DEVICE_HOSTS
 export DEVICE_HOSTNAME="${DEVICE_HOSTNAME}.local"
+export DEVICE_IP=$DEVICE_IP
 
 # Increase default Docker and Compose timeouts to 240s
 # as bitcoin can take a long while to respond

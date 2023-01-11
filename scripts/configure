@@ -91,6 +91,7 @@ with open("./db/dependencies.yml", "r") as file:
 # upon the user-supplied value of $NETWORK
 # If the network is not specified, then use the mainnet
 BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
+DEVICE_IP=os.environ.get("DEVICE_IP")
 
 # Check if network neither mainnet nor testnet nor regtest
 if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
