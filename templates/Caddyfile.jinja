@@ -28,7 +28,7 @@
 	{% endfor %}
 {% endfor %}
 
-{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email %}
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email and https_options.app_domains %}
 	{% for app_id, domain in https_options.app_domains %}
 		{% for entry in caddy_entries[app_id] %}
 			{% if entry.is_primary %}
