@@ -1,7 +1,7 @@
 services:
   tor:
     container_name: tor
-    image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
+    image: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
     user: toruser
     restart: on-failure
     volumes:
@@ -16,7 +16,7 @@ services:
     - host.docker.internal:host-gateway
   app-tor:
     container_name: app-tor
-    image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
+    image: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
     user: toruser
     restart: on-failure
     volumes:
@@ -29,7 +29,7 @@ services:
     - host.docker.internal:host-gateway
   app-2-tor:
     container_name: app-2-tor
-    image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
+    image: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
     user: toruser
     restart: on-failure
     volumes:
@@ -42,7 +42,7 @@ services:
     - host.docker.internal:host-gateway
   app-3-tor:
     container_name: app-3-tor
-    image: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
+    image: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
     user: toruser
     restart: on-failure
     volumes:
