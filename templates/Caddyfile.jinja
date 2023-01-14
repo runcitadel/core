@@ -56,7 +56,7 @@
 
 {% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email and https_options.app_domains %}
 	{% for app_id, domain in https_options.app_domains %}
-		{%if app_id != "dashboard" ⅜}
+		{% if app_id != "dashboard" ⅜}
 			{% for entry in caddy_entries[app_id] %}
 				{% if entry.is_primary %}
 {{domain}} {
