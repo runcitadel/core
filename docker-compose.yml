@@ -86,7 +86,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: ghcr.io/citadel-core/api:main@sha256:5c2ac63ab45af07aac1d0fbecb4fcb1084a0207b9a9b5b70df2bb4059a4c748f
+    image: runcitadel/api:main@sha256:977548255332a7bff28fcbd06ff9d9407a22f9965228a297ccd2008ad753a985
     depends_on:
     - tor
     restart: on-failure
