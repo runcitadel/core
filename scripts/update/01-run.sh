@@ -128,8 +128,8 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "installing", "progress": 85, "description": "Installing LND", "updateTo": "$RELEASE"}
 EOF
 # LND config needs update
+./scripts/app uninstall "lnd"
 ./scripts/configure || true
-./scripts/app install "lnd"
 ./scripts/app stop "lnd"
 
 rm -rf "$CITADEL_ROOT"/app-data/lnd/lnd
