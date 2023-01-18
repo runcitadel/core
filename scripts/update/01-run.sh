@@ -99,8 +99,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 ./scripts/stop || true
 
-electrum_implementation=$(cat services/installed.yml | grep "electrum:" | sed "s/electrum: //g")
-
 # Overlay home dir structure with new dir tree
 echo "Overlaying $CITADEL_ROOT/ with new directory tree"
 rsync --archive \
@@ -124,6 +122,21 @@ EOF
 cd "$CITADEL_ROOT"
 ./scripts/start || true
 
+
+echo "Installing LND as app"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 85, "description": "Installing LND", "updateTo": "$RELEASE"}
+EOF
+./scripts/app install "lnd"
+./scripts/app stop "lnd"
+
+rm -rf "$CITADEL_ROOT"/app-data/lnd/lnd
+
+mv "$CITADEL_ROOT"/lnd "$CITADEL_ROOT"/app-data/lnd/lnd
+
+rm -f "$CITADEL_ROOT"/app-data/lnd/lnd/lnd.conf
+
+./scripts/app start lnd
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
