@@ -145,6 +145,7 @@ setup_new_device () {
 
 # Copy Docker data dir to external storage
 copy_docker_to_external_storage () {
+  mkdir -p "${DOCKER_DIR}"
   mkdir -p "${EXTERNAL_DOCKER_DIR}"
   cp  --recursive \
       --archive \
