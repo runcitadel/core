@@ -9,3 +9,5 @@ services/bitcoin/*
 services/lightning/*
 db/dependencies.yml
 apps/stores.yml
+caddy/.gitkeep
+
