@@ -74,9 +74,6 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
     sudo apt install -y python3-semver
 fi
 
-# Help migration from earlier versions
-mv "$CITADEL_ROOT/db/umbrel-seed" "$CITADEL_ROOT/db/citadel-seed" || true
-
 cd "$CITADEL_ROOT"
 
 # Stopping karen

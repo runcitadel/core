@@ -1,7 +1,7 @@
 {
-    "version": "0.1.4",
-    "name": "Citadel 0.1.4",
-    "requires": ">=0.1.0",
+    "version": "0.1.5",
+    "name": "Citadel 0.1.5",
+    "requires": ">=0.1.4",
     "isQuickUpdate": false,
-    "notes": "This update includes bug fixes and performance improvements. Please note: This update currently breaks the Alby connection in Citadel."
+    "notes": "This update includes bug fixes and performance improvements. It also includes 99% of the HTTPS beta, which we will soon roll out to everyone."
 }
