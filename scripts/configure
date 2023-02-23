@@ -4,16 +4,19 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import sys
-import os
-from lib.rpcauth import get_data
-import re
-import subprocess
 import json
+import os
+import re
 import shutil
-import yaml
+import subprocess
+import sys
 from binascii import hexlify
 from os import urandom
+from time import sleep
+
+import yaml
+from lib.rpcauth import get_data
+
 
 def generate_password(size):
     """Create size byte hex salt"""
@@ -88,6 +91,7 @@ with open("./db/dependencies.yml", "r") as file:
 # upon the user-supplied value of $NETWORK
 # If the network is not specified, then use the mainnet
 BITCOIN_NETWORK=os.environ.get('NETWORK') or 'mainnet'
+DEVICE_IP=os.environ.get("DEVICE_IP")
 
 # Check if network neither mainnet nor testnet nor regtest
 if BITCOIN_NETWORK not in ['mainnet', 'testnet', 'signet', 'regtest']:
@@ -137,8 +141,8 @@ def parse_dotenv(file_path):
 ############ Generate configuration variables ############
 ##########################################################
 
-NGINX_PORT=os.environ.get('NGINX_PORT') or "80"
-NGINX_SSL_PORT=os.environ.get('NGINX_SSL_PORT') or "443"
+CADDY_PORT=os.environ.get('CADDY_PORT') or "80"
+CADDY_HTTPS_PORT=os.environ.get('CADDY_PORT') or "443"
 UPDATE_CHANNEL="stable"
 
 if reconfiguring:
@@ -155,14 +159,15 @@ if reconfiguring:
   BITCOIN_RPC_USER=dotenv['BITCOIN_RPC_USER']
   BITCOIN_RPC_PASS=dotenv['BITCOIN_RPC_PASS']
   BITCOIN_RPC_AUTH=dotenv['BITCOIN_RPC_AUTH']
-  TOR_PASSWORD=dotenv['TOR_PASSWORD']
-  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
-  NGINX_PORT=dotenv['NGINX_PORT']
-  NGINX_SSL_PORT="443"
-  if 'NGINX_SSL_PORT' in dotenv:
-    NGINX_SSL_PORT=dotenv['NGINX_SSL_PORT']
-  if NGINX_SSL_PORT == "80" and NGINX_PORT == "80":
-    NGINX_SSL_PORT="443"
+  if 'NGINX_PORT' in dotenv:
+    CADDY_PORT=dotenv['NGINX_PORT']
+  if 'CADDY_PORT' in dotenv:
+    CADDY_PORT=dotenv['CADDY_PORT']
+  CADDY_HTTPS_PORT="443"
+  if 'CADDY_HTTPS_PORT' in dotenv:
+    CADDY_HTTPS_PORT=dotenv['CADDY_HTTPS_PORT']
+  if CADDY_HTTPS_PORT == "80" and CADDY_PORT == "80":
+    CADDY_HTTPS_PORT="443"
   if 'UPDATE_CHANNEL' in dotenv and dotenv['UPDATE_CHANNEL'] != "main" and dotenv['UPDATE_CHANNEL'] != "migration":
     UPDATE_CHANNEL=dotenv['UPDATE_CHANNEL']
   if 'I2P_PASSWORD' in dotenv:
@@ -176,7 +181,6 @@ else:
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
-
   # Pull Tor image and generate Tor password
   print("Generating Tor password\n")
   os.system('docker pull --quiet {}'.format(dependencies["tor"]))
@@ -255,19 +259,17 @@ if BITCOIN_NETWORK == "testnet":
 # IP addresses for services
 NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
-NGINX_IP="10.21.21.2"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
 MIDDLEWARE_IP="10.21.21.5"
 NEUTRINO_SWITCHER_IP="10.21.21.6"
-DASHBOARD_NEW_IP="10.21.21.7"
-BITCOIN_IP="10.21.21.8"
-LND_IP="10.21.21.9"
-TOR_PROXY_IP="10.21.21.11"
-APPS_TOR_IP="10.21.21.12"
-APPS_2_TOR_IP="10.21.21.13"
-APPS_3_TOR_IP="10.21.21.14"
-I2P_IP="10.21.21.15"
+BITCOIN_IP="10.21.21.7"
+LND_IP="10.21.21.8"
+TOR_PROXY_IP="10.21.21.9"
+APPS_TOR_IP="10.21.21.10"
+APPS_2_TOR_IP="10.21.21.11"
+APPS_3_TOR_IP="10.21.21.12"
+I2P_IP="10.21.21.13"
 
 # Ports
 BITCOIN_RPC_PORT="8332"
@@ -323,22 +325,7 @@ def replace_vars(file_path):
     file_contents = file.read()
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1)), locals(), file_path), file_contents)
 
-templates_to_build = {
-  "./templates/torrc-core-sample": "./tor/torrc-core",
-  "./templates/lnd-sample.conf": "./lnd/lnd.conf",
-  "./templates/bitcoin-sample.conf": "./bitcoin/bitcoin.conf",
-  "./templates/.env-sample": "./.env",
-  "./templates/nginx-sample.conf": "./nginx/nginx.conf",
-  "./templates/i2p-sample.conf": "./i2p/i2pd.conf",
-  "./templates/i2p-tunnels-sample.conf": "./i2p/tunnels.conf"
-}
-
-print("Generating configuration files...")
-
-# Loop through templates_to_build and build them
-for template_path, output_path in templates_to_build.items():
-  if output_path == "./nginx/nginx.conf" and os.path.isfile(output_path):
-    continue
+def build_template(template_path, output_path):
   data = replace_vars(template_path)
   # If output path is a list, then it is a list of output paths
   if isinstance(output_path, list):
@@ -355,9 +342,15 @@ for template_path, output_path in templates_to_build.items():
     with open(output_path, 'w') as file:
       file.write(data)
 
-print("Generated configuration files\n")
+print("Generating configuration files...")
+build_template("./templates/torrc-core-sample", "./tor/torrc-core")
+build_template("./templates/bitcoin-sample.conf", "./bitcoin/bitcoin.conf")
+build_template("./templates/i2p-sample.conf", "./i2p/i2pd.conf")
+build_template("./templates/i2p-tunnels-sample.conf", "./i2p/tunnels.conf")
+build_template("./templates/lnd-sample.conf", "./lnd/lnd.conf")
+build_template("./templates/.env-sample", "./.env")
 
-print("Checking if Docker Compose is installed...")
+print("Ensuring Docker Compose is up to date...")
 download_docker_compose()
 
 print("Updating core services...")
@@ -377,14 +370,21 @@ try:
 except: pass
 
 if not reconfiguring:
-  print("Updating apps...\n")
+  print("Downloading apps...\n")
   os.system('./scripts/app update')
 else:
-  print("Updating apps...\n")
+  print("Generating app configuration...\n")
   os.system('./scripts/app generate')
+
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
+
+print("Configuring permissions...\n")
+try:
+  os.system('chown -R 1000:1000 {}'.format(CITADEL_ROOT))
+except: pass
+
 print("Configuration successful\n")
 print("You can now start Citadel by running:")
 print("  sudo ./scripts/start")

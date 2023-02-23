@@ -330,11 +330,11 @@ if [[ "$command" = "configure" ]]; then
     exit
   fi
 
-  if [[ "$2" = "nginx" ]]; then
-    edit_file $CITADEL_ROOT/nginx/nginx.conf
-    prompt_apply_config nginx false
-    exit
-  fi
+  #if [[ "$2" = "nginx" ]]; then
+    #edit_file $CITADEL_ROOT/nginx/nginx.conf
+    #prompt_apply_config nginx false
+    #exit
+  #fi
 
   if $persist; then
     echo "NOTE: As of now persisted config changes will not be kept when updating Citadel."

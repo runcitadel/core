@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 compose: v2.12.2
-dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:8920719b77a1db517e60742d72a4b63230f170d980d116f8e01974247e8da148
-manager: ghcr.io/citadel-core/api:main@sha256:720a6ab0c0ada97e57186519b6c22f5a1d58ab5301e967363b905113a6cbe068
-middleware: ghcr.io/runcitadel/middleware:main@sha256:b18065b02fffca0facef456109cf0de1b6cb4391f6b2186b6cd467ce6caf7642
-app-cli: ghcr.io/citadel-core/app-manager:main@sha256:0e029661c7918921c3fcc4b18b9a07ed431ab47d608f35d2365da20eb58667a9
-tor: lncm/tor:0.4.7.9@sha256:86c2fe9d9099e6376798979110b8b9a3ee5d8adec27289ac4a5ee892514ffe92
+dashboard: ghcr.io/runcitadel/dashboard:no-https@sha256:7fc5a5b70496240e6e48a381e8ac3c7978e7343285fda4951c00846580d6216d
+manager: runcitadel/api:main@sha256:12d299d8850d830fa5abd0e64c8537dfcbaec662de18376b0d7b01fa59895132
+middleware: ghcr.io/runcitadel/middleware:main@sha256:cbd5fd2ab5afe420025c61e276d21c79a004d6148b8dfdd58649adb55907682b
+app-cli: runcitadel/app-manager:backports@sha256:dde9197ed141e516f8300bbcdf76915366eacdda65639522d9358d4d1420a673
+tor: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f

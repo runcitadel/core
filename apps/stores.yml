@@ -1,0 +1,76 @@
+- id: citadel
+  name: Citadel app store
+  tagline: The official app store by the Citadel team
+  icon: https://icons.runcitadel.space/app-stores/main.svg
+  developers: The Citadel developers
+  license: AGPL-3.0-or-later
+  apps:
+    lightning-terminal: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    code-server: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    lightning-shell: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    lnmarkets: a819714e71f3ab24c15dda4110cde0e6da0c8c42
+    mempool: 3fed81a6ff73bf1600ff4132bfe82d04660c0aae
+    bitcartcc: 3fed81a6ff73bf1600ff4132bfe82d04660c0aae
+    lnme: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    robosats: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    btcpay-server: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    thunderhub: 39433b0675a1b43e9ecbbfad6c8cc82b12667fac
+    synapse-admin: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    btc-rpc-explorer: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    node-red: 3fed81a6ff73bf1600ff4132bfe82d04660c0aae
+    gitea: cc93b09639e3cfc5c271be5f34073d2afe29809c
+    nextcloud: 6ff003d693753a021bb104d091c6c7a50e438e4d
+    sphinx-relay: d62423ec8ed163fe4e689dc7d6e019324a86dc56
+    specter-desktop: 153e2dbd1b6827f2bcd4756d1932101af0bbfac4
+    oak-node: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    tallycoin-connect: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    btc-rpc-explorer-public-fast: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    agora: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    kollider: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    lndhub: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    woofbot: 931bcab746129838ad539b2d535786865e2bd7a4
+    wordpress: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    krystal-bull: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    snowflake: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    ride-the-lightning: 153e2dbd1b6827f2bcd4756d1932101af0bbfac4
+    lnbits: db645071fd1241ca35eb2ffa42d5309884f1ed4d
+    ringtools: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    usocial: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    vaultwarden: d901ad3315853224c7c77d6b61ef850c14e255bb
+    squeaknode: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    itchysats: 3fed81a6ff73bf1600ff4132bfe82d04660c0aae
+    fulcrum: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    jam: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    nostr-relay: 132fb6d853f905431ea3c20097fa06e5e04a505a
+    electrs: 29bacf5a4b571d1e4b0e49e85ff9c219a551b76e
+    bluewallet: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    lnplus: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    ln-visualizer: 22b6f7e549a8e772dbf9f594dce66487ef0fd698
+    lndg: 53b0aae0f8cb7364ace04f7282118358744c89ce
+    bitfeed: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+    element: 36315f17b00450eea62e8d525a670a629ab1ebf8
+    tailscale: 14eddca042802891b02e0d5f8999a2a1dd40c080
+    synapse: 996b62274dabea9653852aa57b575d3b97ed96c5
+    btc-rpc-explorer-public: 76bfe58c1b6cbc2ea23309c3217750318ac27075
+    uptime-kuma: 8500658ad8bc5c869c9e17d14a8b668b5d51ffaf
+    spigot-mc: 974ac0549be3c6038dcd2bb0705bb6b722a8b4ff
+  commit: 14eddca042802891b02e0d5f8999a2a1dd40c080
+  repo: https://github.com/citadel-core/apps
+  branch: main
+  subdir: v4
+- id: citadel
+  name: Citadel app store
+  tagline: The official app store by the Citadel team
+  icon: https://icons.runcitadel.space/app-stores/main.svg
+  developers: The Citadel developers
+  license: Proprietary
+  apps:
+    samourai-server: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+    photoprism: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+    simple-torrent: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+    home-assistant: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+    pi-hole: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+  commit: 496d384c754d5e68dc03c8390e8e81b8ee9dc125
+  repo: https://github.com/citadel-core/apps-nonfree
+  branch: main
+  subdir: v4

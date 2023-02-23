@@ -8,3 +8,4 @@ apps/docker-compose.common.yml
 services/bitcoin/*
 services/lightning/*
 db/dependencies.yml
+apps/stores.yml

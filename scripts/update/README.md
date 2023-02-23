@@ -9,7 +9,7 @@ How over-the-air updates work on Citadel.
 
 ## Execution Flow
 
-1. New developments across the any/entire fleet of Citadel's services (bitcoind, lnd, dashboard, middleware, etc) are made, which maintain their own independent version-control and release-schedule. Subsequently, their new docker images are built, tagged and pushed to Docker Hub.
+1. New developments across the any/entire fleet of Citadel's services (bitcoind, dashboard, manager, etc) are made, which maintain their own independent version-control and release-schedule. Subsequently, their new docker images are built, tagged and pushed to Docker Hub.
 
 2. The newly built and tagged images are updated in the main repository's (i.e. this repo) [`docker-compose.yml`](https://github.com/runcitadel/core/blob/main/docker-compose.yml) file.
 

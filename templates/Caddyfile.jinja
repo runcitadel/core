@@ -1,0 +1,75 @@
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email %}
+{
+	acme_ca https://acme-v02.api.letsencrypt.org/directory
+	email {{ https_options.email }}
+}
+{% endif %}
+
+:{{CADDY_PORT}} {
+	route /api/* {
+		uri strip_prefix /api
+		reverse_proxy {{MIDDLEWARE_IP}}:3000
+	}
+
+	route /api-v2/* {
+		uri strip_prefix /api-v2
+		reverse_proxy {{MANAGER_IP}}:3000
+	}
+
+	reverse_proxy {{DASHBOARD_IP}}:3004
+}
+
+
+
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email and https_options.app_domains and https_options.app_domains.dashboard %}
+{{https_options.app_domains.dashboard}} {
+	{% if https_options.user and https_options.user.username and https_options.user.password and https_options.app_domains.dashboard is ending_with(".runningcitadel.com") %}
+		tls {
+			dns runningcitadel {{ https_options.user.username }} {{ https_options.user.password }}
+		}
+	{% endif %}
+
+	route /api/* {
+		uri strip_prefix /api
+		reverse_proxy {{MIDDLEWARE_IP}}:3000
+	}
+
+	route /api-v2/* {
+		uri strip_prefix /api-v2
+		reverse_proxy {{MANAGER_IP}}:3000
+	}
+
+	reverse_proxy {{DASHBOARD_IP}}:3004
+	
+}
+{% endif %}
+
+
+{% for app_id, entries in caddy_entries %}
+	{% for entry in entries %}
+:{{entry.public_port}} {
+	{% set container_ip_entry = "APP_" ~ app_id ~ "_" ~ entry.container_name ~ "_IP" | upper | replace(from="-", to="_") %}
+	reverse_proxy {{ ip_map[container_ip_entry] }}:{{ entry.internal_port }}
+}
+	{% endfor %}
+{% endfor %}
+
+{% if https_options and https_options.agreed_lets_encrypt_tos and https_options.email and https_options.app_domains %}
+	{% for app_id, domain in https_options.app_domains %}
+		{% if app_id != "dashboard" %}
+			{% for entry in caddy_entries[app_id] %}
+				{% if entry.is_primary %}
+{{domain}} {
+	{% set container_ip_entry = "APP_" ~ app_id ~ "-" ~ entry.container_name ~ "_IP" | upper | replace(from="-", to="_") %}
+	reverse_proxy {{ ip_map[container_ip_entry] }}:{{ entry.internal_port }}
+	{% if https_options.user and https_options.user.username and https_options.user.password and domain is ending_with(".runningcitadel.com") %}
+		tls {
+			dns runningcitadel {{ https_options.user.username }} {{ https_options.user.password }}
+		}
+	{% endif %}
+}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+{% endif %}
