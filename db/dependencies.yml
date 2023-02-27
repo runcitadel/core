@@ -6,5 +6,5 @@ compose: v2.12.2
 dashboard: ghcr.io/runcitadel/dashboard:no-https@sha256:7fc5a5b70496240e6e48a381e8ac3c7978e7343285fda4951c00846580d6216d
 manager: runcitadel/api:main@sha256:12d299d8850d830fa5abd0e64c8537dfcbaec662de18376b0d7b01fa59895132
 middleware: ghcr.io/runcitadel/middleware:main@sha256:cbd5fd2ab5afe420025c61e276d21c79a004d6148b8dfdd58649adb55907682b
-app-cli: runcitadel/app-manager:backports@sha256:e495acfedb1ccdfd302b9a17bee5ec54592655fce24c82108a46a3c955784bfd
+app-cli: runcitadel/app-manager:backports@sha256:11a8c1b73fe5e4c6f45126d5bde10b5a469977e280319c62e2edfacad256012d
 tor: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
