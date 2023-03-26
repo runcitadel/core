@@ -68,7 +68,7 @@ def setService(name, implementation):
     except FileNotFoundError:
         installed = {
             "lightning": "lnd",
-            "bitcoin": "knots"
+            "bitcoin": "core"
         }
     installed[name] = implementation
     with open(os.path.join(nodeRoot, "services", "installed.yml"), 'w') as stream:
@@ -99,7 +99,7 @@ def uninstallService(name):
     except FileNotFoundError:
         installed = {
             "lightning": "lnd",
-            "bitcoin": "knots"
+            "bitcoin": "core"
         }
     try:
         del installed[name]
@@ -116,7 +116,7 @@ def installServices():
     except FileNotFoundError:
         installed = {
             "lightning": "lnd",
-            "bitcoin": "knots"
+            "bitcoin": "core"
         }
     
     for key, value in installed.items():

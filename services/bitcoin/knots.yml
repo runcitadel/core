@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 bitcoin:
   container_name: bitcoin
-  image: ghcr.io/runcitadel/bitcoinknots:main@sha256:5fbee0f6f0d09d42aacc11c373ffe6162210c42ce21e6eba294e547e3ad80219
+  image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
   depends_on:
   - tor
   volumes:
