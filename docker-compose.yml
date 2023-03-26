@@ -116,7 +116,7 @@ services:
     volumes:
     - ${PWD}/info.json:/info.json
     - ${PWD}/db:/db
-    - ${PWD}/karen.socket:/karen.socket
+    - ${PWD}/events:/events
     - ${PWD}/apps:/apps
     - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
@@ -154,7 +154,7 @@ services:
       I2P_USERNAME: i2pd
       ELECTRUM_HOST: $APP_ELECTRUM_IP
       ELECTRUM_PORT: 50001
-      KAREN_SOCKET: /karen.socket
+      KAREN_SOCKET: /events/karen.socket
       IP_ADDR: $DEVICE_IP
     networks:
       default:
