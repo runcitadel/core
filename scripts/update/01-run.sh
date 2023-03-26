@@ -65,13 +65,6 @@ if [[ ! -z "${CITADEL_OS:-}" ]]; then
       install -m 644 "${service_path}" "/etc/systemd/system/${service_name}"
       systemctl enable "${service_name}"
     done
-
-    # Apply config.txt changes
-    curl https://raw.githubusercontent.com/runcitadel/os/main/stage1/00-boot-files/files/config.txt > /boot/config.txt
-
-    echo "source ~/citadel/setenv" | tee -a /home/citadel/.bashrc
-
-    sudo apt install -y python3-semver
 fi
 
 cd "$CITADEL_ROOT"
@@ -92,7 +85,7 @@ EOF
 # Stop old containers
 echo "Stopping old containers"
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 67, "description": "Stopping old containers", "updateTo": "$RELEASE"}
+{"state": "installing", "progress": 70, "description": "Stopping old containers", "updateTo": "$RELEASE"}
 EOF
 ./scripts/stop || true
 

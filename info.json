@@ -1,7 +1,7 @@
 {
-    "version": "0.1.5",
-    "name": "Citadel 0.1.5",
-    "requires": ">=0.1.4",
+    "version": "0.1.6",
+    "name": "Update compatibility package",
+    "requires": ">=0.1.5",
     "isQuickUpdate": false,
-    "notes": "This update includes bug fixes and performance improvements. It also includes 99% of the HTTPS beta, which we will soon roll out to everyone."
+    "notes": "This update is mostly done to prepare for a future update of Citadel. It also includes the latest Bitcoin Core & LND."
 }
