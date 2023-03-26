@@ -1,9 +1,9 @@
-# SPDX-FileCopyrightText: 2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2022-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 compose: v2.17.2
-dashboard: ghcr.io/runcitadel/dashboard:no-https@sha256:7fc5a5b70496240e6e48a381e8ac3c7978e7343285fda4951c00846580d6216d
+dashboard: ghcr.io/runcitadel/dashboard:no-https@sha256:f668225fcb84effd88ee6887b5bfca681c522433461199cdc53550b323601454
 manager: runcitadel/api:main@sha256:12d299d8850d830fa5abd0e64c8537dfcbaec662de18376b0d7b01fa59895132
 middleware: ghcr.io/runcitadel/middleware:main@sha256:cbd5fd2ab5afe420025c61e276d21c79a004d6148b8dfdd58649adb55907682b
 app-cli: runcitadel/app-manager:backports@sha256:953c23bf2e176a0b2b9dbe4e3e82d897b04ae6048a2e202a3b043c6e393285c5
