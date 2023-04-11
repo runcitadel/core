@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2023 Citadel and contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
+
+"${CITADEL_ROOT}/scripts/configure"
