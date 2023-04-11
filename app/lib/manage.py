@@ -8,19 +8,12 @@ import re
 import shutil
 import stat
 import subprocess
-import threading
 from sys import argv
 from typing import List
 
 import yaml
 from lib.citadelutils import parse_dotenv
 from lib.entropy import deriveEntropy
-
-
-# For an array of threads, join them and wait for them to finish
-def joinThreads(threads: List[threading.Thread]):
-    for thread in threads:
-        thread.join()
 
 # The directory with this script
 scriptDir = os.path.dirname(os.path.realpath(__file__))
@@ -143,6 +136,7 @@ def compose(app, arguments):
         subprocess.call("chmod -R 770 {}".format(os.path.join(appDataDir, app, "data", "nextcloud")), shell=True)
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
     os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
+    os.environ["CITADEL_ROOT"] = nodeRoot
     # List all hidden services for an app and put their hostname in the environment
     hiddenServices: List[str] = getAppHiddenServices(app)
     for service in hiddenServices:

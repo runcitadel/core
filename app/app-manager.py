@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -59,14 +59,17 @@ elif args.action == 'update':
     update()
     exit(0)
 elif args.action == 'ls-installed':
-    # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps
-    with open(userFile, "r") as f:
-        userData = json.load(f)
-    if "installedApps" in userData:
-        print("\n".join(userData["installedApps"]))
-    else:
-        # To match the behavior of the old script, print a newline if there are no apps installed
-        print("\n")
+    try:
+        # Load the userFile as JSON, check if installedApps is in it, and if so, print the apps
+        with open(userFile, "r") as f:
+            userData = json.load(f)
+        if "installedApps" in userData:
+            print("\n".join(userData["installedApps"]))
+        else:
+            # To match the behavior of the old script, print a newline if there are no apps installed
+            print("\n")
+    except:
+        pass
 elif args.action == 'install':
     if not args.app:
         print("No app provided")
