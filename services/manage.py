@@ -67,7 +67,6 @@ def setService(name, implementation):
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "lightning": "lnd",
             "bitcoin": "core"
         }
     installed[name] = implementation
@@ -98,7 +97,6 @@ def uninstallService(name):
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "lightning": "lnd",
             "bitcoin": "core"
         }
     try:
@@ -115,7 +113,6 @@ def installServices():
             installed = yaml.safe_load(stream)
     except FileNotFoundError:
         installed = {
-            "lightning": "lnd",
             "bitcoin": "core"
         }
     

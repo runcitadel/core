@@ -15,7 +15,6 @@
 .backup
 *.pyc
 bitcoin/*
-lnd/*
 tor/*
 db/*
 statuses/*
@@ -33,7 +32,6 @@ docker-compose.override.yml
 !db/citadel-seed
 db/citadel-seed/*
 !db/citadel-seed/.gitkeep
-!lnd/.gitkeep
 !logs/.gitkeep
 !tor/data/.gitkeep
 !tor/run/.gitkeep
@@ -42,8 +40,6 @@ db/citadel-seed/*
 !caddy/.gitkeep
 !i2p/.gitkeep
 
-!**/*.license
-services/installed.json
-services/installed.yml
+!**/*.License
 
-events/karen
+karen.socket

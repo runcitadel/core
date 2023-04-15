@@ -7,9 +7,7 @@
 CITADEL_ROOT="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))"
 
 alias citadel="${CITADEL_ROOT}/bin/citadel"
-alias lncli="docker exec -it lightning lncli"
+alias lncli="docker exec -it lnd-service-1 lncli"
 alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
 alias docker-compose="sudo docker compose"
 alias docker="sudo docker"
-
-export BOS_DEFAULT_LND_PATH="${CITADEL_ROOT}/lnd"

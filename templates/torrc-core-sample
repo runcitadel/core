@@ -4,7 +4,6 @@
 
 # Bind only to "<tor-proxy-ip>" which is the tor IP within the container
 SocksPort   <tor-proxy-ip>:<tor-proxy-port>
-ControlPort <tor-proxy-ip>:<tor-control-port>
 
 # Citadel Core Services
 
@@ -19,13 +18,3 @@ HiddenServicePort <bitcoin-p2p-port> <bitcoin-ip>:<bitcoin-p2p-port>
 # Bitcoin Core RPC Hidden Service
 HiddenServiceDir /var/lib/tor/bitcoin-rpc
 HiddenServicePort <bitcoin-rpc-port> <bitcoin-ip>:<bitcoin-rpc-port>
-
-# LND REST Hidden Service
-HiddenServiceDir /var/lib/tor/lnd-rest
-HiddenServicePort <lnd-rest-port> <lnd-ip>:<lnd-rest-port>
-
-# LND gRPC Hidden Service
-HiddenServiceDir /var/lib/tor/lnd-grpc
-HiddenServicePort <lnd-grpc-port> <lnd-ip>:<lnd-grpc-port>
-
-HashedControlPassword <tor-hashed-password>

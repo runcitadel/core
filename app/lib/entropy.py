@@ -15,8 +15,7 @@ def deriveEntropy(identifier: str):
         if os.path.isfile(alternativeSeedFile):
             seedFile = alternativeSeedFile
         else:
-            print("No seed file found, exiting...")
-            exit(1)
+            raise Exception("No seed file found")
     with open(seedFile, "r") as f:
         node_seed = f.read().strip()
     entropy = subprocess.check_output(

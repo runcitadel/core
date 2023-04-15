@@ -76,27 +76,6 @@ services:
     networks:
       default:
         ipv4_address: $BITCOIN_IP
-  lightning:
-    container_name: lightning
-    image: lightninglabs/lnd:v0.15.4-beta@sha256:f5b19812ab7d28faa350838dac4bb88e7fcf9ae905e44d3539be41a97b80ca23
-    user: 1000:1000
-    depends_on:
-    - tor
-    - bitcoin
-    volumes:
-    - ${PWD}/lnd:/data/.lnd
-    - ${PWD}/walletpassword:/walletpassword
-    environment:
-      HOME: /data
-    restart: on-failure
-    stop_grace_period: 5m30s
-    ports:
-    - 9735:9735
-    - $LND_REST_PORT:$LND_REST_PORT
-    - $LND_GRPC_PORT:$LND_GRPC_PORT
-    networks:
-      default:
-        ipv4_address: $LND_IP
   dashboard:
     container_name: dashboard
     image: ghcr.io/runcitadel/dashboard:no-https@sha256:7fc5a5b70496240e6e48a381e8ac3c7978e7343285fda4951c00846580d6216d
@@ -118,7 +97,6 @@ services:
     - ${PWD}/db:/db
     - ${PWD}/events:/events
     - ${PWD}/apps:/apps
-    - ${PWD}/lnd:/lnd:ro
     - ${PWD}/statuses:/statuses
     - ${PWD}/tor/data:/var/lib/tor/
     - jwt-public-key:/jwt-public-key
@@ -138,8 +116,6 @@ services:
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIN_RPC_USER: $BITCOIN_RPC_USER
       BITCOIN_RPC_PASSWORD: $BITCOIN_RPC_PASS
-      LND_CERT_FILE: /lnd/tls.cert
-      LND_ADMIN_MACAROON_FILE: /lnd/data/chain/bitcoin/${BITCOIN_NETWORK}/admin.macaroon
       GITHUB_REPO: runcitadel/core
       GITHUB_BRANCH: ${UPDATE_CHANNEL:-"stable"}
       VERSION_FILE: /info.json
@@ -159,51 +135,6 @@ services:
     networks:
       default:
         ipv4_address: $MANAGER_IP
-  middleware:
-    container_name: middleware
-    image: ghcr.io/runcitadel/middleware:main@sha256:cbd5fd2ab5afe420025c61e276d21c79a004d6148b8dfdd58649adb55907682b
-    depends_on:
-    - bitcoin
-    - lightning
-    command: sh -c "./wait-for-manager.sh $MANAGER_IP && ././start.sh"
-    restart: on-failure
-    volumes:
-    - ${PWD}/lnd:/lnd
-    - jwt-public-key:/jwt-public-key
-    environment:
-      PORT: '3000'
-      BITCOIN_HOST: $BITCOIN_IP
-      RPC_PORT: $BITCOIN_RPC_PORT
-      RPC_USER: $BITCOIN_RPC_USER
-      RPC_PASSWORD: $BITCOIN_RPC_PASS
-      LND_NETWORK: $BITCOIN_NETWORK
-      LND_HOST: ${LND_IP}
-      JWT_PUBLIC_KEY_FILE: /jwt-public-key/jwt.pem
-      DEVICE_HOSTS: ${DEVICE_HOSTS:-"http://citadel.local"}
-      UNSAFE_REMOVE_CORS_CHECK: true
-    networks:
-      default:
-        ipv4_address: $MIDDLEWARE_IP
-  neutrino-switcher:
-    container_name: neutrino-switcher
-    image: lncm/neutrino-switcher:1.0.5@sha256:3ddf58c5599ba22db8414f2694bfeeba086455d4a19b4955b26c3ae5e967d42a
-    depends_on:
-    - bitcoin
-    - lightning
-    restart: on-failure
-    volumes:
-    - ${PWD}/lnd:/lnd
-    - ${PWD}/statuses:/statuses
-    - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      JSONRPCURL: http://${BITCOIN_IP}:${BITCOIN_RPC_PORT}
-      RPCUSER: $BITCOIN_RPC_USER
-      RPCPASS: $BITCOIN_RPC_PASS
-      LND_CONTAINER_NAME: lightning
-      SLEEPTIME: 3600
-    networks:
-      default:
-        ipv4_address: $NEUTRINO_SWITCHER_IP
   i2p:
     container_name: i2p
     user: 1000:1000

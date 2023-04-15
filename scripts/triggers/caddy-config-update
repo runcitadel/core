@@ -7,3 +7,5 @@
 CITADEL_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../..)"
 
 "${CITADEL_ROOT}/scripts/configure"
+
+docker restart caddy

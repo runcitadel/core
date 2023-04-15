@@ -7,11 +7,12 @@
 import argparse
 import json
 import os
+import time
 
 from lib.manage import (compose, convert_to_upper, createDataDir, deleteData,
-                        download, downloadAll, get_var_safe,
+                        download, downloadAll, downloadNew, get_var_safe,
                         getAvailableUpdates, getUserData, setInstalled,
-                        setRemoved, update)
+                        setRemoved, update, getAppRegistryEntry)
 
 # Print an error if user is not root
 if os.getuid() != 0:
@@ -25,10 +26,11 @@ appsDir = os.path.join(nodeRoot, "apps")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 legacyScript = os.path.join(nodeRoot, "scripts", "app")
+torDataDir = os.path.join(nodeRoot, "tor", "data")
 
 parser = argparse.ArgumentParser(description="Manage apps on your Citadel")
 parser.add_argument('action', help='What to do with the app database.', choices=[
-                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "get-ip"])
+                    "download", "generate", "update", "list-updates", "ls-installed", "install", "uninstall", "stop", "start", "compose", "restart", "get-ip", "get-implementation"])
 parser.add_argument('--verbose', '-v', action='store_true')
 parser.add_argument(
     'app', help='Optional, the app to perform an action on. (For install, uninstall, stop, start and compose)', nargs='?')
@@ -45,6 +47,9 @@ if args.action == "list-updates":
     exit(0)
 elif args.action == 'download':
     downloadAll()
+    exit(0)
+elif args.action == 'download-new':
+    downloadNew()
     exit(0)
 elif args.action == 'generate':
     update()
@@ -64,7 +69,13 @@ elif args.action == 'ls-installed':
         with open(userFile, "r") as f:
             userData = json.load(f)
         if "installedApps" in userData:
-            print("\n".join(userData["installedApps"]))
+            with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+                virtual_apps = json.load(f)
+            # Print the apps
+            # Filter out virtual apps (virtual_apps.keys())
+            for app in userData["installedApps"]:
+                if app not in virtual_apps.keys():
+                    print(app)
         else:
             # To match the behavior of the old script, print a newline if there are no apps installed
             print("\n")
@@ -74,6 +85,29 @@ elif args.action == 'install':
     if not args.app:
         print("No app provided")
         exit(1)
+    registryEntry = getAppRegistryEntry(args.app)
+    # If registryEntry is None, fail
+    if registryEntry is None:
+        print("App {} does not seem to exist".format(args.app))
+        exit(1)
+    if isinstance(registryEntry['hiddenServices'], list):
+        for entry in registryEntry['hiddenServices']:
+            if not os.path.exists(os.path.join(torDataDir, entry, "hostname")):
+                print("Restarting Tor containers...")
+                try:
+                    os.system("docker restart app-tor app-2-tor app-3-tor")
+                except:
+                    print("Failed to restart Tor containers")
+                    exit(1)
+                print("Waiting for Tor containers to restart...")
+                for i in range(60):
+                    if os.path.exists(os.path.join(torDataDir, entry, "hostname")):
+                        break
+                    time.sleep(1)
+                else:
+                    print("Tor containers did not restart in time")
+                    exit(1)
+    update()
     with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
         virtual_apps = json.load(f)
     userData = getUserData()
@@ -173,7 +207,21 @@ elif args.action == "get-ip":
         print("Not an virtual app")
         exit(1)
 
-else:
-    print("Error: Unknown action")
-    print("See --help for usage")
+elif args.action == "get-implementation":
+    if args.app == "":
+        print("Missing app")
+        exit(1)
+    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
+        virtual_apps = json.load(f)
+    userData = getUserData()
+    implements_service = False
+    if args.app in virtual_apps:
+        for implementation in virtual_apps[args.app]:
+            if "installedApps" in userData and implementation in userData["installedApps"]:
+                print(implementation)
+                exit(0)
+    else:
+        print("Not an virtual app")
+        exit(1)
+    print("Virtual app not found")
     exit(1)

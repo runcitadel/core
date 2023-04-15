@@ -2,9 +2,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-version: "3.8"
-
 networks:
   default:
     name: citadel_main_network
     external: true
+
+volumes:
+  jwt-public-key:
+    external: true
+    name: citadel-jwt-public-key

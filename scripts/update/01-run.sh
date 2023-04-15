@@ -113,6 +113,23 @@ cd "$CITADEL_ROOT"
 ./scripts/start || true
 
 
+echo "Installing LND as app"
+cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
+{"state": "installing", "progress": 85, "description": "Installing LND", "updateTo": "$RELEASE"}
+EOF
+# LND config needs update
+./scripts/app uninstall "lnd"
+./scripts/configure || true
+./scripts/app stop "lnd"
+
+rm -rf "$CITADEL_ROOT"/app-data/lnd/lnd
+
+mv "$CITADEL_ROOT"/lnd "$CITADEL_ROOT"/app-data/lnd/lnd
+
+rm -f "$CITADEL_ROOT"/app-data/lnd/lnd/lnd.conf
+
+./scripts/app start lnd
+
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
 EOF

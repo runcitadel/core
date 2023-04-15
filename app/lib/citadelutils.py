@@ -17,7 +17,7 @@ def parse_dotenv(file_path):
         value = value.strip('"').strip("'")
         envVars[key] = value
       else:
-        print("Error: Invalid line in {}: {}".format(file_path, line))
+        print("Warning: Invalid line in {}: {}".format(file_path, line))
         print("Line should be in the format KEY=VALUE or KEY=\"VALUE\" or KEY='VALUE'")
-        exit(1)
+        continue
   return envVars
