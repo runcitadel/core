@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -140,12 +140,6 @@ if [[ "${1}" == "--run" ]]; then
     echo "-----------------"
     echo
     docker compose logs --tail=30 bitcoin
-    
-    echo
-    echo "Lightning logs"
-    echo "--------------"
-    echo
-    docker compose logs --tail=30 lightning
 
     echo
     echo "Tor logs"

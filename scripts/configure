@@ -174,8 +174,6 @@ if reconfiguring:
     I2P_PASSWORD=dotenv['I2P_PASSWORD']
   else:
     I2P_PASSWORD=generate_password(64)
-  TOR_PASSWORD=dotenv['TOR_PASSWORD']
-  TOR_HASHED_PASSWORD=dotenv['TOR_HASHED_PASSWORD']
 else:
   # Generate RPC credentials
   print("Generating auth credentials\n")
@@ -183,64 +181,18 @@ else:
   BITCOIN_RPC_DETAILS=get_data(BITCOIN_RPC_USER)
   BITCOIN_RPC_AUTH=BITCOIN_RPC_DETAILS['auth']
   BITCOIN_RPC_PASS=BITCOIN_RPC_DETAILS['password']
-  # Pull Tor image and generate Tor password
-  print("Generating Tor password\n")
-  os.system('docker pull --quiet {}'.format(dependencies["tor"]))
-  TOR_PASSWORD=get_data('itdoesntmatter')['password']
-  TOR_HASHED_PASSWORD=os.popen('docker run --rm {} --quiet --hash-password "{}"'.format(dependencies["tor"], TOR_PASSWORD)).read()[:-1]
   I2P_PASSWORD=generate_password(64)
 
-BITCOIN_NODE="neutrino"
-ALIAS_AND_COLOR=""
-ADDITIONAL_BITCOIN_OPTIONS=""
-BOLT_DB_OPTIONS=""
-CHANNEL_LIMITATIONS=""
-BASEFEE = "bitcoin.basefee=0"
 EXTERNAL_IP = ""
 if os.path.isfile('./tor/data/bitcoin-p2p/hostname'):
   EXTERNAL_IP="externalip=" + open('./tor/data/bitcoin-p2p/hostname').read()
 
-if os.path.isfile("./lnd/lnd.conf"):
-  with open("./lnd/lnd.conf", 'r') as file:
-    # We generally don't want to allow changing lnd.conf, but we keep as many custom settings as possible
-    for line in file:
-      if line.startswith("bitcoin.node="):
-        BITCOIN_NODE = line.split("=")[1].strip()
-      if line.startswith("alias="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("color="):
-        ALIAS_AND_COLOR += "\n" + line.strip()
-      if line.startswith("bitcoin.basefee"):
-        BASEFEE = line.strip()
-      if line.startswith("bitcoin.feerate"):
-        ADDITIONAL_BITCOIN_OPTIONS += "\n" + line.strip()
-      if line.startswith("minchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxchansize"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("maxpendingchannels"):
-        CHANNEL_LIMITATIONS += "\n" + line.strip()
-      if line.startswith("db.bolt.auto-compact"):
-        BOLT_DB_OPTIONS += "\n" + line.strip()
-
-if BOLT_DB_OPTIONS != "":
-  BOLT_DB_OPTIONS = "[bolt]\n" + BOLT_DB_OPTIONS
-
-if CHANNEL_LIMITATIONS == "":
-  CHANNEL_LIMITATIONS = "maxpendingchannels=3\nminchansize=10000"
-
-NEUTRINO_PEERS=""
 if BITCOIN_NETWORK == "mainnet":
   BITCOIN_RPC_PORT=8332
   BITCOIN_P2P_PORT=8333
 elif BITCOIN_NETWORK == "testnet":
   BITCOIN_RPC_PORT=18332
   BITCOIN_P2P_PORT=18333
-  NEUTRINO_PEERS='''
-[neutrino]
-neutrino.addpeer=testnet1-btcd.zaphq.io
-neutrino.addpeer=testnet2-btcd.zaphq.io
-  '''
 elif BITCOIN_NETWORK == "signet":
   BITCOIN_RPC_PORT=38332
   BITCOIN_P2P_PORT=38333
@@ -263,10 +215,10 @@ NETWORK_IP="10.21.21.0"
 GATEWAY_IP="10.21.21.1"
 DASHBOARD_IP="10.21.21.3"
 MANAGER_IP="10.21.21.4"
-MIDDLEWARE_IP="10.21.21.5"
-NEUTRINO_SWITCHER_IP="10.21.21.6"
+#MIDDLEWARE_IP="10.21.21.5"
+#NEUTRINO_SWITCHER_IP="10.21.21.6"
 BITCOIN_IP="10.21.21.7"
-LND_IP="10.21.21.8"
+#LND_IP="10.21.21.8"
 TOR_PROXY_IP="10.21.21.9"
 APPS_TOR_IP="10.21.21.10"
 APPS_2_TOR_IP="10.21.21.11"
@@ -280,8 +232,6 @@ BITCOIN_ZMQ_RAWBLOCK_PORT="28332"
 BITCOIN_ZMQ_RAWTX_PORT="28333"
 BITCOIN_ZMQ_HASHBLOCK_PORT="28334"
 BITCOIN_ZMQ_SEQUENCE_PORT="28335"
-LND_GRPC_PORT="10009"
-LND_REST_PORT="8080"
 TOR_PROXY_PORT="9050"
 I2P_SAM_PORT="7656"
 TOR_CONTROL_PORT="29051"
@@ -296,12 +246,6 @@ except:
 DOCKER_EXECUTABLE=subprocess.check_output(["which", "docker"]).decode("utf-8").strip()
 # Get the real path by following symlinks
 DOCKER_BINARY=subprocess.check_output(["readlink",  "-f", DOCKER_EXECUTABLE]).decode("utf-8").strip()
-
-# Set LND fee URL for neutrino on mainnet
-LND_FEE_URL=""
-# If the network is mainnet and status_dir/node-status-bitcoind-ready doesn't exist, set the FEE_URL
-if BITCOIN_NETWORK == 'mainnet' and BITCOIN_NODE == 'neutrino':
-   LND_FEE_URL="feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
 
 # Checks if a variable with the name exists, if not, check if an env var with the name existts
 # if neither exists, then exit with an error
@@ -349,7 +293,7 @@ build_template("./templates/torrc-core-sample", "./tor/torrc-core")
 build_template("./templates/bitcoin-sample.conf", "./bitcoin/bitcoin.conf")
 build_template("./templates/i2p-sample.conf", "./i2p/i2pd.conf")
 build_template("./templates/i2p-tunnels-sample.conf", "./i2p/tunnels.conf")
-build_template("./templates/lnd-sample.conf", "./lnd/lnd.conf")
+MIDDLEWARE_IP="NOT_YET_SET"
 build_template("./templates/.env-sample", "./.env")
 
 print("Ensuring Docker Compose is up to date...")
@@ -359,7 +303,7 @@ print("Updating core services...")
 print()
 with open("docker-compose.yml", 'r') as stream:
   compose = yaml.safe_load(stream)
-for service in ["manager", "middleware", "dashboard"]:
+for service in ["manager", "dashboard"]:
   compose["services"][service]["image"] = dependencies[service]
 for service in ["tor", "app-tor", "app-2-tor", "app-3-tor"]:
   compose["services"][service]["image"] = dependencies["tor"]
@@ -377,6 +321,24 @@ if not reconfiguring:
 else:
   print("Generating app configuration...\n")
   os.system('./scripts/app generate')
+
+# Run ./scripts/app get-implementation lightning to get the implementation
+# If it fails, install the LND app and set the implementation to LND
+try:
+  implementation = subprocess.check_output("./scripts/app get-implementation lightning", shell=True).decode("utf-8").strip()
+except:
+  print("Installing LND...\n")
+  os.system('./scripts/app install lnd')
+  implementation = "lnd"
+
+# Get APP_<IMPLEMENTATION>_MIDDLEWARE_IP from the .env file
+dotenv=parse_dotenv('./.env')
+MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper().replace("-", "_"))]
+
+build_template("./templates/.env-sample", "./.env")
+
+print("Updating app configuration...\n")
+os.system('./scripts/app generate')
 
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:

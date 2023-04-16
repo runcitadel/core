@@ -365,13 +365,8 @@ if [[ "$command" = "configure" ]]; then
   fi
 
   if [[ "$2" = "lnd" ]]; then
-    if $persist; then
-      edit_file $CITADEL_ROOT/templates/lnd-sample.conf
-      prompt_apply_config lightning true
-    else
-      edit_file $CITADEL_ROOT/lnd/lnd.conf
-      prompt_apply_config lightning false
-    fi
+    edit_file $CITADEL_ROOT/app-data/lnd/lnd.conf
+    prompt_apply_config lnd-service-1 false
     exit
   fi
 

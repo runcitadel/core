@@ -1,7 +1,7 @@
 {
-    "version": "0.1.7",
-    "name": "Citadel 0.1.7",
+    "version": "0.1.8",
+    "name": "Citadel 0.1.8",
     "requires": ">=0.1.5",
     "isQuickUpdate": false,
-    "notes": "This update should hopefully fix a few more bugs in Citadel. It also contains a few more changes to prepare the Nirvati release and enables HTTPS for everyone."
+    "notes": "This update moves LND into an app that can not be uninstalled to make updates in the future easier and to prepare for Nirvati. It also fixes a bug that prevented Tailscale from working properly."
 }

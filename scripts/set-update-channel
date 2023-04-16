@@ -6,7 +6,7 @@
 
 NODE_ROOT="$(readlink -f $(dirname "${BASH_SOURCE[0]}")/..)"
 
-# IN ${NODE_ROOT}/.env, change the UPDATE_CHANNEL to the desired channel ($1)
+# In ${NODE_ROOT}/.env, change the UPDATE_CHANNEL to the desired channel ($1)
 # If $1 is not given, fail
 if [ -z "$1" ]; then
     echo "Usage: $0 <channel>"

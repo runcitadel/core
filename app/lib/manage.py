@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -19,21 +19,13 @@ from lib.entropy import deriveEntropy
 scriptDir = os.path.dirname(os.path.realpath(__file__))
 nodeRoot = os.path.join(scriptDir, "..", "..")
 appsDir = os.path.join(nodeRoot, "apps")
-appSystemDir = os.path.join(nodeRoot, "app-system")
-updateIgnore = os.path.join(appsDir, ".updateignore")
+appSystemDir = os.path.join(nodeRoot, "app")
 appDataDir = os.path.join(nodeRoot, "app-data")
 userFile = os.path.join(nodeRoot, "db", "user.json")
 with open(os.path.join(nodeRoot, "db", "dependencies.yml"), "r") as file: 
   dependencies = yaml.safe_load(file)
 
 dotenv = {}
-
-# Returns a list of every argument after the second one in sys.argv joined into a string by spaces
-def getArguments():
-    arguments = ""
-    for i in range(3, len(argv)):
-        arguments += argv[i] + " "
-    return arguments
 
 def get_var_safe(var_name):
     dotenv = parse_dotenv(os.path.join(nodeRoot, ".env"))
@@ -51,17 +43,6 @@ def get_var(var_name):
         print("Error: {} is not defined!".format(var_name))
         exit(1)
 
-def getInstalledVirtualApps():
-    installedApps = []
-    with open(os.path.join(appsDir, "virtual-apps.json"), "r") as f:
-        virtual_apps = json.load(f)
-    userData = getUserData()
-    for virtual_app in virtual_apps.keys():
-        for implementation in virtual_apps[virtual_app]:
-            if "installedApps" in userData and implementation in userData["installedApps"]:
-                installedApps.append(virtual_app)
-    return installedApps
-
 # Converts a string to uppercase, also replaces all - with _
 def convert_to_upper(string):
   return string.upper().replace('-', '_')
@@ -71,9 +52,12 @@ def convert_to_upper(string):
 def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
-
 def update():
     os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
+    print("Generated configuration successfully")
+
+def downloadNew():
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-new /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 def downloadAll():
@@ -120,11 +104,14 @@ def compose(app, arguments):
         "hostname -s 2>/dev/null || echo 'citadel'", shell=True).decode("utf-8").strip() + ".local"
     os.environ["APP_HIDDEN_SERVICE"] = subprocess.check_output("cat {} 2>/dev/null || echo 'notyetset.onion'".format(
         os.path.join(nodeRoot, "tor", "data", "app-{}/hostname".format(app))), shell=True).decode("utf-8").strip()
-    os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
-    # Allow more app seeds, with random numbers from 1-5 assigned in a loop
-    for i in range(1, 6):
-        os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
+    try:
+        os.environ["APP_SEED"] = deriveEntropy("app-{}-seed".format(app))
+        # Allow more app seeds, with random numbers from 1-5 assigned in a loop
+        for i in range(1, 6):
+            os.environ["APP_SEED_{}".format(i)] = deriveEntropy("app-{}-seed{}".format(app, i))
+    except: pass
     os.environ["APP_DATA_DIR"] = os.path.join(appDataDir, app)
+    os.environ["CITADEL_APP_DATA"] = appDataDir
     # Chown and chmod dataDir to have the owner 1000:1000 and the same permissions as appDir
     subprocess.call("chown -R 1000:1000 {}".format(os.path.join(appDataDir, app)), shell=True)
     try:
@@ -135,10 +122,9 @@ def compose(app, arguments):
         subprocess.call("chown -R 33:33 {}".format(os.path.join(appDataDir, app, "data", "nextcloud")), shell=True)
         subprocess.call("chmod -R 770 {}".format(os.path.join(appDataDir, app, "data", "nextcloud")), shell=True)
     os.environ["BITCOIN_DATA_DIR"] = os.path.join(nodeRoot, "bitcoin")
-    os.environ["LND_DATA_DIR"] = os.path.join(nodeRoot, "lnd")
     os.environ["CITADEL_ROOT"] = nodeRoot
     # List all hidden services for an app and put their hostname in the environment
-    hiddenServices: List[str] = getAppHiddenServices(app)
+    hiddenServices: List[str] = getAppRegistryEntry(app).get("hiddenServices", [])
     for service in hiddenServices:
         appHiddenServiceFile = os.path.join(
             nodeRoot, "tor", "data", "app-{}-{}/hostname".format(app, service))
@@ -196,13 +182,13 @@ def setRemoved(app: str):
     with open(userFile, "w") as f:
         json.dump(userData, f)
 
-
-def getAppHiddenServices(app: str):
-    torDir = os.path.join(nodeRoot, "tor", "data")
-    # List all subdirectories of torDir which start with app-${APP}-
-    # but return them without the app-${APP}- prefix
-    results = []
-    for subdir in os.listdir(torDir):
-        if subdir.startswith("app-{}-".format(app)):
-            results.append(subdir[len("app-{}-".format(app)):])
-    return results
+# Gets the app's registry entry from the registry.json file
+# The file is an array of objects, each object is an app's registry entry
+# We can filter by the "id" property to get the app's registry entry
+def getAppRegistryEntry(app: str):
+    with open(os.path.join(appsDir, "registry.json")) as f:
+        registry = json.load(f)
+    for appRegistryEntry in registry:
+        if appRegistryEntry["id"] == app:
+            return appRegistryEntry
+    return None

@@ -28,9 +28,6 @@ check_dependencies () {
 # Check system's dependencies
 check_dependencies readlink dirname ip docker
 
-# Check karen's dependencies
-check_dependencies fswatch
-
 # Check OTA update scripts' dependencies
 check_dependencies rsync jq curl
 
@@ -44,7 +41,7 @@ fi
 
 # Configure Citadel if it isn't already configured
 if [[ ! -f "${CITADEL_ROOT}/statuses/configured" ]]; then
-  NGINX_PORT=${NGINX_PORT:-80} NGINX_SSL_PORT=${NGINX_SSL_PORT:-443} NETWORK="${NETWORK:-mainnet}" "${CITADEL_ROOT}/scripts/configure"
+  CADDY_PORT=${CADDY_PORT:-80} CADDY_HTTPS_PORT=${CADDY_HTTPS_PORT:-443} NETWORK="${NETWORK:-mainnet}" "${CITADEL_ROOT}/scripts/configure"
 fi
 
 echo
@@ -76,6 +73,7 @@ fi
 export DEVICE_HOSTS=$DEVICE_HOSTS
 export DEVICE_IP=$DEVICE_IP
 export DEVICE_HOSTNAME="${DEVICE_HOSTNAME}.local"
+export DEVICE_IP=$DEVICE_IP
 
 # Increase default Docker and Compose timeouts to 240s
 # as bitcoin can take a long while to respond

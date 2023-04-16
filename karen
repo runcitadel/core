@@ -4,8 +4,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import socket
 import os
+import socket
 
 rootDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(rootDir)
@@ -27,7 +27,7 @@ while True:
         trigger = instructions[1]
         instructions.pop(0)
         instructions.pop(0)
-        os.system("events/triggers/{} {}".format(trigger, " ".join(instructions)))
+        os.system("scripts/triggers/{} {}".format(trigger, " ".join(instructions)))
     elif cmd == "exec":
         instructions.pop(0)
         os.system(" ".join(instructions))

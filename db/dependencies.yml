@@ -5,6 +5,5 @@
 compose: v2.17.2
 dashboard: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:54214fbb0e9d7b08771e0c5af912ef1dc4ae1bc1650d8640b74ed01554696beb
 manager: harbor.nirvati.org/citadel/api:main@sha256:12d299d8850d830fa5abd0e64c8537dfcbaec662de18376b0d7b01fa59895132
-middleware: ghcr.io/runcitadel/middleware:main@sha256:cbd5fd2ab5afe420025c61e276d21c79a004d6148b8dfdd58649adb55907682b
-app-cli: harbor.nirvati.org/citadel/app-manager:backports@sha256:e5d54e0559eef96472aca56b9343bfc06f45777283967015dfdbf618d25cadd0
+app-cli: harbor.nirvati.org/citadel/app-manager:main@sha256:b841a27f14aa6785a357c4af3632f5fd98dbf2e3b1530e5a6dcd1175fda94f8a
 tor: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f

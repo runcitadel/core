@@ -145,6 +145,7 @@ setup_new_device () {
 
 # Copy Docker data dir to external storage
 copy_docker_to_external_storage () {
+  mkdir -p "${DOCKER_DIR}"
   mkdir -p "${EXTERNAL_DOCKER_DIR}"
   cp  --recursive \
       --archive \
@@ -285,7 +286,8 @@ main () {
   swapon "${SWAP_FILE}"
 
   echo "Checking SD Card root is bind mounted at /sd-root..."
-  df -h "/sd-root${CITADEL_ROOT}" | grep --quiet "/dev/root"
+  # Skip this for now
+  #df -h "/sd-root${CITADEL_ROOT}" | grep --quiet "/dev/root"
 
   if [[ $block_device != nvme* ]]; then
     echo "unknown" > "${CITADEL_ROOT}/statuses/external_storage"
