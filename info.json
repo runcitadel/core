@@ -1,7 +1,7 @@
 {
-    "version": "0.1.8",
-    "name": "Citadel 0.1.8",
-    "requires": ">=0.1.5",
+    "version": "0.2.0",
+    "name": "Citadel 0.2.0",
+    "requires": ">=0.1.8",
     "isQuickUpdate": false,
-    "notes": "This update moves LND into an app that can not be uninstalled to make updates in the future easier and to prepare for Nirvati. It also fixes a bug that prevented Tailscale from working properly."
+    "notes": "This update unifies the previous 0.1.x and 0.2.x development branches to prepare for 0.3.0."
 }
