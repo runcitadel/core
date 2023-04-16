@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2023 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -53,23 +53,23 @@ def replace_vars(file_content: str):
   return re.sub(r'<(.*?)>', lambda m: get_var(convert_to_upper(m.group(1))), file_content)
 
 def update():
-    os.system("docker run --rm -v {}:/citadel -u 1000:1000 --add-host=host.docker.internal:host-gateway {} /app-cli convert /citadel --caddy-url http://host.docker.internal:2019/".format(nodeRoot, dependencies['app-cli']))
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli convert /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 def downloadNew():
-    os.system("docker run --rm -v {}:/citadel -u 1000:1000 --add-host=host.docker.internal:host-gateway {} /app-cli download-new /citadel".format(nodeRoot, dependencies['app-cli']))
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-new /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 def downloadAll():
-    os.system("docker run --rm -v {}:/citadel -u 1000:1000 --add-host=host.docker.internal:host-gateway {} /app-cli download-apps /citadel".format(nodeRoot, dependencies['app-cli']))
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download-apps /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 def download(app_id):
-    os.system("docker run --rm -v {}:/citadel -u 1000:1000 --add-host=host.docker.internal:host-gateway {} /app-cli download {} --citadel-root /citadel".format(nodeRoot, dependencies['app-cli'], app_id))
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli download {} --citadel-root /citadel".format(nodeRoot, dependencies['app-cli'], app_id))
     print("Generated configuration successfully")
 
 def getAvailableUpdates():
-    os.system("docker run --rm -v {}:/citadel -u 1000:1000 --add-host=host.docker.internal:host-gateway {} /app-cli check-updates /citadel".format(nodeRoot, dependencies['app-cli']))
+    os.system("docker run --rm -v {}:/citadel -u 1000:1000 {} /app-cli check-updates /citadel".format(nodeRoot, dependencies['app-cli']))
     print("Generated configuration successfully")
 
 def getUserData():
