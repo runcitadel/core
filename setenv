@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# SPDX-FileCopyrightText: 2021-2022 Citadel and contributors
+# SPDX-FileCopyrightText: 2021-2024 Citadel and contributors
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,3 +11,5 @@ alias lncli="docker exec -it lnd-service-1 lncli"
 alias bitcoin-cli="docker exec -it bitcoin bitcoin-cli"
 alias docker-compose="sudo docker compose"
 alias docker="sudo docker"
+
+export BOS_DEFAULT_LND_PATH="${CITADEL_ROOT}/app-data/lnd/lnd"
