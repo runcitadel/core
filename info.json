@@ -1,7 +1,7 @@
 {
-    "version": "0.2.0",
-    "name": "Citadel 0.2.0",
-    "requires": ">=0.1.8",
+    "version": "0.2.1",
+    "name": "Citadel 0.2.1",
+    "requires": ">=0.2.0",
     "isQuickUpdate": false,
-    "notes": "This update unifies the previous 0.1.x and 0.2.x development branches to prepare for 0.3.0."
+    "notes": "This update fixes a few minor bugs in 0.2.0."
 }
