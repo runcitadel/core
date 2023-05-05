@@ -1,7 +1,7 @@
 {
-    "version": "0.2.1",
-    "name": "Citadel 0.2.1",
+    "version": "0.2.2",
+    "name": "Citadel 0.2.2",
     "requires": ">=0.2.0",
     "isQuickUpdate": false,
-    "notes": "This update fixes a few minor bugs in 0.2.0."
+    "notes": "This update fixes a few minor bugs in 0.2.x. We're still focusing on Nirvati, so you'll have to wait a bit for the next major update, but we'll keep fixing bugs here."
 }
