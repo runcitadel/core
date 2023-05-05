@@ -64,7 +64,7 @@ services:
     network_mode: host
   bitcoin:
     container_name: bitcoin
-    image: ghcr.io/runcitadel/bitcoinknots:main@sha256:5fbee0f6f0d09d42aacc11c373ffe6162210c42ce21e6eba294e547e3ad80219
+    image: lncm/bitcoind:v24.0@sha256:db19fe46f30acd3854f4f0d239278137d828ce3728f925c8d92faaab1ba8556a
     depends_on:
     - tor
     volumes:
@@ -78,7 +78,7 @@ services:
         ipv4_address: $BITCOIN_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:no-https@sha256:7fc5a5b70496240e6e48a381e8ac3c7978e7343285fda4951c00846580d6216d
+    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:d491387a35d22c8f2bfa9ac474268736064add730cde3c4ff852ff8dea82751d
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -86,7 +86,7 @@ services:
         ipv4_address: $DASHBOARD_IP
   manager:
     container_name: manager
-    image: runcitadel/api:main@sha256:12d299d8850d830fa5abd0e64c8537dfcbaec662de18376b0d7b01fa59895132
+    image: harbor.nirvati.org/citadel/api:main@sha256:bf500e4e518be3fc28502151669aec976c95469201dca003f0068118ebb902f5
     depends_on:
     - tor
     restart: on-failure
