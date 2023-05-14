@@ -78,7 +78,7 @@ services:
         ipv4_address: $BITCOIN_IP
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:citadel-0.0.10@sha256:d491387a35d22c8f2bfa9ac474268736064add730cde3c4ff852ff8dea82751d
+    image: ghcr.io/runcitadel/dashboard:next@sha256:d1a88462f9e1d5a31a20dd07c8b65def9a6499e739a23fb3702bd2fc32d2b15b
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
