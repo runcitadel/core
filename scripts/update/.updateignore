@@ -2,7 +2,7 @@
 bitcoin/*
 /db/*
 lnd/*
-statuses
+statuses/*
 tor/*
 logs/*
 app-data/*
