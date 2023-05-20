@@ -61,7 +61,9 @@
 				{% if entry.is_primary %}
 {{domain}} {
 	{% set container_ip_entry = "APP_" ~ app_id ~ "-" ~ entry.container_name ~ "_IP" | upper | replace(from="-", to="_") %}
-	reverse_proxy {{ ip_map[container_ip_entry] }}:{{ entry.internal_port }}
+	reverse_proxy {{ ip_map[container_ip_entry] }}:{{ entry.internal_port }} {
+		header_up X-Forwarded-Host "{{ domain }}"
+	}
 	{% if https_options.user and https_options.user.username and https_options.user.password and domain is ending_with(".runningcitadel.com") %}
 		tls {
 			dns runningcitadel {{ https_options.user.username }} {{ https_options.user.password }}
