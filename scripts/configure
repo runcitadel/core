@@ -340,6 +340,27 @@ build_template("./templates/.env-sample", "./.env")
 print("Updating app configuration...\n")
 os.system('./scripts/app generate')
 
+# TODO: Remove this, this is just the above again to ensure LND works properly
+
+
+# Run ./scripts/app get-implementation lightning to get the implementation
+# If it fails, install the LND app and set the implementation to LND
+try:
+  implementation = subprocess.check_output("./scripts/app get-implementation lightning", shell=True).decode("utf-8").strip()
+except:
+  print("Installing LND...\n")
+  os.system('./scripts/app install lnd')
+  implementation = "lnd"
+
+# Get APP_<IMPLEMENTATION>_MIDDLEWARE_IP from the .env file
+dotenv=parse_dotenv('./.env')
+MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper().replace("-", "_"))]
+
+build_template("./templates/.env-sample", "./.env")
+
+print("Updating app configuration...\n")
+os.system('./scripts/app generate')
+
 # Touch status_dir/configured
 with open(status_dir+'/configured', 'w') as file:
   file.write('')
