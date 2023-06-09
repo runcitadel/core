@@ -119,6 +119,7 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 cd "$CITADEL_ROOT"
 cp -f apps/lnd/torrc app-data/lnd/torrc
+cp -f apps/lnd/lnd.conf app-data/lnd/lnd.conf
 sudo ./scripts/app stop lnd
 sudo ./scripts/app start lnd
 
