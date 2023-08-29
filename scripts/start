@@ -140,8 +140,8 @@ if [[ "$FIRST_BOOT" == "true" ]]; then
   echo
   echo "Stopping API..."
   echo
-  docker stop api || true
-  docker rm api || true
+  docker stop manager || true
+  docker rm manager || true
   echo
   echo "Starting containers again..."
   echo
