@@ -324,7 +324,7 @@ else:
 
 # Run ./scripts/app get-implementation lightning to get the implementation
 # If it fails, install the LND app and set the implementation to LND
-if not reconfiguring:
+if reconfiguring:
   try:
     implementation = subprocess.check_output("./scripts/app get-implementation lightning", shell=True).decode("utf-8").strip()
   except:
