@@ -39,8 +39,10 @@ if [[ ! -d "$CITADEL_ROOT" ]]; then
   exit 1
 fi
 
+FIRST_BOOT="false"
 # Configure Citadel if it isn't already configured
 if [[ ! -f "${CITADEL_ROOT}/statuses/configured" ]]; then
+  FIRST_BOOT="true"
   CADDY_PORT=${CADDY_PORT:-80} CADDY_HTTPS_PORT=${CADDY_HTTPS_PORT:-443} NETWORK="${NETWORK:-mainnet}" "${CITADEL_ROOT}/scripts/configure"
 fi
 
@@ -103,9 +105,11 @@ echo "Starting decoy backup trigger..."
 echo
 ./scripts/backup/decoy-trigger &>> "${CITADEL_LOGS}/backup-decoy-trigger.log" &
 
-echo "Resetting config files"
-echo
-./scripts/configure
+if [[ "$FIRST_BOOT" == "false" ]]; then
+  echo "Updating config files"
+  echo
+  ./scripts/configure
+fi
 
 echo
 echo "Starting Docker services..."
@@ -122,6 +126,17 @@ echo
 if [[ -f "${CITADEL_ROOT}/db/user.json.lock" ]]; then
   echo "WARNING: The user file was locked, Citadel probably wasn't shut down properly"
   rm "${CITADEL_ROOT}/db/user.json.lock"
+fi
+
+
+if [[ "$FIRST_BOOT" == "true" ]]; then
+  echo "Updating config files"
+  echo
+  ./scripts/configure
+  echo
+  echo "Restarting Caddy..."
+  echo
+  docker restart caddy
 fi
 
 echo
