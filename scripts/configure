@@ -317,7 +317,7 @@ except: pass
 
 if not reconfiguring:
   print("Downloading apps...\n")
-  os.system('./scripts/app update --setup')
+  os.system('./scripts/app update')
 else:
   print("Generating app configuration...\n")
   os.system('./scripts/app generate')
