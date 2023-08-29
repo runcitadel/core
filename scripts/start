@@ -137,6 +137,18 @@ if [[ "$FIRST_BOOT" == "true" ]]; then
   echo "Restarting Caddy..."
   echo
   docker restart caddy
+  echo
+  echo "Stopping API..."
+  echo
+  docker stop api || true
+  docker rm api || true
+  echo
+  echo "Starting containers again..."
+  echo
+  docker compose up --detach --build --remove-orphans || {
+    echo "Failed to start containers"
+    exit 1
+  }
 fi
 
 echo
