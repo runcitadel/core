@@ -12,6 +12,7 @@ services:
     networks:
       default:
         ipv4_address: $TOR_PROXY_IP
+        ipv6_address: $TOR_PROXY_IP6
     extra_hosts:
     - host.docker.internal:host-gateway
   app-tor:
@@ -25,6 +26,7 @@ services:
     networks:
       default:
         ipv4_address: $APPS_TOR_IP
+        ipv6_address: $APPS_TOR_IP6
     extra_hosts:
     - host.docker.internal:host-gateway
   app-2-tor:
@@ -38,6 +40,7 @@ services:
     networks:
       default:
         ipv4_address: $APPS_2_TOR_IP
+        ipv6_address: $APPS_2_TOR_IP6
     extra_hosts:
     - host.docker.internal:host-gateway
   app-3-tor:
@@ -51,6 +54,7 @@ services:
     networks:
       default:
         ipv4_address: $APPS_3_TOR_IP
+        ipv6_address: $APPS_3_TOR_IP6
     extra_hosts:
     - host.docker.internal:host-gateway
   caddy:
@@ -76,6 +80,7 @@ services:
     networks:
       default:
         ipv4_address: $BITCOIN_IP
+        ipv6_address: $BITCOIN_IP6
   dashboard:
     container_name: dashboard
     image: ghcr.io/runcitadel/dashboard:next@sha256:d1a88462f9e1d5a31a20dd07c8b65def9a6499e739a23fb3702bd2fc32d2b15b
@@ -84,6 +89,7 @@ services:
     networks:
       default:
         ipv4_address: $DASHBOARD_IP
+        ipv6_address: $DASHBOARD_IP6
   manager:
     container_name: manager
     image: harbor.nirvati.org/citadel/api:main@sha256:bf500e4e518be3fc28502151669aec976c95469201dca003f0068118ebb902f5
@@ -135,6 +141,7 @@ services:
     networks:
       default:
         ipv4_address: $MANAGER_IP
+        ipv6_address: $MANAGER_IP6
   i2p:
     container_name: i2p
     user: 1000:1000
@@ -148,13 +155,18 @@ services:
     networks:
       default:
         ipv4_address: $I2P_IP
+        ipv6_address: $I2P_IP6
 networks:
   default:
     name: citadel_main_network
+    enable_ipv6: true
     ipam:
       driver: default
       config:
       - subnet: $NETWORK_IP/24
+        gateway: $GATEWAY_IP
+      - subnet: $NETWORK_IP6/96
+        gateway: $GATEWAY_IP6
 volumes:
   jwt-public-key:
     name: citadel-jwt-public-key

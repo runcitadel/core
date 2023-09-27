@@ -225,6 +225,22 @@ APPS_2_TOR_IP="10.21.21.11"
 APPS_3_TOR_IP="10.21.21.12"
 I2P_IP="10.21.21.13"
 
+
+# IP6 addresses for services
+NETWORK_IP6="fd00::21:0:0:0"
+GATEWAY_IP6="fd00::21:0:0:1"
+DASHBOARD_IP6="fd00::21:0:0:3"
+MANAGER_IP6="fd00::21:0:0:4"
+#MIDDLEWARE_IP6="fd00::21:0:0:5"
+#NEUTRINO_SWITCHER_IP6="fd00::21:0:0:6"
+BITCOIN_IP6="fd00::21:0:0:7"
+#LND_IP6="fd00::21:0:0:8"
+TOR_PROXY_IP6="fd00::21:0:0:9"
+APPS_TOR_IP6="fd00::21:0:0:10"
+APPS_2_TOR_IP6="fd00::21:0:0:11"
+APPS_3_TOR_IP6="fd00::21:0:0:12"
+I2P_IP6="fd00::21:0:0:13"
+
 # Ports
 BITCOIN_RPC_PORT="8332"
 BITCOIN_P2P_PORT="8333"
@@ -294,6 +310,7 @@ build_template("./templates/bitcoin-sample.conf", "./bitcoin/bitcoin.conf")
 build_template("./templates/i2p-sample.conf", "./i2p/i2pd.conf")
 build_template("./templates/i2p-tunnels-sample.conf", "./i2p/tunnels.conf")
 MIDDLEWARE_IP="NOT_YET_SET"
+MIDDLEWARE_IP6="NOT_YET_SET"
 build_template("./templates/.env-sample", "./.env")
 
 print("Ensuring Docker Compose is up to date...")
@@ -336,8 +353,10 @@ if reconfiguring:
 if reconfiguring:
   dotenv=parse_dotenv('./.env')
   MIDDLEWARE_IP = dotenv["APP_{}_MIDDLEWARE_IP".format(implementation.upper().replace("-", "_"))]
+  MIDDLEWARE_IP6 = dotenv["APP_{}_MIDDLEWARE_IP6".format(implementation.upper().replace("-", "_"))]
 else:
   MIDDLEWARE_IP = "0.0.0.0"
+  MIDDLEWARE_IP6 = "::"
 
 build_template("./templates/.env-sample", "./.env")
 
