@@ -1,7 +1,7 @@
 {
-    "version": "0.2.4",
-    "name": "Citadel 0.2.4",
+    "version": "0.2.6",
+    "name": "Citadel 0.2.6",
     "requires": ">=0.2.0",
     "isQuickUpdate": false,
-    "notes": "This update fixes a bug that prevented the connect wallet menu from working for Lightning wallets and also updates Bitcoin Core, and fixes a bug in 0.2.3 that caused LND to crash after the update. We're still focusing on Nirvati, so you'll have to wait a bit for the next major update, but we'll keep fixing bugs here."
+    "notes": "This update fixes a very large amount bugs, prepares for Citadel 0.3.0 LTS, includes up-to-date dependencies and prepares a few new features behind the scenes."
 }

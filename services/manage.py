@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-from typing import List
 import yaml
 import os
 import argparse
