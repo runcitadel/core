@@ -16,3 +16,4 @@ bitcoin:
   networks:
     default:
       ipv4_address: $BITCOIN_IP
+      ipv6_address: $BITCOIN_IP6

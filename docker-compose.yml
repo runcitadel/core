@@ -83,7 +83,7 @@ services:
         ipv6_address: $BITCOIN_IP6
   dashboard:
     container_name: dashboard
-    image: ghcr.io/runcitadel/dashboard:next@sha256:d1a88462f9e1d5a31a20dd07c8b65def9a6499e739a23fb3702bd2fc32d2b15b
+    image: harbor.nirvati.org/citadel/dashboard:latest@sha256:7f7e6953036c25c3a09d89c566c36965713c559fbd920676336cebff75009870
     restart: on-failure
     stop_grace_period: 1m30s
     networks:
@@ -92,7 +92,7 @@ services:
         ipv6_address: $DASHBOARD_IP6
   manager:
     container_name: manager
-    image: harbor.nirvati.org/citadel/api:main@sha256:bf500e4e518be3fc28502151669aec976c95469201dca003f0068118ebb902f5
+    image: harbor.nirvati.org/citadel/api:latest@sha256:bf500e4e518be3fc28502151669aec976c95469201dca003f0068118ebb902f5
     depends_on:
     - tor
     restart: on-failure
