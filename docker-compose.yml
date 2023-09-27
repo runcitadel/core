@@ -150,7 +150,7 @@ services:
     volumes:
     - ${PWD}/i2p:/home/i2pd/data
     restart: on-failure
-    stop_grace_period: 1m
+    stop_grace_period: 10s
     init: true
     networks:
       default:
