@@ -122,8 +122,8 @@ services:
       BITCOIN_RPC_PORT: $BITCOIN_RPC_PORT
       BITCOIN_RPC_USER: $BITCOIN_RPC_USER
       BITCOIN_RPC_PASSWORD: $BITCOIN_RPC_PASS
-      GITHUB_REPO: runcitadel/core
-      GITHUB_BRANCH: ${UPDATE_CHANNEL:-"stable"}
+      GITLAB_REPO: nirvati/citadel/lts/core
+      GITLAB_BRANCH: ${UPDATE_CHANNEL:-"stable"}
       VERSION_FILE: /info.json
       UPDATE_LOCK_FILE: /statuses/update-in-progress
       BACKUP_STATUS_FILE: /statuses/backup-status.json
