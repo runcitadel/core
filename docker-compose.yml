@@ -92,7 +92,7 @@ services:
         ipv6_address: $DASHBOARD_IP6
   manager:
     container_name: manager
-    image: harbor.nirvati.org/citadel/api:latest@sha256:1cbbfe1fd31a370e2027377138d27f28a8b570424394be4459a798d5aa06c55b
+    image: harbor.nirvati.org/citadel/api:latest@sha256:801e82a8451dd7a39d4d9fd78743b6a0037cf806479d85753e21518be28a6c8f
     depends_on:
     - tor
     restart: on-failure
