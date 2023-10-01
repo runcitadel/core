@@ -59,7 +59,7 @@ services:
     - host.docker.internal:host-gateway
   caddy:
     container_name: caddy
-    image: ghcr.io/runcitadel/caddy:main@sha256:a64ed99ad821ab53119c5e314aab47b37406c5d6caf1ec0bcd65c8da981823d8
+    image: harbor.nirvati.org/citadel/caddy:latest@sha256:3fd2fafd654cc27db35c13a7591d5428145cc15aaf5f41b771cb3fe6728db4c8
     volumes:
     - ${PWD}/caddy/data:/data
     - ${PWD}/caddy/Caddyfile:/etc/caddy/Caddyfile

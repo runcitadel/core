@@ -1,6 +1,1 @@
-{
-    "state": "success",
-    "progress": 100,
-    "description": "",
-    "updateTo": ""
-}
+{"state": "success", "progress": 100, "description": "Update successful", "updateTo": ""}
