@@ -3,5 +3,5 @@
     "name": "Citadel 0.2.6",
     "requires": ">=0.2.0",
     "isQuickUpdate": false,
-    "notes": "This update fixes a very large amount bugs, prepares for Citadel 0.3.0 LTS, includes up-to-date dependencies and prepares a few new features behind the scenes."
+    "notes": "This update fixes a very large amount bugs, prepares for Citadel 0.3.0 LTS, includes up-to-date dependencies and prepares a few new features behind the scenes. Important: After this update, you should be offered an upgrade to Citadel v0.2.7. This is just a test of the update system, and if you do not see this update, please contact us."
 }
