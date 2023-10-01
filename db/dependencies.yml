@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 compose: v2.22.0
-dashboard: harbor.nirvati.org/citadel/dashboard:latest@sha256:7f7e6953036c25c3a09d89c566c36965713c559fbd920676336cebff75009870
-manager: harbor.nirvati.org/citadel/api:latest@sha256:bf500e4e518be3fc28502151669aec976c95469201dca003f0068118ebb902f5
+dashboard: harbor.nirvati.org/citadel/dashboard:latest@sha256:cdbfe78b1f148b419f1c8d0f8baa2919e8384cfc65bf64de46e292f63ea7c03b
+manager: harbor.nirvati.org/citadel/api:latest@sha256:1cbbfe1fd31a370e2027377138d27f28a8b570424394be4459a798d5aa06c55b
 app-cli: harbor.nirvati.org/citadel/app-manager:latest@sha256:a1632e60c4a19d88dc10eff07fe0d681ca171386e335996b364620d5e31420e8
-tor: ghcr.io/runcitadel/tor-latest:main@sha256:761948a86f8367238eb61f991cf87094b12a8a772be0eabec00d66164d13075f
+tor: harbor.nirvati.org/citadel/tor:latest@sha256:fce68374eab2f44d0139f39b8514596ade385652f14a40dc35d66336d767561d
