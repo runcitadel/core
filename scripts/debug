@@ -149,6 +149,12 @@ if [[ "${1}" == "--run" ]]; then
     docker compose logs --tail=30 app-tor
     docker compose logs --tail=30 app-2-tor
     docker compose logs --tail=30 app-3-tor
+
+    echo
+    echo "API logs"
+    echo "--------"
+    echo
+    docker compose logs --tail=70 api
     
     installed_apps=$(./scripts/app ls-installed)
     if [[ ! -z "${installed_apps:-}" ]]; then
