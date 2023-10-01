@@ -23,15 +23,6 @@ echo
 
 [[ -f "/etc/default/citadel" ]] && source "/etc/default/citadel"
 
-# If ${CITADEL_ROOT}/c-lightning exists, fail
-if [[ -d "${CITADEL_ROOT}/c-lightning" ]]; then
-    echo "This update is not compatible with the c-lightning beta."
-    cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 1, "description": "This update is not compatible with c-lightning", "updateTo": "$RELEASE"}
-EOF
-    exit 1
-fi
-
 # Make Citadel OS specific updates
 if [[ ! -z "${CITADEL_OS:-}" ]]; then
     echo
@@ -111,17 +102,6 @@ cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 EOF
 cd "$CITADEL_ROOT"
 ./scripts/start || true
-
-# Start updated containers
-echo "Updating LND Tor config file"
-cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
-{"state": "installing", "progress": 90, "description": "Updating LND Tor config file", "updateTo": "$RELEASE"}
-EOF
-cd "$CITADEL_ROOT"
-cp -f apps/lnd/torrc app-data/lnd/torrc
-cp -f apps/lnd/lnd.conf app-data/lnd/lnd.conf
-sudo ./scripts/app stop lnd
-sudo ./scripts/app start lnd
 
 cat <<EOF > "$CITADEL_ROOT"/statuses/update-status.json
 {"state": "success", "progress": 100, "description": "Successfully installed Citadel $RELEASE", "updateTo": ""}
